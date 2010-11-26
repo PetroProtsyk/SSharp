@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D6B6380D-55FF-4201-AB10-EB70F795B125}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Scripting.SSharp.GrammarGenerator</RootNamespace>
+    <AssemblyName>Scripting.SSharp.GrammarGenerator</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Binaries\NET\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\Binaries\NET\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Ast\AScriptAstTemplate.cs" />
+    <Compile Include="Ast\AstNode.cs" />
+    <Compile Include="Ast\AstNodeArgs.cs" />
+    <Compile Include="Ast\IAstVisitor.cs" />
+    <Compile Include="Ast\ScriptArrayConstructor.cs" />
+    <Compile Include="Ast\ScriptArrayResolution.cs" />
+    <Compile Include="Ast\ScriptAssignExpr.cs" />
+    <Compile Include="Ast\ScriptAst.cs" />
+    <Compile Include="Ast\ScriptBinExpr.cs" />
+    <Compile Include="Ast\ScriptCompoundStatement.cs" />
+    <Compile Include="Ast\ScriptCondition.cs" />
+    <Compile Include="Ast\ScriptConstExpr.cs" />
+    <Compile Include="Ast\ScriptElements.cs" />
+    <Compile Include="Ast\ScriptExpr.cs" />
+    <Compile Include="Ast\ScriptExprList.cs" />
+    <Compile Include="Ast\ScriptFlowControlStatement.cs" />
+    <Compile Include="Ast\ScriptForEachStatement.cs" />
+    <Compile Include="Ast\ScriptForStatement.cs" />
+    <Compile Include="Ast\ScriptFuncContract.cs" />
+    <Compile Include="Ast\ScriptFuncContractInv.cs" />
+    <Compile Include="Ast\ScriptFuncContractPost.cs" />
+    <Compile Include="Ast\ScriptFuncContractPre.cs" />
+    <Compile Include="Ast\ScriptFuncParameters.cs" />
+    <Compile Include="Ast\ScriptFunctionCall.cs" />
+    <Compile Include="Ast\ScriptFunctionDefinition.cs" />
+    <Compile Include="Ast\ScriptGenericsPostfix.cs" />
+    <Compile Include="Ast\ScriptGlobalList.cs" />
+    <Compile Include="Ast\ScriptIfStatement.cs" />
+    <Compile Include="Ast\ScriptIsExpr.cs" />
+    <Compile Include="Ast\ScriptMetaExpr.cs" />
+    <Compile Include="Ast\ScriptMObject.cs" />
+    <Compile Include="Ast\ScriptMObjectPart.cs" />
+    <Compile Include="Ast\ScriptNewArrStmt.cs" />
+    <Compile Include="Ast\ScriptNewStmt.cs" />
+    <Compile Include="Ast\ScriptProg.cs" />
+    <Compile Include="Ast\ScriptQualifiedName.cs" />
+    <Compile Include="Ast\ScriptRefExpr.cs" />
+    <Compile Include="Ast\ScriptStatement.cs" />
+    <Compile Include="Ast\ScriptSwitchCaseStatement.cs" />
+    <Compile Include="Ast\ScriptSwitchDefaultStatement.cs" />
+    <Compile Include="Ast\ScriptSwitchRootStatement.cs" />
+    <Compile Include="Ast\ScriptSwitchStatement.cs" />
+    <Compile Include="Ast\ScriptTryCatchFinallyStatement.cs" />
+    <Compile Include="Ast\ScriptTypeConstructor.cs" />
+    <Compile Include="Ast\ScriptTypeConvertExpr.cs" />
+    <Compile Include="Ast\ScriptTypeExpr.cs" />
+    <Compile Include="Ast\ScriptTypeExprList.cs" />
+    <Compile Include="Ast\ScriptUnaryExpr.cs" />
+    <Compile Include="Ast\ScriptUsingStatement.cs" />
+    <Compile Include="Ast\ScriptVarExpr.cs" />
+    <Compile Include="Ast\ScriptWhileStatement.cs" />
+    <Compile Include="Ast\TokenAst.cs" />
+    <Compile Include="Common.cs" />
+    <Compile Include="CompilerContext.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="Exceptions.cs" />
+    <Compile Include="Grammar\FastParserGenerator.cs" />
+    <Compile Include="Grammar\Grammar.cs" />
+    <Compile Include="Grammar\GrammarData.cs" />
+    <Compile Include="Grammar\GrammarDataBuilder.cs" />
+    <Compile Include="Grammar\GrammarExpression.cs" />
+    <Compile Include="Grammar\GrammarTerm.cs" />
+    <Compile Include="Grammar\NonTerminal.cs" />
+    <Compile Include="Grammar\Parser.cs" />
+    <Compile Include="Grammar\ParserStack.cs" />
+    <Compile Include="Grammar\Scanner.cs" />
+    <Compile Include="Grammar\SourceFile.cs" />
+    <Compile Include="Grammar\Terminal.cs" />
+    <Compile Include="LanguageCompiler.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SyntaxError.cs" />
+    <Compile Include="Terminals\CommentTerminal.cs" />
+    <Compile Include="Terminals\IdentifierTerminal.cs" />
+    <Compile Include="Terminals\NumberLiteral.cs" />
+    <Compile Include="Terminals\RegExBasedTerminal.cs" />
+    <Compile Include="Terminals\StringLiteral.cs" />
+    <Compile Include="Terminals\SymbolTerminal.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,29 @@
+ //Global scope
+
+           { //Local scope 1
+             var a; //Create empty variable in local scope 1
+
+             {//Local scope 2
+
+               //This will set variable to top-most scope which contains 
+               //definition for variable, which is Local scope 1              
+               a = 5;
+                
+               { //Local scope 3
+                 
+                 var a; //Create empty variable in local scope 3
+             
+                 //This will set variable to top-most scope which contains 
+                 //definition for variable, which is Local scope 1
+                 global:a = 4;
+                 
+                 a = 3; // Set local variable
+               }
+             }
+             
+             //Create variable in global scope equal to current value of a in this scope
+             b = a;
+           }
+
+           //b = 4;
+Test.AreEqual(4, b);

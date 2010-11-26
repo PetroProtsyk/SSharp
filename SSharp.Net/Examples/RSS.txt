@@ -1,0 +1,7 @@
+//Script.NET examples
+//(c)2007-2009, Protsyk Petro, http://www.protsyk.com
+
+  a = new XmlDocument();
+  a.Load("http://protsyk.com/cms/?feed=rss2&cat=10");
+  foreach (n in a.SelectNodes('/rss/channel/item'))
+     Console.WriteLine(n['title'].InnerText + ' ' + n['link'].InnerText);

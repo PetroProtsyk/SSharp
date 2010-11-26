@@ -1,0 +1,8 @@
+a = new List<|string|>();
+
+a.Add("Hello");
+a.Add("World");
+
+s = String.Join(" ", a.ToArray());
+
+Test.AreEqual("Hello World", s);

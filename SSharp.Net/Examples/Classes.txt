@@ -1,0 +1,33 @@
+//Implementation of classes in Script.NET
+//Please use latest version to run this sample
+//
+//
+//S#
+//09.04.2008
+//http://www.protsyk.com/scriptdotnet
+
+
+         school =
+          [
+            classes ->
+              [
+                A->['Alexey', 'Ivan','John'],
+                B->['Petr','Valya','Masha','Joe']
+              ],
+
+             GetClasses->function ()
+              {
+                foreach(class in body.classes.Fields)
+                   Console.WriteLine(class);
+              },
+
+             GetClass->function (name)
+              {
+                foreach(student in body.classes[name] )
+                   Console.WriteLine(student);
+              }
+
+          ];
+
+         school.GetClasses();
+         school.GetClass('B');

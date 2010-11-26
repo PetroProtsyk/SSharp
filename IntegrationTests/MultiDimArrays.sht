@@ -1,0 +1,13 @@
+           a = new int[3,3];
+           c = 1;
+           for (i=0; i<3; i++)
+            for (j=0; j<3; j++){
+             a[i,j] = c; c++;
+            }
+
+           s = '';
+           for (i=0; i<3; i++)
+            for (j=0; j<3; j++)
+              s += a[i,j];
+
+           Test.AreEqual('123456789',s);

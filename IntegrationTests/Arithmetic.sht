@@ -1,0 +1,28 @@
+a = 1.0;
+b = 2.0; 
+c = 3.0; 
+d = 2.0;
+e = 18.0;
+f = 6.0;
+
+p = 2.0; u = 3.0; v = 1.0; r = 2.0; s = 5.0; t = 12.0;
+
+// r1 = 9
+r1 = a + b + c*d;
+Test.AreEqual(9d, r1);
+
+// r2 = -2.5
+r2 = a*(b - c/d )- e/f;
+Test.AreEqual(-2.5, r2);
+
+//r3 = -4.5
+r3 = a*b*((c - d )*a - p*(u - v)*(r + s))/t;
+Test.AreEqual(-4.5, r3);
+
+//r4 = 65536
+r4 = 2 * d^(c*5);
+Test.AreEqual(65536d, r4);
+
+//r5 = 2
+r5 = 5 % 3;
+Test.AreEqual(2, r5);

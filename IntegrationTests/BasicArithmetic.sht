@@ -1,0 +1,12 @@
+a = 1;
+b = 2;
+
+Test.AreEqual(3, a+b);
+
+a = 3.14;
+b = 2;
+
+Test.AreEqual(6.28, a*b);
+
+Test.AreEqual(1024d, 2^10);
+Test.AreEqual(1024d, 2^(5*2));

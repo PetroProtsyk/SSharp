@@ -1,0 +1,23 @@
+//Script.NET examples
+//(c)2007-2009, Protsyk Petro, http://www.protsyk.com
+
+          function GCD(a,b){
+           if (a>b) return GCD(a-b,b);
+           else
+            if (b>a) return GCD(a,b-a);
+           else
+             return a;
+          }
+
+          function GCD_fast(a,b){
+
+           while ( a!=b )
+           {
+             if (a>b) a = a-b;
+             else    
+              if (b>a) b = b-a;
+           }          
+           return a;
+          }
+
+          return 'GCD='+GCD_fast(12,4);

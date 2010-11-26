@@ -1,0 +1,15 @@
+a = true;
+b = false;
+
+c = a | b;
+
+Test.IsTrue(c);
+
+c = a & b;
+
+Test.IsTrue(!c);
+
+a = 2d;
+c = a is double;
+
+Test.IsTrue(c);

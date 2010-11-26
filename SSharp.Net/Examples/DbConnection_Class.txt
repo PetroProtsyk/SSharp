@@ -1,0 +1,50 @@
+//Script.NET examples
+//(c)2007-2009, Protsyk Petro, http://www.protsyk.com
+  
+db = [
+       ConnectionString -> "Data Source=PPROTSYK\\SQLEXPRESS;Initial Catalog=TestBase;Integrated Security=True",
+      
+       Init -> function ()
+       {
+          sql = DbProviderFactories.GetFactory("System.Data.SqlClient");
+          connection = sql.CreateConnection();
+          connection.ConnectionString = me.ConnectionString;
+          connection.Open();
+          
+          me.Connection = connection;
+          me.Sql = sql;
+       },
+       
+       
+       ExecSql -> function (query)
+       {
+         command = me.Sql.CreateCommand();
+         command.Connection = me.Connection;
+         command.CommandText = query;
+
+         return command.ExecuteReader();  
+       },
+       
+       Free -> function()
+       {
+         if (me.Connection != null)
+         {
+          me.Connection.Dispose();
+         }
+       }
+     ];
+      
+
+db.Init();
+
+ reader = db.ExecSql("select * from Table_1");
+ while (reader.Read())
+ {
+   Console.WriteLine(reader["ID"]+". "+ reader["Name"]);
+ }
+ 
+db.Free();
+
+
+
+

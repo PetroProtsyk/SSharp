@@ -1,0 +1,19 @@
+//Script.NET examples
+//(c)2007-2009, Protsyk Petro, http://www.protsyk.com
+  
+      sql = DbProviderFactories.GetFactory("System.Data.SqlClient");
+      connection = sql.CreateConnection();
+      connection.ConnectionString = "Data Source=PPROTSYK\\SQLEXPRESS;Initial Catalog=TestBase;Integrated Security=True";
+      connection.Open();
+
+      command = sql.CreateCommand();
+      command.Connection = connection;
+      command.CommandText = "select * from Table_1";
+
+
+      reader = command.ExecuteReader();
+      while (reader.Read())
+      {
+        Console.WriteLine(reader["ID"]+". "+ reader["Name"]);
+      }
+      connection.Dispose();

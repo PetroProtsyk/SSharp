@@ -1,0 +1,15 @@
+//Script.NET examples
+//(c)2007-2009, Protsyk Petro, http://www.protsyk.com
+
+function Draw(level)
+{
+ Console.WriteLine(level);
+ if (level>1)
+ {
+   level = level - 1;
+   Draw(level);
+   Draw(level);
+ }
+}
+
+Draw(4);

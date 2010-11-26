@@ -1,0 +1,9 @@
+//Script.NET examples
+//(c)2007-2009, Protsyk Petro, http://www.protsyk.com
+
+using (Math)
+{
+  //Build-in Objects
+  //using the Pow function from Math class
+  a = Pow(2, 3);
+}

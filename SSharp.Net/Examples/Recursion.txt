@@ -1,0 +1,14 @@
+//Script.NET examples
+//(c)2007-2009, Protsyk Petro, http://www.protsyk.com
+
+          function fib(n){
+           if (n==1) return 1;
+           else if (n==2) return 2;
+           else return fib(n-1)+fib(n-2);
+          }
+
+          function fac(n){
+           if (n==1) return 1;
+           else return n*fac(n-1);
+          }
+          return 'Rez=' + (fac(5) + fib(3));

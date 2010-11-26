@@ -1,0 +1,9 @@
+loop = 1000000;
+
+while(loop>0)
+{
+ loop = loop - 1;
+ 
+ counter = 817 + 1+(2+3)*10+15;
+}
+

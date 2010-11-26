@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="DesktopBuild" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Do not edit this -->
+  <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\TeamBuild\Microsoft.TeamFoundation.Build.targets" />
+
+  <ProjectExtensions>
+    <Description>S# build</Description>
+    <BuildMachine></BuildMachine>
+  </ProjectExtensions>
+  <PropertyGroup>
+    <RunTest>true</RunTest>
+    <RunCodeAnalysis>Always</RunCodeAnalysis>
+    <BuildSolutionsInParallel>false</BuildSolutionsInParallel>
+  </PropertyGroup>
+  <ItemGroup>
+    <SolutionToBuild Include="$(SolutionRoot)\SSharp.sln">
+      <Properties>NoWarn=$(NoWarn),1607</Properties>
+    </SolutionToBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ConfigurationToBuild Include="Debug|Any CPU">
+      <FlavorToBuild>Debug</FlavorToBuild>
+      <PlatformToBuild>Any CPU</PlatformToBuild>
+    </ConfigurationToBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <MetaDataFile Include="$(SolutionRoot)\SSharp.vsmdi">
+      <TestList>AllTests</TestList>
+    </MetaDataFile>
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalReferencePath Include="$(SolutionRoot)\LibImports" />
+  </ItemGroup>
+
+  <Target Name="BeforeCompile">
+  </Target>
+
+  <Target Name="PackageBinaries">
+  </Target>
+
+  <Target Name="BeforeTest">
+  </Target>
+
+  <Target Name="AfterTest">
+  </Target>
+
+</Project>

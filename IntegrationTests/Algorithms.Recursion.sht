@@ -1,0 +1,17 @@
+s = 0;
+
+function Draw(level)
+{
+ global:s++;
+
+ if (level>1)
+ {
+   level = level - 1;
+   Draw(level);
+   Draw(level);
+ }
+}
+
+Draw(10);
+
+Test.AreEqual((int)(2^10-1), s);

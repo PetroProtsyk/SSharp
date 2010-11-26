@@ -1,0 +1,11 @@
+function DotProduct(a,b){
+ return a.x*b.x + a.y*b.y;
+}
+
+function Scale(a, s){
+ return [x->a.x*s, y->a.y*s];
+}
+
+
+Test.AreEqual(19, DotProduct([x->1, y->3], [x->4, y->5]));
+Test.AreEqual(5.1, Scale([x->0.51, y->3], 10).x);

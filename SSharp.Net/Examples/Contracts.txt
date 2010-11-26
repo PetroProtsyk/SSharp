@@ -1,0 +1,34 @@
+//Script.NET examples
+//(c)2007-2009, Protsyk Petro, http://www.protsyk.com
+
+function Push(item)
+[
+ pre(me.Count < 10 );
+ post();
+ invariant();
+]
+{
+ me.Push(item);
+}
+
+function Pop()
+[
+ pre(me.Count > 0);
+ post();
+ invariant();
+]
+{
+ return me.Pop();
+}
+
+stack = new Stack<|int|>();
+
+//Create Mutant
+mObject = [ Push -> Push, Pop -> Pop ];
+mObject.Mutate(stack);
+
+for (i=0; i<5; i++)
+  mObject.Push(i);
+
+Console.WriteLine((string)mObject.Pop());
+

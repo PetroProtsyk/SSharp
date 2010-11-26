@@ -1,0 +1,10 @@
+a = [
+ x -> 2,
+ y -> 3];
+
+a.Name = "Hello";
+
+
+Test.AreEqual("Hello", a.Name);
+Test.AreEqual(2, a.x);
+Test.AreEqual(3, a.y);

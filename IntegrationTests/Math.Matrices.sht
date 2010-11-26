@@ -1,0 +1,44 @@
+m = [
+ r->3,
+ c->3,
+ v->[1,2,3,
+     4,5,6,
+     7,8,9],
+
+ cell->function(row,col){
+   return me.v[me.c*row + col];
+ },
+
+ set->function(row,col,val){
+   me.v[me.c*row + col] = val;
+ }
+
+];
+
+Test.AreEqual(6, m.cell(1,2));
+
+function MatProduct(a,b){
+ rez = [
+  r->a.r,
+  c->b.c,
+  v->new double[a.r*b.c],
+  cell->a.cell,
+  set->a.set
+ ];
+ 
+ for(i=0; i<a.r; i++){
+   for (j=0; j<b.c; j++){
+    s = 0;
+    for (v=0; v<a.c; v++){
+      s+= a.cell(i,v)*b.cell(v,j);
+    } 
+
+    rez.set(i,j,s);
+   }
+ }
+
+ return rez;
+}
+
+r = MatProduct(m,m);
+Test.AreEqual(30d, r.cell(0,0));

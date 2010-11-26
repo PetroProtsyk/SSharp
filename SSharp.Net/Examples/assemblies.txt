@@ -1,0 +1,5 @@
+//Script.NET examples
+//(c)2007-2009, Protsyk Petro, http://www.protsyk.com
+
+foreach (a in AppDomain.CurrentDomain.GetAssemblies())
+ Console.WriteLine(a);

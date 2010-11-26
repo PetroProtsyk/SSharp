@@ -1,0 +1,12 @@
+a = [
+ x -> 4,
+ y -> 3,
+ 
+ length -> function() {
+       Math.Sqrt(me.x^2+me.y^2);
+ } 
+
+];
+
+
+Test.AreEqual(5.0, a.length());

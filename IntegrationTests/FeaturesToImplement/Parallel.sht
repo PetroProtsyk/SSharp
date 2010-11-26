@@ -1,0 +1,35 @@
+N = 1000000;
+l = new List<|int|>(N);
+for (i = 0; i < N; i++) l.Add(i);
+
+function calc(x){
+  return 1;
+}
+
+for (j = 0; j < 5; j++){
+
+ sw = Stopwatch.StartNew();
+ s2 = l.AsParallel<|int|>().Max<|int|>();
+ Console.WriteLine("Time for parallel:" +sw.ElapsedMilliseconds+" result:"+s2);
+
+ sw = Stopwatch.StartNew();
+ s1 = l.Max<|int|>();
+ Console.WriteLine("Time for 1 thread:" + sw.ElapsedMilliseconds+" result:"+s1);
+
+}
+
+for (j = 0; j < 5; j++){
+
+ sw = Stopwatch.StartNew();
+ s1 = l.Sum<|int|>();
+ Console.WriteLine("Time for 1 thread:" + sw.ElapsedMilliseconds+" result:"+s1);
+
+ sw = Stopwatch.StartNew();
+ s2 = l.AsParallel<|int|>().Sum<|int|>();
+ Console.WriteLine("Time for parallel:" +sw.ElapsedMilliseconds+" result:"+s2);
+
+}
+
+//al = ArrayList.Synchronized(new ArrayList());
+//l.AsParallel<|int|>().ForAll(function(l1){ al.Add( l1*l1 ); });
+

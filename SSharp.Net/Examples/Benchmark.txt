@@ -1,0 +1,11 @@
+//Script.NET examples
+//(c)2007-2009, Protsyk Petro, http://www.protsyk.com
+
+loop = 1000000;
+counter = 0;
+while(loop>0)
+{
+ loop = loop - 1;
+ counter = counter + 1;
+}
+Console.WriteLine(counter);

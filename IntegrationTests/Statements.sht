@@ -1,0 +1,38 @@
+s = "case1";
+
+switch(s){
+ case "case1" :
+       r = 1;
+ case "case2":
+       r = 2;
+ default:   {
+       r = 3;
+      }
+}
+
+Test.AreEqual(1, r);
+
+
+switch("not a case"){
+ case "case1" :
+       r = 1;
+ case "case2":
+       r = 2;
+ default:   {
+       r = 3;
+      }
+}
+
+Test.AreEqual(3, r);
+
+switch("case" + 2){
+ case "case1" :
+       r = 1;
+ case "case2":
+       r = 2;
+ default:   {
+       r = 3;
+      }
+}
+
+Test.AreEqual(2, r);

@@ -1,0 +1,96 @@
+          y = 100;
+
+          //Treat y as global variable
+          function f() global(y)
+          { 
+            y = y - 1;
+          }
+
+          //Assign local variable with nearest value
+          function f1()
+          { 
+            y = y - 1;
+          }
+
+          //Assign global variable with nearest value
+          function f2()
+          { 
+            global:y = y - 1;
+          }
+
+          //Assign global variable with global value
+          function f3()
+          { 
+            global:y = global:y - 1;
+          }
+
+          //Assign local variable with global value
+          function f4()
+          { 
+            y = global:y - 1;
+          }
+
+          f(); 
+
+Test.AreEqual(99, y);
+
+          f1();
+
+Test.AreEqual(99, y);
+
+          f2();
+
+Test.AreEqual(98, y);
+
+          f3();
+
+Test.AreEqual(97, y);
+
+          f4();
+
+Test.AreEqual(97, y);
+
+function f7()
+{
+ y = 2;
+ f1();
+ Test.AreEqual(2, y);
+}
+
+f7();
+
+Test.AreEqual(97, y);
+
+function f8()
+{
+ y = 2;
+ Test.AreEqual(2, y);
+
+ f2();
+ Test.AreEqual(1, y);
+}
+
+f8();
+
+Test.AreEqual(97, y);
+
+//Local scope changes global variable
+{
+ {
+  y = 15;
+ }
+}
+
+Test.AreEqual(15, y);
+
+//Local scope create local variable
+{
+ {
+  var y = 25;
+ }
+}
+
+Test.AreEqual(15, y);
+
+
+

@@ -1,0 +1,10 @@
+loop = 1000000;
+counter = 0;
+while(loop>0)
+{
+ loop = loop - 1;
+ counter = counter + 1;
+}
+
+Test.AreEqual(1000000, counter);
+//------------------------------------//

@@ -1,0 +1,4 @@
+//Script.NET examples
+//(c)2007-2009, Protsyk Petro, http://www.protsyk.com
+
+a = [1,2,3];
