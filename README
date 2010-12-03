@@ -1,0 +1,6 @@
+Script.NET or S# is a scripting language for .NET applications which allows 
+to customize behavior of your .NET applications, interact with native .NET 
+objects, types and assemblies. The hosting application itself could change 
+the default behavior of script run-time by an xml configuration, replacing
+binding behavior to methods, properties, constructors of native .NET types; 
+name, function and type resolving and much more.
