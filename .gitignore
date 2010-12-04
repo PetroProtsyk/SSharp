@@ -1,6 +1,12 @@
-Binaries/
-bin/
-obj/
-*.dll
-*.suo
 *.user
+*.suo
+*.sln.cache
+*.pdb
+[bB]in/
+[oO]bj/
+TestResults/
+_ReSharper.*
+*.vssscc
+*.vspscc
+*.xap
+Binaries/
