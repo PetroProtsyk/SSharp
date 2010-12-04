@@ -23,12 +23,26 @@ namespace Scripting.SSharp
 
     public static Tuple<dynamic, dynamic> TryConvert(dynamic left, dynamic right)
     {
+      // Denys Vuika: the code below crash for mono 2.8 though should work fine, 
+      // slightly rewriting to make the code mono-compatible
+      /*
       Dictionary<Type, Func<dynamic, dynamic, Tuple<dynamic, dynamic>>> funcs = null;
       if (converters.TryGetValue(left.GetType(), out funcs))
       {
         Func<dynamic, dynamic, Tuple<dynamic, dynamic>> function = null;
         if (funcs.TryGetValue(right.GetType(), out function))
           return function(left, right);
+      }
+      */
+
+      Type leftType = left.GetType();
+      if (converters.ContainsKey(leftType))
+      {
+        var funcs = converters[leftType];
+        Type rightType = right.GetType();
+
+        if (funcs.ContainsKey(rightType))
+          return funcs[rightType](left, right);
       }
 
       return null;
