@@ -1,6 +1,21 @@
-﻿using System;
+﻿/*
+ * Copyright © 2011, Petro Protsyk, Denys Vuika
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+using System;
 using System.Collections.Generic;
-using Scripting.SSharp.Runtime.Operators;
 
 namespace Scripting.SSharp
 {
@@ -23,12 +38,26 @@ namespace Scripting.SSharp
 
     public static Tuple<dynamic, dynamic> TryConvert(dynamic left, dynamic right)
     {
+      // Denys Vuika: the code below crash for mono 2.8 though should work fine, 
+      // slightly rewriting to make the code mono-compatible
+      /*
       Dictionary<Type, Func<dynamic, dynamic, Tuple<dynamic, dynamic>>> funcs = null;
       if (converters.TryGetValue(left.GetType(), out funcs))
       {
         Func<dynamic, dynamic, Tuple<dynamic, dynamic>> function = null;
         if (funcs.TryGetValue(right.GetType(), out function))
           return function(left, right);
+      }
+      */
+
+      Type leftType = left.GetType();
+      if (converters.ContainsKey(leftType))
+      {
+        var funcs = converters[leftType];
+        Type rightType = right.GetType();
+
+        if (funcs.ContainsKey(rightType))
+          return funcs[rightType](left, right);
       }
 
       return null;
