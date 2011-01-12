@@ -7,6 +7,7 @@ using Scripting.SSharp.Runtime;
 using Scripting.SSharp.Runtime.Promotion;
 using Scripting.SSharp;
 using Scripting.SSharp.Runtime.Operators;
+using System.Threading.Tasks;
 
 namespace UnitTests
 {
@@ -367,6 +368,50 @@ namespace UnitTests
          ");
         Assert.AreEqual("123456789",rez);
     }
+
+    [TestMethod]
+    public void ProblemWithGlobalScope() {
+        Script s = Script.Compile(@"
+            abc = '123';
+            function OnGetCustomersCompleted(s, e)
+            {
+                s.v = abc;
+            }
+
+            s = new CustomerFacade();
+            s.GetCustomersCompleted += OnGetCustomersCompleted;
+            s.GetCustomersAsync();
+            
+            return s;
+         ");
+        
+        CustomerFacade rez = (CustomerFacade) s.Execute();
+
+        while (rez.busy) System.Threading.Thread.Sleep(100);
+
+        Assert.AreEqual("123", rez.v);
+    }
+
+    [TestMethod]
+    public void ProblemWithGlobalScopeWithAsyncEvents() {
+        CustomerFacade rez = (CustomerFacade)Script.RunCode(@"
+            abc = '123';
+            function OnGetCustomersCompleted(s, e)
+            {
+                s.v = abc;
+            }
+
+            s = new CustomerFacade();
+            s.GetCustomersCompleted += OnGetCustomersCompleted;
+            s.GetCustomersAsync();
+            
+            return s;
+         ");
+
+        //Now scope is clear, while event is still subscribed and will be invoked
+        while (rez.busy) System.Threading.Thread.Sleep(100);
+        Assert.IsTrue(rez.v.Contains("given handler is not associated with any context"));
+    }
   }
 
   #region Interfaces
@@ -406,6 +451,38 @@ namespace UnitTests
   #endregion
 
   #region Test Class
+  public class CustomerFacade {
+      
+      public event EventHandler<EventArgs> GetCustomersCompleted;
+
+      public string v { get; set; }
+
+      public bool busy { get; set; }
+
+      public void GetCustomersAsync()
+      {
+          busy = true;
+          
+          Task t = Task.Factory.StartNew(
+              () => {
+                  System.Threading.Thread.Sleep(500);
+
+                  try {
+                      if (GetCustomersCompleted != null) {
+                          GetCustomersCompleted.Invoke(this, EventArgs.Empty);
+                      }
+                  }
+                  catch(Exception e)
+                  {
+                      v = e.ToString();
+                  }
+                  finally {
+                      busy = false;
+                  }
+              });
+      }
+  }
+
   public class Class1_1
   {
     public short Short { get { return 1; } }
