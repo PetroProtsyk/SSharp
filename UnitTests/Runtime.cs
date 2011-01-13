@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Scripting.SSharp.Runtime;
+using Scripting.SSharp.Runtime.Configuration;
 using Scripting.SSharp.Runtime.Promotion;
 using Scripting.SSharp;
 
@@ -29,6 +30,26 @@ namespace UnitTests
         configStream.Seek(0, SeekOrigin.Begin);
         return configStream;
       }
+    }
+
+    // Ensures runtime host does not crash if Initialize is called multiple times
+    [TestMethod]
+    public void ShouldAllowMultipleInitializes()
+    {
+      RuntimeHost.Initialize();
+      RuntimeHost.Initialize();
+      RuntimeHost.Initialize(TestConfig);
+      RuntimeHost.Initialize(new ScriptConfiguration());
+    }
+
+    [TestMethod]
+    public void ShouldChangeInitializationState()
+    {
+      Assert.IsFalse(RuntimeHost.IsInitialized);
+      RuntimeHost.Initialize();
+      Assert.IsTrue(RuntimeHost.IsInitialized);
+      RuntimeHost.CleanUp();
+      Assert.IsFalse(RuntimeHost.IsInitialized);
     }
 
     [TestMethod]

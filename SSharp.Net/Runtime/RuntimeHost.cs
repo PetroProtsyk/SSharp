@@ -64,6 +64,8 @@ namespace Scripting.SSharp.Runtime
     /// </summary>
     private static readonly object SyncRoot = new object();
 
+    public static bool IsInitialized { get; private set; }
+
     [Promote(false)]
     public static IScopeFactory ScopeFactory { get; private set; }
 
@@ -108,6 +110,8 @@ namespace Scripting.SSharp.Runtime
     [Promote(false)]
     public static void Initialize(Stream configuration)
     {
+      if (IsInitialized) return;
+
       Initialize(LoadConfiguration(configuration));
     }
 
@@ -118,6 +122,8 @@ namespace Scripting.SSharp.Runtime
     [Promote(false)]
     public static void Initialize(ScriptConfiguration configuration)
     {
+      if (IsInitialized) return;
+
       if (Parser == null)
       {
         Parser = new Parser.FastGrammar.LRParser();
@@ -158,6 +164,7 @@ namespace Scripting.SSharp.Runtime
       }
       finally
       {
+        IsInitialized = true;
         UnLock();
       }
     }
@@ -227,6 +234,7 @@ namespace Scripting.SSharp.Runtime
       }
       finally
       {
+        IsInitialized = false;
         UnLock();
       }
     }
