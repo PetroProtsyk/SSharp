@@ -110,8 +110,6 @@ namespace Scripting.SSharp.Runtime
     [Promote(false)]
     public static void Initialize(Stream configuration)
     {
-      if (IsInitialized) return;
-
       Initialize(LoadConfiguration(configuration));
     }
 
