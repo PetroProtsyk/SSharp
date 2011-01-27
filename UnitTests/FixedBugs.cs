@@ -370,7 +370,8 @@ namespace UnitTests
     }
 
     [TestMethod]
-    public void ProblemWithGlobalScope() {
+    public void ProblemWithGlobalScope()
+    {
         Script s = Script.Compile(@"
             abc = '123';
             function OnGetCustomersCompleted(s, e)
@@ -384,8 +385,8 @@ namespace UnitTests
             
             return s;
          ");
-        
-        CustomerFacade rez = (CustomerFacade) s.Execute();
+
+        CustomerFacade rez = (CustomerFacade)s.Execute();
 
         while (rez.busy) System.Threading.Thread.Sleep(100);
 
@@ -393,7 +394,8 @@ namespace UnitTests
     }
 
     [TestMethod]
-    public void ProblemWithGlobalScopeWithAsyncEvents() {
+    public void ProblemWithGlobalScopeWithAsyncEvents()
+    {
         CustomerFacade rez = (CustomerFacade)Script.RunCode(@"
             abc = '123';
             function OnGetCustomersCompleted(s, e)
@@ -411,6 +413,24 @@ namespace UnitTests
         //Now scope is clear, while event is still subscribed and will be invoked
         while (rez.busy) System.Threading.Thread.Sleep(100);
         Assert.IsTrue(rez.v.Contains("given handler is not associated with any context"));
+    }
+    
+    [TestMethod]
+    public void ContextReusageProblem()
+    {
+        var context = new ScriptContext();
+
+        string code1 = "'test';";
+        string code2 = "3*5; return 1+1;";
+
+        var result1 = Script.RunCode(code1, context, true);
+
+        var script = Script.Compile(code2);
+        script.Context = context;
+
+        script.Execute();
+
+        Assert.AreEqual(2, context.Result);
     }
   }
 
