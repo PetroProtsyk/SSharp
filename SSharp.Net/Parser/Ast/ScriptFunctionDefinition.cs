@@ -134,9 +134,7 @@ namespace Scripting.SSharp.Parser.Ast
         finally
         {
           context.RemoveLocalScope();
-          context.SetBreak(false);
-          context.SetContinue(false);
-          context.SetReturn(false);
+          context.ResetControlFlags();
           context.Result = result;
 
           functionScope.BeforeSetItem -= ScopeBeforeSetItem;

@@ -432,6 +432,16 @@ namespace UnitTests
 
         Assert.AreEqual(2, context.Result);
     }
+
+    [TestMethod]
+    public void ContextReusageProblemMetaOperator()
+    {
+      string code1 = "a=<! return 1+2; !>; a(); 3*5; return 1+1;";
+      var s = Script.Compile(code1);
+      var c = s.Code(s.Ast);
+
+      Assert.AreEqual(2, s.Execute());
+    }
   }
 
   #region Interfaces

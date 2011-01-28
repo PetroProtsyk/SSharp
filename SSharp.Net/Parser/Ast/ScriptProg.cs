@@ -39,8 +39,12 @@ namespace Scripting.SSharp.Parser.Ast
     {
       context.SetItem("Context", context);
       context.SetItem("prog", this);
+      //Reset flags in context
+      context.ResetControlFlags();
 
       base.Evaluate(context);
+
+      context.ResetControlFlags();
     }
 
     #region IInvokable Members

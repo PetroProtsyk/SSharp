@@ -376,6 +376,16 @@ namespace UnitTests
            if (a[2]>a[1])
              return 2;
       ");
+      Assert.AreEqual(2, result);
+
+      //Is a conflict between meta expression token <!   !>
+      //and array resolution with greater operator
+      result = Script.RunCode(@"
+           a=true;
+           if (a<!a)
+             return 5;
+           else return 3;
+      ");
 
       Assert.AreEqual(2, result);
     }

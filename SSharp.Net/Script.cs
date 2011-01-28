@@ -91,12 +91,6 @@ namespace Scripting.SSharp
     /// <returns>result of execution</returns>
     public object Execute()
     {
-      //TODO: Check with Meta operator and other IInvokable
-      //Reset flags in context
-      Context.SetContinue(false);
-      Context.SetBreak(false);
-      Context.SetReturn(false);
-
       return Ast.Execute(Context);
     }
 

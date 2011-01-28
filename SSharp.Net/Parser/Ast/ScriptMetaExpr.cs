@@ -69,13 +69,18 @@ namespace Scripting.SSharp.Parser.Ast
 
       try
       {
+        context.ResetControlFlags();
+
         _metaProg.Evaluate(context);
+        
         return context.Result;
       }
       finally
       {
         if (scopeOwner)
           context.RemoveLocalScope();
+
+        context.ResetControlFlags();
       }
     }
 

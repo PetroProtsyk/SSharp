@@ -92,11 +92,19 @@ namespace Scripting.SSharp.Runtime
     void SetReturn(bool val);
     void SetBreak(bool val);
     void SetContinue(bool val);
+    
     bool IsReturn();
     bool IsBreak();
     bool IsContinue();
+
+    /// <summary>
+    /// Reset all flags that control execution. Called on each context 
+    /// before and after script execution
+    /// </summary>
+    void ResetControlFlags();
     #endregion
 
+    #region Common
     /// <summary>
     /// Result of script execution
     /// </summary>
@@ -110,5 +118,6 @@ namespace Scripting.SSharp.Runtime
     {
       get;
     }
+    #endregion
   }
 }

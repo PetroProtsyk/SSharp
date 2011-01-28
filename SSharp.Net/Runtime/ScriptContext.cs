@@ -23,6 +23,10 @@ namespace Scripting.SSharp.Runtime
   /// </summary>
   public class ScriptContext : IScriptContext
   {
+    #region Fields
+    private ContextFlags _flags = ContextFlags.Empty;
+    #endregion
+
     #region Properties
     /// <summary>
     /// Scope object
@@ -39,27 +43,13 @@ namespace Scripting.SSharp.Runtime
       private set;
     }
 
-    private ContextFlags _flags = ContextFlags.Empty;
-
-/*
-    bool IsSkip
-    {
-      get
-      {
-        return IsBreak() || IsContinue() || IsReturn();
-      }
-    }
-*/
-
-    private object result;
-
     /// <summary>
     /// Script Result object
     /// </summary>
     public object Result
     {
-      get { return result; }
-      set { result = value; }
+      get;
+      set;
     }
     #endregion
 
@@ -137,7 +127,11 @@ namespace Scripting.SSharp.Runtime
           args = new ReferencingEventArgs(false, scope.Ref(id));
           if (args.Ref != null && OnReferenced(args))
           {
-            if (Owner != null) Owner.NotifyReferenceCreated(args.Ref);
+            if (Owner != null)
+            {
+              Owner.NotifyReferenceCreated(args.Ref);
+            }
+
             return args.Ref;
           }
           return null;
@@ -211,6 +205,15 @@ namespace Scripting.SSharp.Runtime
         _flags = _flags | ContextFlags.Continue;
       else
         _flags = _flags & ~ContextFlags.Continue;
+    }
+
+    /// <summary>
+    /// Reset all flags that control execution. Called on each context 
+    /// before and after script execution
+    /// </summary>
+    public void ResetControlFlags()
+    {
+      _flags = ContextFlags.Empty;
     }
 
     /// <summary>
