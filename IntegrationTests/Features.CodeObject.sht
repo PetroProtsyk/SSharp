@@ -1,4 +1,4 @@
-a = <!c++; b+=3; return 2;!>;
+a = <!global:c++; global:b+=3; return 2;!>;
 
 c=2;
 b=5;

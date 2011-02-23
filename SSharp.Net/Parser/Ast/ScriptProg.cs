@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+using System.Linq;
 using Scripting.SSharp.Runtime;
+using Scripting.SSharp.Runtime.Promotion;
 
 namespace Scripting.SSharp.Parser.Ast
 {
@@ -56,8 +58,28 @@ namespace Scripting.SSharp.Parser.Ast
 
     public object Invoke(IScriptContext context, object[] args)
     {
-      Evaluate(context);
-      return context.Result;
+        var functionScope = (INotifyingScope)RuntimeHost.ScopeFactory.Create(ScopeTypes.Function, context.Scope, context);
+        context.CreateScope(functionScope);
+
+        Expando values=args.FirstOrDefault() as Expando;
+        if (values != null) {
+            foreach (var field in values.Fields) {
+                context.SetItem(field, values[field]);
+            }
+        } else {
+            if (args.Length > 0)
+                throw new ScriptExecutionException("Wrong type of arguments passed to Program Invokation");
+        }
+
+        try {
+            Evaluate(context);
+        }
+        finally {
+            context.RemoveLocalScope();
+            context.ResetControlFlags();
+        }
+
+        return context.Result;
     }
 
     #endregion

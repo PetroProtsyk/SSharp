@@ -11,13 +11,13 @@ namespace Debug.TestExecute
 {
   class Program
   {
-    static void Main(string[] args)
+    static int Main(string[] args)
     {
       Console.WriteLine("S# Test Execute");
       if (args == null || args.Length ==0 || !Directory.Exists(args[0]))
       {
         TypeLine("Please specify valid path containing test files", ConsoleColor.Red);
-        return;
+        return 1;
       }
 
       TypeLine("Initializing script engine", ConsoleColor.Yellow);
@@ -78,10 +78,12 @@ namespace Debug.TestExecute
       if (execErr + parsingErr == 0)
       {
         TypeLine("Done, all " + total + " tests passed, time " + totalTime.ElapsedMilliseconds, ConsoleColor.Green);
+        return 0;
       }
       else
       {
         TypeLine(string.Format("Done tests {2} in {3} ms with errors: parsing {0}, execution {1}", parsingErr, execErr, total, totalTime.ElapsedMilliseconds), ConsoleColor.Red);
+        return 1;
       }
     }
 
