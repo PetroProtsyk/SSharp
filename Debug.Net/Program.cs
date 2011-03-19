@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using Scripting.SSharp;
 using Scripting.SSharp.Runtime;
+using Scripting.SSharp.Processing;
 
 namespace Debug.Net
 {
@@ -33,6 +34,20 @@ namespace Debug.Net
     {
       RuntimeHost.Initialize();
       RuntimeHost.AddType<Person>("Person");
+
+      DebugManager.BreakPoint += (s1, e) =>
+      {
+        Console.WriteLine(string.Format("{0}:{1}[{2}]",e.Location.Position.Line, e.Location.Position.Column, e.Location.Code));
+        Console.ReadKey(true);
+      };
+
+      using (Script s = Script.CompileForDebug(@"1+1; 2+2; b=true; for (i=1; i<3; i++) { b=false; }"))
+      {
+        //Console.Write(s.SyntaxTree);
+        s.Execute();
+      }
+      Console.ReadKey();
+      return;
 
       object o = Script.RunCode(@"
  
