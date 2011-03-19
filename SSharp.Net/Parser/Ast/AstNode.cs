@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
 namespace Scripting.SSharp.Parser.Ast
 {
   /// <summary>
@@ -26,18 +29,18 @@ namespace Scripting.SSharp.Parser.Ast
     {
       Term = args.Term;
       Span = args.Span;
-      if (args.ChildNodes == null || args.ChildNodes.Count == 0) return;
+      _childNodesReadonly = new ReadOnlyAstNodeList(_childNodes);
 
-      foreach (AstNode child in args.ChildNodes)
-      {
-        if (child != null && !child.Term.IsSet(TermOptions.IsPunctuation))
-          AddChild(child);
-      }
+      ReplaceChildNodes(args.ChildNodes);
     }
     #endregion
 
     #region Fields
-    private readonly AstNodeList _childNodes = new AstNodeList();
+    /// <summary>
+    /// NOTE: This will should be only accessed by LRParser
+    /// </summary>
+    internal readonly AstNodeList _childNodes = new AstNodeList();
+    private readonly ReadOnlyAstNodeList _childNodesReadonly;
     #endregion
 
     #region Properties
@@ -61,12 +64,12 @@ namespace Scripting.SSharp.Parser.Ast
     public AstNode Parent
     {
       get;
-      set;
+      internal set;
     }
 
-    public AstNodeList ChildNodes
+    public ReadOnlyAstNodeList ChildNodes
     {
-      get { return _childNodes; }
+      get { return _childNodesReadonly; }
     }
 
     #endregion
@@ -76,18 +79,33 @@ namespace Scripting.SSharp.Parser.Ast
     {
       if (child == null) return;
       child.Parent = this;
-      ChildNodes.Add(child);
+      _childNodes.Add(child);
+    }
+
+    public void ReplaceChildNodes(IEnumerable<AstNode> nodes) {
+        _childNodes.Clear();
+        if (nodes == null) return;
+
+        foreach (AstNode child in nodes) {
+            if (child != null && !child.Term.IsSet(TermOptions.IsPunctuation))
+                AddChild(child);
+        }
+
+        OnNodesReplaced();
+    }
+
+    protected virtual void OnNodesReplaced() {
     }
     #endregion
 
     #region Visitors, Iterators
     public virtual void AcceptVisitor(IAstVisitor visitor)
     {
-      visitor.BeginVisit(this);
-      if (ChildNodes.Count > 0)
-        foreach (AstNode node in ChildNodes)
-          node.AcceptVisitor(visitor);
-      visitor.EndVisit(this);
+        if (visitor.BeginVisit(this)) {
+            foreach (AstNode node in ChildNodes)
+                node.AcceptVisitor(visitor);
+        }
+        visitor.EndVisit(this);
     }
     #endregion
   }

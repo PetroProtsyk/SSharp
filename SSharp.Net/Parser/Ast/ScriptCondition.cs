@@ -43,7 +43,12 @@ namespace Scripting.SSharp.Parser.Ast
     public ScriptCondition(AstNodeArgs args)
         : base(args)
     {
-      _conditionExpression = (ScriptExpr)ChildNodes[0];
+    }
+
+    protected override void OnNodesReplaced() {
+        base.OnNodesReplaced();
+
+        _conditionExpression = (ScriptExpr)ChildNodes[0];
     }
 
     public override void Evaluate(IScriptContext context)

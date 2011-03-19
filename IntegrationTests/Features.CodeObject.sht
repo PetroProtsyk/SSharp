@@ -1,4 +1,18 @@
-a = <!global:c++; global:b+=3; return 2;!>;
+a = <!
+          c++; 
+          b+=3; 
+
+          //ScriptProg has read access to 
+          //global variables 
+          Test.AreEqual(3, c);
+          Test.AreEqual(8, b);
+          
+          //in order to modify them it should
+          //use global
+
+          global:c+=10;
+
+          return 2;!>;
 
 c=2;
 b=5;
@@ -6,8 +20,8 @@ b=5;
 f = a();
 
 Test.AreEqual(2, f);
-Test.AreEqual(3, c);
-Test.AreEqual(8, b);
+Test.AreEqual(12, c);
+Test.AreEqual(5, b);
 
 Test.AreEqual(2,  eval('1+1'));
 

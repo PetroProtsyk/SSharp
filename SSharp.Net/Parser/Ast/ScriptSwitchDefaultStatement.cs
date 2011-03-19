@@ -33,7 +33,7 @@ namespace Scripting.SSharp.Parser.Ast
 
     public override void Evaluate(IScriptContext context)
     {      
-      Statement.Evaluate(context);      
+      Statement.Evaluate(context);
     }
   }
 }

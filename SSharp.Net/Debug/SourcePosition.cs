@@ -1,5 +1,5 @@
-/*
- * Copyright � 2011, Petro Protsyk, Denys Vuika
+﻿/*
+ * Copyright © 2011, Petro Protsyk, Denys Vuika
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#if !SILVERLIGHT
 
-namespace Scripting.SSharp.Parser.Ast
-{
-  internal class ScriptWhileStatement : ScriptStatement
-  {
-  }
+namespace Scripting.SSharp.Debug {
+    public class SourcePosition {
+        public int Position { get; private set; }
+
+        public int Line { get; private set; }
+
+        public int Column { get; private set; }
+
+        public int Length { get; private set; }
+
+        public SourcePosition(int position, int line, int column, int length) {
+            Position = position;
+            Line = line;
+            Column = column;
+            Length = length;
+        }
+    }
 }
+#endif

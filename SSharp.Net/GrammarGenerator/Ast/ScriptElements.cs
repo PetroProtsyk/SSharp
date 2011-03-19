@@ -19,7 +19,7 @@ namespace Scripting.SSharp.Parser.Ast
   /// <summary>
   /// 
   /// </summary>
-  internal class ScriptElements : ScriptExpr
+  internal class ScriptElements : ScriptAst
   {
   }
 }

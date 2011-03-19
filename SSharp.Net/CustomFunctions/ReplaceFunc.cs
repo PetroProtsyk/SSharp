@@ -46,7 +46,7 @@ namespace Scripting.SSharp.CustomFunctions
       while (prog != null && !(prog is ScriptQualifiedName) && ! (prog.ChildNodes[0] is TokenAst && ((TokenAst)prog.ChildNodes[0]).Text == FunctionName))
         prog = prog.Parent;
 
-      if (prog != null) prog.Parent.ChildNodes.Add(node);
+      if (prog != null) prog.Parent.AddChild(node);
       return node;
     }
 

@@ -47,7 +47,7 @@ namespace Scripting.SSharp.CustomFunctions
       if (prog != null)
       {
         foreach (var scriptnode in node.Elements.ChildNodes)
-          prog.ChildNodes[0].ChildNodes.Add(scriptnode);
+          prog.ChildNodes[0].AddChild(scriptnode);
       }
 
       return node;

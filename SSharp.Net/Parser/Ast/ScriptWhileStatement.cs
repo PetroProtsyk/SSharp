@@ -21,7 +21,7 @@ namespace Scripting.SSharp.Parser.Ast
   /// <summary>
   /// Script Array Constructor Expression
   /// </summary>
-  internal class ScriptWhileStatement : ScriptExpr
+  internal class ScriptWhileStatement : ScriptStatement
   {
     public ScriptCondition Condition { get; private set; }
     public ScriptStatement Statement { get; private set; }

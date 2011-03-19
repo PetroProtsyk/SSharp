@@ -162,6 +162,19 @@ namespace Scripting.SSharp
       return Compile(code, new IPostProcessing[] { new FunctionDeclarationVisitor() }, false);
     }
 
+#if !SILVERLIGHT
+    public static Script CompileForDebug(string code)
+    {
+      return Compile(code, 
+                    new IPostProcessing[] 
+                    { 
+                        new FunctionDeclarationVisitor(), 
+                        new Scripting.SSharp.Debug.DebugMarkerVisitor()
+                    }, 
+                    false);
+    }
+#endif
+
     public static Script CompileExpression(string code)
     {
       return Compile(code, null, true);
@@ -266,6 +279,19 @@ namespace Scripting.SSharp
     #endregion
 
     #region IDisposable Members
+    /// <summary>
+    /// Notifies clients of script that it is about to dispose. Gives opportunity to
+    /// perform necessary clean up
+    /// </summary>
+    public EventHandler Disposing;
+    
+    protected virtual void OnDisposing()
+    {
+      var handler=Disposing;
+      if (handler!=null)
+        handler.Invoke(this, EventArgs.Empty);
+    }
+
     private bool _disposed;
     protected bool Disposed
     {
@@ -283,6 +309,7 @@ namespace Scripting.SSharp
       lock (this)
       {
         if (_disposed) return;
+        OnDisposing();
         Cleanup();
         _disposed = true;
         GC.SuppressFinalize(this);
@@ -303,6 +330,7 @@ namespace Scripting.SSharp
 
       Ast = null;
       SourceCode = null;
+      Disposing = null;
     }
 
     ~Script()

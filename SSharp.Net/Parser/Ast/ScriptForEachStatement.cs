@@ -26,9 +26,9 @@ namespace Scripting.SSharp.Parser.Ast
   /// </summary>
   internal class ScriptForEachStatement : ScriptStatement
   {
-    private readonly TokenAst _name;
-    private readonly ScriptExpr _expr;
-    private readonly ScriptStatement _statement;
+    private TokenAst _name;
+    private ScriptExpr _expr;
+    private ScriptStatement _statement;
 
     public string Id
     {
@@ -48,9 +48,14 @@ namespace Scripting.SSharp.Parser.Ast
     public ScriptForEachStatement(AstNodeArgs args)
       : base(args)
     {
-      _name = (TokenAst)ChildNodes[1];
-      _expr = (ScriptExpr)ChildNodes[3];
-      _statement = (ScriptStatement)ChildNodes[4];
+    }
+
+    protected override void OnNodesReplaced() {
+        base.OnNodesReplaced();
+
+        _name = (TokenAst)ChildNodes[1];
+        _expr = (ScriptExpr)ChildNodes[3];
+        _statement = (ScriptStatement)ChildNodes[4];
     }
 
     public override void Evaluate(IScriptContext context)
@@ -80,7 +85,10 @@ namespace Scripting.SSharp.Parser.Ast
 
       while (enumerator.MoveNext())
       {
+        // TODO: Should be debug friendly
         context.SetItem(_name.Text, enumerator.Current);
+        context.Result = enumerator.Current;
+
         _statement.Evaluate(context);
         if (context.IsBreak() || context.IsReturn())
         {

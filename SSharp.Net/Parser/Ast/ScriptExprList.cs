@@ -25,7 +25,7 @@ namespace Scripting.SSharp.Parser.Ast
   /// </summary>
   internal class ScriptExprList : ScriptExpr
   {
-    private readonly AstNodeList _exprList;
+    private readonly ReadOnlyAstNodeList _exprList;
 
     public IEnumerable<ScriptExpr> List
     {
@@ -38,7 +38,7 @@ namespace Scripting.SSharp.Parser.Ast
     public ScriptExprList(AstNodeArgs args)
         : base(args)
     {
-      _exprList = (ChildNodes[0] is ScriptExpr) ? ChildNodes : ChildNodes[0].ChildNodes;
+        _exprList = (ChildNodes[0] is ScriptExpr) ? ChildNodes : ChildNodes[0].ChildNodes;
     }
 
     public override void Evaluate(IScriptContext context)

@@ -23,8 +23,8 @@ namespace Scripting.SSharp.Parser.Ast
   /// </summary>
   internal class ScriptSwitchCaseStatement : ScriptStatement
   {
-    private readonly ScriptExpr _cond;
-    private readonly ScriptStatement _statement;
+    private ScriptExpr _cond;
+    private ScriptStatement _statement;
 
     public ScriptExpr Condition { get { return _cond; } }
     public ScriptStatement Statement { get { return _statement; } }
@@ -32,8 +32,13 @@ namespace Scripting.SSharp.Parser.Ast
     public ScriptSwitchCaseStatement(AstNodeArgs args)
         : base(args)
     {
-      _cond = ChildNodes[1] as ScriptExpr;
-      _statement = ChildNodes[3] as ScriptStatement;
+    }
+
+    protected override void OnNodesReplaced() {
+        base.OnNodesReplaced();
+
+        _cond = ChildNodes[1] as ScriptExpr;
+        _statement = ChildNodes[3] as ScriptStatement;
     }
 
     public override void Evaluate(IScriptContext context)

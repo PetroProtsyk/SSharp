@@ -1,5 +1,5 @@
-/*
- * Copyright � 2011, Petro Protsyk, Denys Vuika
+﻿/*
+ * Copyright © 2011, Petro Protsyk, Denys Vuika
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#if !SILVERLIGHT
+using System;
 
-namespace Scripting.SSharp.Parser.Ast
-{
-  internal class ScriptWhileStatement : ScriptStatement
-  {
-  }
+namespace Scripting.SSharp.Debug {
+    public class DebugBreakPointEventArgs : EventArgs {
+        public Script Script { get; private set; }
+        public DebugLocation Location { get; private set; }
+
+        public DebugBreakPointEventArgs(Script script, DebugLocation location) {
+            Script = script;
+            Location = location;
+        }
+    }
 }
+#endif

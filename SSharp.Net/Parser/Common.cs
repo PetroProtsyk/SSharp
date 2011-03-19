@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Scripting.SSharp.Parser.Ast;
+using System.Collections.ObjectModel;
 
 namespace Scripting.SSharp.Parser
 {
@@ -41,7 +42,14 @@ namespace Scripting.SSharp.Parser
     TokenAst TryMatch(CompilerContext context, ISourceStream source);    
   }
 
-  internal class AstNodeList : List<AstNode> { }
+  internal class AstNodeList : List<AstNode> {
+  }
+
+  internal class ReadOnlyAstNodeList : ReadOnlyCollection<AstNode> {
+      public ReadOnlyAstNodeList(IList<AstNode> nodes)
+          : base(nodes) {
+      }
+  }
 
   internal class StringDictionary : Dictionary<string, string> { }
   internal class CharList : List<char> { }
