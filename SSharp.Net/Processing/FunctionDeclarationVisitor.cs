@@ -26,15 +26,17 @@ namespace Scripting.SSharp.Processing
 
     #region IAstVisitor Members
 
-    public void BeginVisit(AstNode node)
+    public bool BeginVisit(AstNode node)
     {
       var definition = node as ScriptFunctionDefinition;
-      if (definition == null || string.IsNullOrEmpty(definition.Name)) return;
+      if (definition == null || string.IsNullOrEmpty(definition.Name)) 
+          return true;
 
       definition._owner = _script;
       _script.Context.SetItem(definition.Name, definition);
 
       EventBroker.RegisterFunction(definition, _script);
+      return true;
     }
 
     public void EndVisit(AstNode node)

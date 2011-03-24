@@ -279,14 +279,14 @@ namespace Scripting.SSharp.Parser.FastGrammar
       {
         result = childNodes[0];
         AstNode newChild = childNodes[childNodes.Count - 1];
-        newChild.Parent = result;
-        result.ChildNodes.Add(newChild);
+        result.AddChild(newChild);
         return result;
       }
 
       if (nonTeminal.IsSet(TermOptions.IsStarList) && childNodes.Count == 1)
       {
-        childNodes = childNodes[0].ChildNodes;
+		//TODO: Review usage of internal _childNodes
+        childNodes = childNodes[0]._childNodes;
       }
 
       if (!isList && !nonTeminal.IsSet(TermOptions.IsPunctuation) && childNodes.Count == 1)

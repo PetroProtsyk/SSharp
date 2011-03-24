@@ -23,10 +23,10 @@ namespace Scripting.SSharp.Parser.Ast
   /// </summary>
   internal class ScriptForStatement : ScriptStatement
   {
-    private readonly ScriptExpr _init;
-    private readonly ScriptExpr _cond;
-    private readonly ScriptExpr _next;
-    private readonly ScriptStatement _statement;
+    private ScriptExpr _init;
+    private ScriptExpr _cond;
+    private ScriptExpr _next;
+    private ScriptStatement _statement;
 
     public ScriptExpr Init { get { return _init; } }
     public ScriptExpr Condition { get { return _cond; } }
@@ -36,14 +36,18 @@ namespace Scripting.SSharp.Parser.Ast
     public ScriptForStatement(AstNodeArgs args)
         : base(args)
     {
-      _init = (ScriptExpr)args.ChildNodes[1];
-      _cond = (ScriptExpr)args.ChildNodes[2];
-      _next = (ScriptExpr)args.ChildNodes[3];
-      _statement = (ScriptStatement)args.ChildNodes[4];
 
-      var body = _statement as ScriptCompoundStatement;
-      if (body != null)
-        body.ShouldCreateScope = false;
+    }
+
+    protected override void OnNodesReplaced() {
+        _init = (ScriptExpr)ChildNodes[1];
+        _cond = (ScriptExpr)ChildNodes[2];
+        _next = (ScriptExpr)ChildNodes[3];
+        _statement = (ScriptStatement)ChildNodes[4];
+
+        var body = _statement as ScriptCompoundStatement;
+        if (body != null)
+            body.ShouldCreateScope = false;
     }
 
     public override void Evaluate(IScriptContext context)

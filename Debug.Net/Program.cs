@@ -35,17 +35,18 @@ namespace Debug.Net
       RuntimeHost.Initialize();
       RuntimeHost.AddType<Person>("Person");
 
-      DebugManager.BreakPoint += (s1, e) =>
-      {
-        Console.WriteLine(string.Format("{0}:{1}[{2}]",e.Location.Position.Line, e.Location.Position.Column, e.Location.Code));
-        Console.ReadKey(true);
-      };
+      try {
+          DebugManager.SetDefaultDebugger(true);
 
-      using (Script s = Script.CompileForDebug(@"1+1; 2+2; b=true; for (i=1; i<3; i++) { b=false; }"))
-      {
-        //Console.Write(s.SyntaxTree);
-        s.Execute();
+          using (Script s = Script.CompileForDebug(@"1+1; 2+2; b=true; for (i=1; i<3; i++) { b=false; }")) {
+              Console.Write(s.SyntaxTree);
+              s.Execute();
+          }
       }
+      finally {
+          DebugManager.SetDefaultDebugger(false);
+      }
+
       Console.ReadKey();
       return;
 

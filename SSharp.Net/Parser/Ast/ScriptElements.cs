@@ -24,7 +24,7 @@ namespace Scripting.SSharp.Parser.Ast
   /// <summary>
   /// 
   /// </summary>
-  internal class ScriptElements : ScriptExpr, IEnumerable<ScriptAst>
+  internal class ScriptElements : ScriptAst, IEnumerable<ScriptAst>
   {
     public ScriptElements(AstNodeArgs args)
       : base(args)
