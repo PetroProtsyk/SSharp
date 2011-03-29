@@ -31,7 +31,12 @@ namespace Scripting.Debug.Debugger {
                         old_code=code;
 
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine(code);
+
+                        string[] lines = code.Split(new char[]{'\r','\n'},StringSplitOptions.RemoveEmptyEntries);
+                        int line = 0;
+                        foreach (string s in lines) {
+                            Console.WriteLine(string.Format("{0}: {1}",line++,s));
+                        }
                         Console.ResetColor();
                     }
 

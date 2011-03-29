@@ -40,6 +40,8 @@ namespace Scripting.SSharp.Parser.Ast
     }
 
     protected override void OnNodesReplaced() {
+        base.OnNodesReplaced();
+
         _init = (ScriptExpr)ChildNodes[1];
         _cond = (ScriptExpr)ChildNodes[2];
         _next = (ScriptExpr)ChildNodes[3];

@@ -195,7 +195,8 @@ namespace Scripting.SSharp.Processing {
                 debugger.Start();
             }
 
-            if (!debugger.ProcessStep(e.Script.SourceCode, string.Format("{0}:{1} Result:[{2}] Code:[{3}]",
+            if (!debugger.ProcessStep(e.Script.SourceCode, 
+                string.Format("{0}:{1} Result:[{2}] Code:[{3}]",
                     e.Location.Position.Line, e.Location.Position.Column,
                     e.Script.Context.Result == null ? "null" : e.Script.Context.Result.ToString(),
                     e.Location.Code))) {
@@ -329,7 +330,6 @@ namespace Scripting.SSharp.Processing {
                 }
             }
 
-            //base.Evaluate(context);
             boundNode.Evaluate(context);
         }
 

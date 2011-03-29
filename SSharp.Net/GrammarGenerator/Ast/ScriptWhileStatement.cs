@@ -16,7 +16,7 @@
 
 namespace Scripting.SSharp.Parser.Ast
 {
-  internal class ScriptWhileStatement : ScriptExpr
+  internal class ScriptWhileStatement : ScriptStatement
   {
   }
 }

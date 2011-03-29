@@ -21,7 +21,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_43C5F66BE7048D895C56AAF37329E5D8"
+        "MsmKey" = "8:_5D8A256322D6CE40074856B1BF406365"
         "OwnerKey" = "8:_D8959691E7DC46079824F65FD92D4866"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -70,7 +70,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_43C5F66BE7048D895C56AAF37329E5D8"
+        "OwnerKey" = "8:_5D8A256322D6CE40074856B1BF406365"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -210,14 +210,14 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_43C5F66BE7048D895C56AAF37329E5D8"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5D8A256322D6CE40074856B1BF406365"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:Scripting.SSharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=1d1c89e6576d99e6, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_43C5F66BE7048D895C56AAF37329E5D8"
+                    "_5D8A256322D6CE40074856B1BF406365"
                     {
                     "Name" = "8:Scripting.SSharp.dll"
                     "Attributes" = "3:512"
@@ -404,7 +404,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:S#"
         "ProductCode" = "8:{7A8AFDD0-FE41-4AE7-B80B-5CAE8A281E48}"
-        "PackageCode" = "8:{B71E6606-E572-4F6A-A2C0-0727A55C63EB}"
+        "PackageCode" = "8:{DE801BC8-453C-4658-919D-AC202E89369E}"
         "UpgradeCode" = "8:{8AE3AD94-AA6C-4CA7-AEAB-A85DCC549208}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1077,7 +1077,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_900E82B57F9D4D6B92A7E52E1D2BC08D"
             {
-            "SourcePath" = "8:..\\SSharp.Net\\obj\\Release\\Scripting.SSharp.dll"
+            "SourcePath" = "8:..\\SSharp.Net\\obj\\Debug\\Scripting.SSharp.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A3D26DF6169B48E0BBF0F4A68B9A9F95"
@@ -1135,7 +1135,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_A60898DABFD24CB3BE769A5F2B32B02E"
             {
-            "SourcePath" = "8:..\\SSharp.Silverlight\\obj\\Release\\Scripting.SSharp.Silverlight.dll"
+            "SourcePath" = "8:..\\SSharp.Silverlight\\obj\\Debug\\Scripting.SSharp.Silverlight.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_96DF52446BD54FCD9908A38EBFFE6C10"
@@ -1163,7 +1163,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D8959691E7DC46079824F65FD92D4866"
             {
-            "SourcePath" = "8:..\\Debug.TestExecute\\obj\\Release\\Scripting.Debug.TestExecute.exe"
+            "SourcePath" = "8:..\\Debug.TestExecute\\obj\\Debug\\Scripting.Debug.TestExecute.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A3D26DF6169B48E0BBF0F4A68B9A9F95"

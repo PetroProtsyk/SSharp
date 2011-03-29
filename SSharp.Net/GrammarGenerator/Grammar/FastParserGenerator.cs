@@ -28,6 +28,11 @@ namespace Scripting.SSharp.Parser
     public static string Build()
     {
       var g = new GrammarDataBuilder(Grammar.CreateScriptGrammar(false)).Build();
+      
+      foreach (var error in g.Errors) {
+          Console.WriteLine(error);
+      }
+
       if (2 != g.Errors.Count)
       {
         Console.WriteLine("Grammar changed!");
