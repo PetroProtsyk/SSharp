@@ -451,6 +451,15 @@ namespace UnitTests
       var c = s.Execute();
       
       Assert.AreEqual(19.2d, c);
+
+      var s1 = Script.Compile("a=(Decimal)19.2; s=a+2; b=a*a; d=2.3*(a+1);");
+      var c1 = s1.Execute();
+
+      Assert.AreEqual(new Decimal(19.2d), s1.Context.GetItem("a",true));
+      Assert.AreEqual(new Decimal(19.2d)+2, s1.Context.GetItem("s", true));
+      Assert.AreEqual(new Decimal(19.2d) * new Decimal(19.2d), s1.Context.GetItem("b", true));
+      Assert.AreEqual(2.3*(double)((new Decimal(19.2d))+1), s1.Context.GetItem("d", true));
+
     }
   }
 
