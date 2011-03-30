@@ -360,6 +360,8 @@ namespace Scripting.SSharp.Runtime.Promotion
     /// <returns>Converted value or NoResult constant if conversion impossible</returns>
     protected static object ConvertToStatic(object value, Type targetType)
     {
+      //TODO: Cache conversion method
+
       if (value == null) return value;
       if (targetType == typeof(object)) return value;
 
@@ -382,10 +384,10 @@ namespace Scripting.SSharp.Runtime.Promotion
         return value;
       }
 
-      //Conversion operators      
-      var mi = MethodProvider.GetConversionMethod(valueType);
+      //Conversion operators
+      var mi = MethodProvider.GetConversionMethod(valueType,targetType);
 
-      if (mi != null && mi.ReturnType == targetType)
+      if (mi != null)
         return mi.Invoke(value, new[] { value });
 
       //NOTE: ref, out

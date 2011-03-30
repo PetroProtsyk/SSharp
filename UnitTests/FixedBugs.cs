@@ -442,6 +442,16 @@ namespace UnitTests
 
       Assert.AreEqual(2, s.Execute());
     }
+
+    [TestMethod]
+    public void ImplicitConversionFailure()
+    {
+      string code1 = "a=(Decimal)19.2; s=Decimal.Parse(a); b=(double)a;";
+      var s = Script.Compile(code1);
+      var c = s.Execute();
+      
+      Assert.AreEqual(19.2d, c);
+    }
   }
 
   #region Interfaces

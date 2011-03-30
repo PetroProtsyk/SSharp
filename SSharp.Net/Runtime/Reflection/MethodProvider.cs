@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 using Scripting.SSharp.Runtime.Promotion;
 
 namespace Scripting.SSharp.Runtime.Reflection
@@ -52,20 +53,40 @@ namespace Scripting.SSharp.Runtime.Reflection
 
     #region Conversion cachce
 
-    private static readonly Dictionary<Type, MethodInfo> ConversionCache = new Dictionary<Type, MethodInfo>();
+    private static readonly Dictionary<Type, Dictionary<Type, MethodInfo>> ConversionCache = new Dictionary<Type, Dictionary<Type, MethodInfo>>();
 
-    public static MethodInfo GetConversionMethod(Type valueType)
+    public static MethodInfo GetConversionMethod(Type valueType,Type targetType)
     {
+      Dictionary<Type, MethodInfo> conversions;
       MethodInfo method;
 
-      if (!ConversionCache.TryGetValue(valueType, out method))
+      if (!ConversionCache.TryGetValue(valueType, out conversions))
+      {
+        conversions = new Dictionary<Type, MethodInfo>();
+        ConversionCache.Add(valueType,conversions);
+      }
+
+      if (!conversions.TryGetValue(targetType, out method))
       {
         // Try gettting implicit converter
-        method = valueType.GetMethod("op_Implicit", BindingFlags.Static | BindingFlags.Public, null, new[] { valueType }, null);
+          IEnumerable<MethodInfo> methods=valueType
+                                        .GetMethods(BindingFlags.Static | BindingFlags.Public)
+                                        .Where(m=>m.ReturnType==targetType);
+
+          method = methods
+                     .Where(m => m.Name=="op_Implicit" && m.GetParameters().First().ParameterType == valueType)
+                     .FirstOrDefault();
+
         // Try getting explicit converter
-        if (method == null) method = valueType.GetMethod("op_Explicit", BindingFlags.Static | BindingFlags.Public, null, new[] { valueType }, null);
-        // put the value into the cache regarldess it's state (null value preserving will allow avoid crawling types that do not have conversion methods at all)
-        ConversionCache.Add(valueType, method);
+          if (method == null) 
+          {
+              method = methods
+                     .Where(m => m.Name == "op_Explicit" && m.GetParameters().First().ParameterType == valueType)
+                     .FirstOrDefault();
+          }
+         // put the value into the cache regarldess it's state (null value preserving will allow avoid crawling types that do not have conversion methods at all)
+
+        conversions.Add(targetType, method);
       }
 
       return method;
