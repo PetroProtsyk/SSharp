@@ -8,6 +8,7 @@ using Scripting.SSharp.Runtime.Promotion;
 using Scripting.SSharp;
 using System.Collections;
 using Scripting.SSharp.Parser;
+using Scripting.SSharp.Debug;
 
 namespace UnitTests
 {
@@ -382,6 +383,46 @@ namespace UnitTests
       Assert.AreEqual("'aaa", context.GetItem("b", true));
       Assert.AreEqual("cc\\aaa", context.GetItem("c", true));
       Assert.AreEqual("hello world \\\\", context.GetItem("d", true));
+    }
+    
+    [TestMethod]
+    public void DebugEvent() {
+        try {
+            int break_points = 0;
+
+            DebugManager.SetDefaultDebugger(false);
+            DebugManager.BreakPoint += (s, e) => {
+                break_points++;
+            };
+
+            using (Script s = Script.CompileForDebug(@"
+                s = (decimal)19.2;
+
+                1+1; 2+2; b=true; 
+                for (i=1; i<3; i++) { 
+                   if (i==2)
+                    s = 'hello debugger!';
+                  else
+                    b=false; 
+                }
+                a=1;
+                while (a<4)
+                {
+                    s=['a','b','c'];
+                    foreach(c in s)
+                        e=(a+c);
+                    a++;
+                }
+
+                ")) {
+                s.Execute();
+
+                Assert.AreEqual(37, break_points);
+            }
+        }
+        finally {
+            DebugManager.BreakPoint = null;
+        }
     }
 
     [TestMethod]

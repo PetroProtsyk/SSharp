@@ -508,9 +508,6 @@
     <Compile Include="..\SSharp.Net\Parser\SyntaxError.cs">
       <Link>Parser\SyntaxError.cs</Link>
     </Compile>
-    <Compile Include="..\SSharp.Net\Processing\DebugMarkerVisitor.cs">
-      <Link>Processing\DebugMarkerVisitor.cs</Link>
-    </Compile>
     <Compile Include="..\SSharp.Net\Processing\FunctionDeclarationVisitor.cs">
       <Link>Processing\FunctionDeclarationVisitor.cs</Link>
     </Compile>

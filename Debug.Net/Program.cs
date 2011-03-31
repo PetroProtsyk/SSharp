@@ -4,6 +4,7 @@ using System.IO;
 using Scripting.SSharp;
 using Scripting.SSharp.Runtime;
 using Scripting.SSharp.Processing;
+using Scripting.SSharp.Debug;
 
 namespace Debug.Net
 {
@@ -38,7 +39,27 @@ namespace Debug.Net
       try {
           DebugManager.SetDefaultDebugger(true);
 
-          using (Script s = Script.CompileForDebug(@"1+1; 2+2; b=true; for (i=1; i<3; i++) { b=false; }")) {
+          using (Script s = Script.CompileForDebug(@"
+                s = (decimal)19.2;
+                MessageBox.Show(s);
+
+                1+1; 2+2; b=true; 
+                for (i=1; i<3; i++) { 
+                   if (i==2)
+                    s = 'hello debugger!';
+                  else
+                    b=false; 
+                }
+                a=1;
+                while (a<4)
+                {
+                    s=['a','b','c'];
+                    foreach(c in s)
+                        Console.WriteLine(a+c);
+                    a++;
+                }
+
+                ")) {
               Console.Write(s.SyntaxTree);
               s.Execute();
           }

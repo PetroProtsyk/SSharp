@@ -404,7 +404,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:S#"
         "ProductCode" = "8:{7A8AFDD0-FE41-4AE7-B80B-5CAE8A281E48}"
-        "PackageCode" = "8:{DE801BC8-453C-4658-919D-AC202E89369E}"
+        "PackageCode" = "8:{FB13138F-2035-4BDB-A1B5-4D3BBFF546DE}"
         "UpgradeCode" = "8:{8AE3AD94-AA6C-4CA7-AEAB-A85DCC549208}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

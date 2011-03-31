@@ -57,6 +57,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompilerException.cs" />
+    <Compile Include="Debug\DebugBreakPointEventArgs.cs" />
+    <Compile Include="Debug\DebugerProcess.cs" />
+    <Compile Include="Debug\DebugLocation.cs" />
+    <Compile Include="Debug\DebugManager.cs" />
+    <Compile Include="Debug\DebugMarkerVisitor.cs" />
+    <Compile Include="Debug\DebugNode.cs" />
+    <Compile Include="Debug\SourcePosition.cs" />
     <Compile Include="Extensions\HashSetExtensions.cs" />
     <Compile Include="GrammarErrorException.cs" />
     <Compile Include="Runtime\Promotion\StringIndexerBinding.cs" />
@@ -187,7 +194,6 @@
     <Compile Include="Parser\Enums.cs" />
     <Compile Include="Parser\Ast\TokenAst.cs" />
     <Compile Include="Parser\SyntaxError.cs" />
-    <Compile Include="Processing\DebugMarkerVisitor.cs" />
     <Compile Include="Processing\FunctionDeclarationVisitor.cs" />
     <Compile Include="Processing\IPostProcessing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

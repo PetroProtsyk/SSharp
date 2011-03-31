@@ -20,6 +20,8 @@ using Scripting.SSharp.Runtime;
 
 namespace Scripting.SSharp.Parser.Ast
 {
+  using Debug = System.Diagnostics.Debug;
+
   /// <summary>
   /// Assignment Expression
   /// </summary>

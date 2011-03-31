@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-using System.Diagnostics;
-
 namespace Scripting.SSharp.Parser.Ast
 {
   using Runtime.Operators;
   using Runtime;
+  using Debug = System.Diagnostics.Debug;
 
   /// <summary>
   /// Script Array Constructor Expression

@@ -165,7 +165,13 @@ namespace Scripting.SSharp
 #if !SILVERLIGHT
     public static Script CompileForDebug(string code)
     {
-      return Compile(code, new IPostProcessing[] { new FunctionDeclarationVisitor(), new DebugMarkerVisitor() }, false);
+      return Compile(code, 
+                    new IPostProcessing[] 
+                    { 
+                        new FunctionDeclarationVisitor(), 
+                        new Scripting.SSharp.Debug.DebugMarkerVisitor()
+                    }, 
+                    false);
     }
 #endif
 
