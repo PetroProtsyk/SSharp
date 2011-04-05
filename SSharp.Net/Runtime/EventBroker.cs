@@ -30,7 +30,7 @@ namespace Scripting.SSharp.Runtime
   {
     protected IInvokable Target { get; set; }
 
-    private static Dictionary<object, Dictionary<EventInfo, InvokactionInfo>> Subscriptions = new Dictionary<object, Dictionary<EventInfo, InvokactionInfo>>();
+    private static Dictionary<object, Dictionary<EventInfo, List<InvocationInfo>>> Subscriptions = new Dictionary<object, Dictionary<EventInfo, List<InvocationInfo>>>();
     private static readonly Dictionary<IInvokable, Script> MethodContextMapping = new Dictionary<IInvokable, Script>();
 
     internal static void RegisterFunction(IInvokable function, Script script)
@@ -51,12 +51,30 @@ namespace Scripting.SSharp.Runtime
       AddInvokation(targetObject, ei, deleg, function);
     }
 
-    internal static void RemoveEvent(EventInfo ei, object targetObject)
+    internal static void RemoveEvent(EventInfo ei, object targetObject, IInvokable function)
     {
-      if (Subscriptions[targetObject].ContainsKey(ei))
+      Dictionary<EventInfo, List<InvocationInfo>> targetSubscriptions;
+      if (Subscriptions.TryGetValue(targetObject, out targetSubscriptions))
       {
-        ei.RemoveEventHandler(targetObject, Subscriptions[targetObject][ei].HandlerDelegate);
-        Subscriptions[targetObject].Remove(ei);
+          List<InvocationInfo> eventSubscriptions;
+          if (targetSubscriptions.TryGetValue(ei, out eventSubscriptions)) {
+
+              foreach (InvocationInfo invocation_info in eventSubscriptions) {
+                  if (invocation_info.HandlerFunction != function) 
+                      continue;
+                  
+                  ei.RemoveEventHandler(targetObject, invocation_info.HandlerDelegate);
+                  eventSubscriptions.Remove(invocation_info);
+
+                  if (eventSubscriptions.Count == 0)
+                      targetSubscriptions.Remove(ei);
+
+                  break;
+              }
+          }
+
+          if (eventSubscriptions.Count == 0)
+              Subscriptions.Remove(targetObject);
       }
     }
 
@@ -73,12 +91,15 @@ namespace Scripting.SSharp.Runtime
       MethodContextMapping.Clear();
 
       if (Subscriptions == null) return;
-      foreach (var o in Subscriptions.Keys)
+      foreach (object targetObject in Subscriptions.Keys.ToArray())
       {
-        var keys = Subscriptions[o].Keys.ToArray();
-        
-        foreach (var ei in keys)
-          RemoveEvent(ei, o);
+        Dictionary<EventInfo, List<InvocationInfo>> targetInvocations=Subscriptions[targetObject];
+        EventInfo[] eventInvocations = targetInvocations.Keys.ToArray();
+        foreach (var ei in eventInvocations) {
+            InvocationInfo[] invocations = targetInvocations[ei].ToArray();
+            foreach (InvocationInfo invocation in invocations)
+                RemoveEvent(ei, targetObject, invocation.HandlerFunction);
+        }
       }
       Subscriptions.Clear();
     }
@@ -105,13 +126,20 @@ namespace Scripting.SSharp.Runtime
 
     private static void AddInvokation(object target, EventInfo ei, Delegate deleg, IInvokable function)
     {
-      if (!Subscriptions.ContainsKey(target))
-        Subscriptions.Add(target, new Dictionary<EventInfo, InvokactionInfo>());
+        Dictionary<EventInfo, List<InvocationInfo>> targetSubscriptions;
 
-      if (Subscriptions[target].ContainsKey(ei))
-        throw new ScriptEventException(Strings.DuplicateEventSubscriptionError);
+        if (!Subscriptions.TryGetValue(target, out targetSubscriptions)) {
+            targetSubscriptions=new Dictionary<EventInfo, List<InvocationInfo>>();
+            Subscriptions.Add(target,targetSubscriptions);
+        }
 
-      Subscriptions[target].Add(ei, new InvokactionInfo(deleg, function));
+        List<InvocationInfo> eventSubscriptions;
+        if (!targetSubscriptions.TryGetValue(ei, out eventSubscriptions)) {
+            eventSubscriptions = new List<InvocationInfo>();
+            targetSubscriptions.Add(ei, eventSubscriptions);
+        }
+
+        eventSubscriptions.Add(new InvocationInfo(deleg, function));
     }
   }
 
@@ -182,12 +210,12 @@ namespace Scripting.SSharp.Runtime
     #endregion
   }
 
-  internal class InvokactionInfo
+  internal class InvocationInfo
   {
     public Delegate HandlerDelegate { get; private set; }
     public IInvokable HandlerFunction { get; private set; }
 
-    public InvokactionInfo(Delegate handler, IInvokable function)
+    public InvocationInfo(Delegate handler, IInvokable function)
     {
       HandlerDelegate = handler;
       HandlerFunction = function;

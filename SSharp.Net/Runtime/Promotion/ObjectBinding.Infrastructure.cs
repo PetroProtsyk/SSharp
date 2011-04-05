@@ -165,10 +165,12 @@ namespace Scripting.SSharp.Runtime.Promotion
         if (ei == null) return NoResult;
         if (!CanBind(ei)) return NoResult;
 
-        if (!(value is RemoveDelegate))
+        RemoveDelegate remove_delegate = value as RemoveDelegate;
+
+        if (remove_delegate==null)
           EventBroker.AssignEvent(ei, instance, (IInvokable)value);
         else
-          EventBroker.RemoveEvent(ei, instance);
+          EventBroker.RemoveEvent(ei, instance, remove_delegate.OriginalMethod);
 
         return value;
       }

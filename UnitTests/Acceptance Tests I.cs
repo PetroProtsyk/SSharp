@@ -585,6 +585,45 @@ namespace UnitTests
     }
 
     [TestMethod]
+    public void DuplicateEvents() {
+        Script s = Script.Compile(
+           @"
+            invoked_count = 0;
+ 
+            function handler(s,e) global(invoked_count) {
+             invoked_count++;
+            }
+
+            function handler2(s,e) global(invoked_count) {
+             invoked_count+=2;
+            }
+
+            ce = new ContextEvent();
+
+            ce.NameChanged += handler;
+            ce.NameChanged += handler;
+            ce.NameChanged += handler2;
+
+            ce.Name = 'TestName';
+            ce.Name = 'TestName0';
+
+            // Remove events in different order
+            ce.NameChanged -= handler2;
+            ce.NameChanged -= handler;
+            ce.NameChanged -= handler;
+
+            // Change again
+            ce.Name = 'TestName1';
+
+            "
+           );
+
+        s.Execute();
+        Assert.AreEqual(8, (int)s.Context.GetItem("invoked_count", false));
+        Assert.IsTrue(((ContextEvent)s.Context.GetItem("ce", false)).IsNullEvent);
+    }
+
+    [TestMethod]
     public void ContextDependantEvents()
     {      
       Script s = Script.Compile(
@@ -674,6 +713,12 @@ namespace UnitTests
         if (NameChanged != null)
           NameChanged.Invoke(this, EventArgs.Empty);
       }
+    }
+
+    public bool IsNullEvent {
+        get {
+            return NameChanged == null;
+        }
     }
 
     public event EventHandler<EventArgs> NameChanged;

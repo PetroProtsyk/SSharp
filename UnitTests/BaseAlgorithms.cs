@@ -508,8 +508,7 @@ namespace UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ScriptEventException))]
-    public void DuplicateEventSubscriptionThrowsException()
+    public void DuplicateEventSubscriptionSupported()
     {
       Script script2 = Script.Compile(@"function f(sender){ sender.test = 1;}
        c = new EventHelperInvocation();
@@ -517,7 +516,7 @@ namespace UnitTests
        c.eva+=f;
        c.eva+=f;
        ");
-      EventHelperInvocation rez = (EventHelperInvocation)script2.Execute();
+      script2.Execute();
     }
 
 
