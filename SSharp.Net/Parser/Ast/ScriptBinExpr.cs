@@ -63,7 +63,7 @@ using System;
 
     public override void Evaluate(IScriptContext context)
     {
-        Evaluation(context);        
+        Evaluation(context);
     }
 
     private void ConstFirstEvaluate(IScriptContext context) {

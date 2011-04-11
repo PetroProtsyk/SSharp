@@ -461,6 +461,17 @@ namespace UnitTests
       Assert.AreEqual(2.3*(double)((new Decimal(19.2d))+1), s1.Context.GetItem("d", true));
 
     }
+
+
+    [TestMethod]
+    public void ExpressionTypeConversion() {
+        string code1 = "a='19'; b='3'; s=(Decimal)a+(Decimal)b;";
+        var s = Script.Compile(code1);
+        var c = s.Execute();
+        string tt = s.SyntaxTree;
+        Assert.IsInstanceOfType(c, typeof(decimal));
+        Assert.AreEqual(new Decimal(22), c);
+    }
   }
 
   #region Interfaces
