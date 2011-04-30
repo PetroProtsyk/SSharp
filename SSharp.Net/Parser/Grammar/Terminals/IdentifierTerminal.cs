@@ -41,7 +41,7 @@ namespace Scripting.SSharp.Parser.FastGrammar
              "switch", "case", "default", "break",
              "continue", "return", "function", "is",
              "pre", "post", "invariant", "new", "using",
-             "global", "ref", "out", "var");
+             "global", "ref", "out", "var", "namespace");
     }
 
     private void AddKeywords(params string[] keywords)

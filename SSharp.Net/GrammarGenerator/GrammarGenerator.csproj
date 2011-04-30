@@ -70,6 +70,7 @@
     <Compile Include="Ast\AScriptAstTemplate.cs" />
     <Compile Include="Ast\AstNode.cs" />
     <Compile Include="Ast\AstNodeArgs.cs" />
+    <Compile Include="Ast\ScriptNamespaceDefinition.cs" />
     <Compile Include="Ast\IAstVisitor.cs" />
     <Compile Include="Ast\ScriptArrayConstructor.cs" />
     <Compile Include="Ast\ScriptArrayResolution.cs" />

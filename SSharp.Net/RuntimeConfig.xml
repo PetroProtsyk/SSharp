@@ -41,6 +41,9 @@
     <!--Local scope-->
     <Scope id="5" type="Scripting.SSharp.Runtime.LocalScopeActivator" />
 
+    <!--Namespace scope-->
+    <Scope id="6" type="Scripting.SSharp.Runtime.NamespaceScopeActivator" />
+
   </Scopes>
 
   <Operators>

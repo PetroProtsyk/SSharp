@@ -55,6 +55,8 @@ namespace Scripting.SSharp.Runtime
 
     Reserved = 4,
 
-    Local = 5
+    Local = 5,
+
+    Namespace = 6
   }
 }

@@ -391,6 +391,9 @@
     <Compile Include="..\SSharp.Net\Parser\Ast\ScriptMObjectPart.cs">
       <Link>Parser\Ast\ScriptMObjectPart.cs</Link>
     </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptNamespaceDefinition.cs">
+      <Link>Parser\Ast\ScriptNamespaceDefinition.cs</Link>
+    </Compile>
     <Compile Include="..\SSharp.Net\Parser\Ast\ScriptNewArrStmt.cs">
       <Link>Parser\Ast\ScriptNewArrStmt.cs</Link>
     </Compile>
@@ -606,6 +609,9 @@
     </Compile>
     <Compile Include="..\SSharp.Net\Runtime\LocalScopeActivator.cs">
       <Link>Runtime\LocalScopeActivator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\NamespaceScope.cs">
+      <Link>Runtime\NamespaceScope.cs</Link>
     </Compile>
     <Compile Include="..\SSharp.Net\Runtime\ObjectActivator.cs">
       <Link>Runtime\ObjectActivator.cs</Link>

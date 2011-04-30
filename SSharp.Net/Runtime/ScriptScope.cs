@@ -154,7 +154,7 @@ namespace Scripting.SSharp.Runtime
 
     public virtual IValueReference Ref(string id)
     {
-      if (!HasVariable(id)) throw new ScriptIdNotFoundException(id);
+      if (!_vars.ContainsKey(id)) throw new ScriptIdNotFoundException(id);
 
       return _vars[id];
     }

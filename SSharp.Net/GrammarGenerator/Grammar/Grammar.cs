@@ -136,6 +136,7 @@ namespace Scripting.SSharp.Parser
       NonTerminal TryCatchFinallyStatement = new NonTerminal("TryCatchFinallyStatement", typeof(ScriptTryCatchFinallyStatement));
       NonTerminal FlowControlStatement = new NonTerminal("FlowControl", typeof(ScriptFlowControlStatement));
       NonTerminal ExprStatement = new NonTerminal("ExprStatement", typeof(ScriptStatement));
+      NonTerminal NamespaceDefinition = new NonTerminal("NamespaceDefinition", typeof(ScriptNamespaceDefinition));
 
       //Block
       NonTerminal BlockStatement = new NonTerminal("BlockStatement", typeof(ScriptStatement));
@@ -255,6 +256,7 @@ namespace Scripting.SSharp.Parser
       ForStatement.Rule = "for" + LCb + OptionalExpression + semicolon + OptionalExpression + semicolon + OptionalExpression + RCb + Statement;
       ForEachStatement.Rule = "foreach" + LCb + v + "in" + Expr + RCb + Statement;
       UsingStatement.Rule = "using" + LCb + Expr + RCb + BlockStatement;
+      NamespaceDefinition.Rule = "namespace" + v + BlockStatement;
       TryCatchFinallyStatement.Rule = "try" + BlockStatement + "catch" + LCb + v + RCb + BlockStatement + "finally" + BlockStatement;
       SwitchStatement.Rule = "switch" + LCb + Expr + RCb + LFb + SwitchStatements + RFb;
       ExprStatement.Rule = Expr + semicolon;
@@ -269,11 +271,12 @@ namespace Scripting.SSharp.Parser
                       | ForStatement                //3. For
                       | ForEachStatement            //4. ForEach
                       | UsingStatement              //5. Using
-                      | SwitchStatement             //6. Switch
-                      | BlockStatement              //7. Block
-                      | TryCatchFinallyStatement    //8. TryCatch
-                      | ExprStatement               //9. Expr
-                      | FlowControlStatement;       //10. FlowControl
+                      | NamespaceDefinition         //6. Namespace
+                      | SwitchStatement             //7. Switch
+                      | BlockStatement              //8. Block
+                      | TryCatchFinallyStatement    //9. TryCatch
+                      | ExprStatement               //10. Expr
+                      | FlowControlStatement;       //11. FlowControl
 
       Statements.SetOption(TermOptions.IsList);
       Statements.Rule = Statements + Statement | Empty;
@@ -379,7 +382,7 @@ namespace Scripting.SSharp.Parser
 
     internal bool IsPseudoTerminal(Terminal term)
     {
-      return term == Empty || term == Eof || term == SyntaxError;        
+      return term == Empty || term == Eof || term == SyntaxError;
     }
     #endregion
   }
