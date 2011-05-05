@@ -26,6 +26,8 @@ namespace Scripting.SSharp.Runtime
     private string _name;
     private HashSet<string> _names = new HashSet<string>();
 
+    internal const string NameFormat = "{0}_{1}";
+
     public NamespaceScope(IScriptScope parent, string name) :
         base(parent)
     {
@@ -36,7 +38,7 @@ namespace Scripting.SSharp.Runtime
 
     public string FormatId(string id)
     {
-      return string.Format("{0}_{1}", _name, id);
+      return string.Format(NameFormat, _name, id);
     }
 
     protected override object GetVariableInternal(string id, bool searchHierarchy)

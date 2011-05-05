@@ -27,6 +27,8 @@ namespace Scripting.SSharp.Parser.Ast
     private readonly string _name;
     private readonly ScriptAst _statement;
 
+    public string Name { get { return _name; } }
+
     public ScriptNamespaceDefinition(AstNodeArgs args)
         : base(args)
     {

@@ -17,6 +17,7 @@
 using System;
 using Scripting.SSharp.Runtime;
 using Scripting.SSharp.Parser.Ast;
+using System.Collections.Generic;
 
 namespace Scripting.SSharp.Processing
 {
@@ -25,20 +26,42 @@ namespace Scripting.SSharp.Processing
     private Script _script;
 
     #region IAstVisitor Members
+    public Stack<string> _names = new Stack<string>();
 
     public void BeginVisit(AstNode node)
     {
+      var namespaceNode = node as ScriptNamespaceDefinition;
+      if (namespaceNode != null)
+      {
+        _names.Push(namespaceNode.Name);
+      }
+
       var definition = node as ScriptFunctionDefinition;
       if (definition == null || string.IsNullOrEmpty(definition.Name)) return;
 
       definition._owner = _script;
-      _script.Context.SetItem(definition.Name, definition);
+
+      if (_names.Count > 0)
+      {
+        _script.Context.SetItem(
+          string.Format(NamespaceScope.NameFormat, _names.Peek(), definition.Name), 
+          definition); 
+      }
+      else
+      {
+        _script.Context.SetItem(definition.Name, definition);
+      }
 
       EventBroker.RegisterFunction(definition, _script);
     }
 
     public void EndVisit(AstNode node)
     {
+      var namespaceNode = node as ScriptNamespaceDefinition;
+      if (namespaceNode != null)
+      {
+        _names.Pop();
+      }
     }
 
     #endregion

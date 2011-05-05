@@ -256,7 +256,7 @@ namespace Scripting.SSharp.Parser
       ForStatement.Rule = "for" + LCb + OptionalExpression + semicolon + OptionalExpression + semicolon + OptionalExpression + RCb + Statement;
       ForEachStatement.Rule = "foreach" + LCb + v + "in" + Expr + RCb + Statement;
       UsingStatement.Rule = "using" + LCb + Expr + RCb + BlockStatement;
-      NamespaceDefinition.Rule = "namespace" + v + BlockStatement;
+      NamespaceDefinition.Rule = "namespace" + v + LFb + Elements + RFb;
       TryCatchFinallyStatement.Rule = "try" + BlockStatement + "catch" + LCb + v + RCb + BlockStatement + "finally" + BlockStatement;
       SwitchStatement.Rule = "switch" + LCb + Expr + RCb + LFb + SwitchStatements + RFb;
       ExprStatement.Rule = Expr + semicolon;

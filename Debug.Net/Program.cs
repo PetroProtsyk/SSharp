@@ -34,6 +34,18 @@ namespace Debug.Net
       RuntimeHost.Initialize();
       RuntimeHost.AddType<Person>("Person");
 
+      object c = Script.RunCode(@"
+        namespace A{
+          b = 2;
+          b = b + 1;
+
+          function c(){
+            return A_b;
+          }
+        }
+
+        return A_c();");
+
       object o = Script.RunCode(@"
  
 N = 100;
