@@ -39,12 +39,25 @@ namespace Debug.Net
           b = 2;
           b = b + 1;
 
-          function c(){
-            return A_b;
+          function c() global(b){
+            b++;
+            return a(b);
+          }
+
+          function a(b){
+            return b+1;
           }
         }
 
-        return A_c();");
+        namespace B{
+          e = 5;
+
+          function c(){
+             return e;
+          }
+        }
+
+        return A_c()+B_c();");
 
       object o = Script.RunCode(@"
  

@@ -82,5 +82,37 @@ namespace UnitTests
       Assert.AreEqual(2, context.GetItem("b", true));
     }
 
+
+    [TestMethod]
+    public void NamespacesInDifferentScenarious() {
+        ScriptContext context = new ScriptContext();
+        IScriptScope scope = context.Scope;
+        Script.RunCode(@"
+        namespace A{
+          b = 2;
+          b = b + 1;
+
+          function c() global(b){
+            b++;
+            return a(b);
+          }
+
+          function a(b){
+            return b+1;
+          }
+        }
+
+        namespace B{
+          e = 5;
+
+          function c(){
+             return e;
+          }
+        }
+
+        return A_c()+B_c();", context);
+
+        Assert.AreEqual(10, context.Result);
+    }
   }
 }

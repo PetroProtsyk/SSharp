@@ -45,7 +45,8 @@ namespace Scripting.SSharp.Processing
       {
         _script.Context.SetItem(
           string.Format(NamespaceScope.NameFormat, _names.Peek(), definition.Name), 
-          definition); 
+          definition);
+        definition.namespaceName = _names.Peek();
       }
       else
       {

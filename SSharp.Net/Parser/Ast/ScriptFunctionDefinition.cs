@@ -37,6 +37,7 @@ namespace Scripting.SSharp.Parser.Ast
 
     //Field used to ensure consistency
     internal Script _owner;
+    internal string namespaceName;
 
     public ScriptFunctionDefinition(AstNodeArgs args)
         : base(args)
@@ -112,6 +113,7 @@ namespace Scripting.SSharp.Parser.Ast
           }
 
           functionScope.BeforeSetItem += ScopeBeforeSetItem;
+          functionScope.BeforeGetItem += ScopeBeforeGetItem;
 
           if (_contract != null)
           {
@@ -138,10 +140,26 @@ namespace Scripting.SSharp.Parser.Ast
           context.Result = result;
 
           functionScope.BeforeSetItem -= ScopeBeforeSetItem;
+          functionScope.BeforeGetItem -= ScopeBeforeGetItem;
           _activeContext = null;
         }
 
         return result;
+    }
+
+    void ScopeBeforeGetItem(IScriptScope sender, ScopeArgs args) {
+        if (string.IsNullOrEmpty(namespaceName)) return;
+        string namespace_name = string.Format(NamespaceScope.NameFormat, namespaceName, args.Name);
+
+        IScriptScope scope = sender;
+        while (scope != null) {
+            if (scope.HasVariable(namespace_name)) {
+                args.Value = scope.GetItem(namespace_name, true);
+                args.Cancel = true;
+                return;
+            }
+            scope = scope.Parent;
+        }
     }
 
     private void ScopeBeforeSetItem(IScriptScope sender, ScopeArgs args)
@@ -151,8 +169,14 @@ namespace Scripting.SSharp.Parser.Ast
 
       if (globalNames.Contains(args.Name))
       {
-        ScriptQualifiedName.SetToParentScope(sender.Parent, args.Name, args.Value);        
-        args.Cancel = true;
+          if (string.IsNullOrEmpty(namespaceName)) {
+              ScriptQualifiedName.SetToParentScope(sender.Parent, args.Name, args.Value);
+          } else {
+              string namespace_name = string.Format(NamespaceScope.NameFormat, namespaceName, args.Name);
+              ScriptQualifiedName.SetToParentScope(sender.Parent, namespace_name, args.Value);
+          }
+
+          args.Cancel = true;
       }
 
       //if (!sender.HasVariable(args.Name))
