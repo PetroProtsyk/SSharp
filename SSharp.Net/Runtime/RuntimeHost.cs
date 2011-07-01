@@ -102,8 +102,8 @@ namespace Scripting.SSharp.Runtime
 #if PocketPC || SILVERLIGHT
       Initialize(DefaultConfig);
 #else
-      Initialize(DefaultConfig);
-      //Initialize(Configurations.CreateDefault());
+      //Initialize(DefaultConfig);
+      Initialize(Configurations.CreateDefault());
 #endif     
     }
 

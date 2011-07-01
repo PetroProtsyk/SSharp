@@ -13,6 +13,7 @@ public class Configurations
    {
       ScriptConfiguration cf = new ScriptConfiguration();
       cf.References.Add(new Reference("System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",true));
+      cf.References.Add(new Reference("System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",true));
       
 
       cf.Types.Add(new TypeXml() { Alias = "string", QualifiedName = "System.String" });
@@ -36,6 +37,7 @@ public class Configurations
       cf.Scopes.Add(new ScopeDefinition() { Id = 2, Type = "Scripting.SSharp.Runtime.ScriptUsingScopeActivator" });
       cf.Scopes.Add(new ScopeDefinition() { Id = 3, Type = "Scripting.SSharp.Runtime.EventScopeActivator" });
       cf.Scopes.Add(new ScopeDefinition() { Id = 5, Type = "Scripting.SSharp.Runtime.LocalScopeActivator" });
+      cf.Scopes.Add(new ScopeDefinition() { Id = 6, Type = "Scripting.SSharp.Runtime.NamespaceScopeActivator" });
 
       cf.Operators.Add(new OperatorDefinition() { Name = "Plus", Type = "Scripting.SSharp.Runtime.Operators.AddOperator" });
       cf.Operators.Add(new OperatorDefinition() { Name = "Minus", Type = "Scripting.SSharp.Runtime.Operators.SubOperator" });
