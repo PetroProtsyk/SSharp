@@ -20,6 +20,7 @@ using System.Text;
 using Scripting.SSharp.Processing;
 using Scripting.SSharp.Runtime;
 using Scripting.SSharp.Parser.Ast;
+using Scripting.SSharp.Parser.PreProcessor;
 
 namespace Scripting.SSharp
 {
@@ -210,6 +211,7 @@ namespace Scripting.SSharp
     {
       if (string.IsNullOrEmpty(code)) throw new ArgumentNullException("code");
 
+      code = PreProcessor.Process(code);
       var result = isExpression ? RuntimeHost.Parser.Parse("return " + code + ";") : RuntimeHost.Parser.Parse(code);
 
       if (result == null)

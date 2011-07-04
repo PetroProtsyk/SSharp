@@ -505,6 +505,9 @@
     <Compile Include="..\SSharp.Net\Parser\Grammar\Terminals\SymbolTerminal.cs">
       <Link>Parser\Grammar\Terminals\SymbolTerminal.cs</Link>
     </Compile>
+    <Compile Include="..\SSharp.Net\Parser\PreProcessor\PreProcessor.cs">
+      <Link>Parser\PreProcessor\PreProcessor.cs</Link>
+    </Compile>
     <Compile Include="..\SSharp.Net\Parser\SourceFile.cs">
       <Link>Parser\SourceFile.cs</Link>
     </Compile>
@@ -609,6 +612,12 @@
     </Compile>
     <Compile Include="..\SSharp.Net\Runtime\LocalScopeActivator.cs">
       <Link>Runtime\LocalScopeActivator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Modules\IScriptModuleManager.cs">
+      <Link>Runtime\Modules\IScriptModuleManager.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Modules\ScriptModuleManager.cs">
+      <Link>Runtime\Modules\ScriptModuleManager.cs</Link>
     </Compile>
     <Compile Include="..\SSharp.Net\Runtime\NamespaceScope.cs">
       <Link>Runtime\NamespaceScope.cs</Link>

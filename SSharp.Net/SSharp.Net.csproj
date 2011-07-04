@@ -60,6 +60,9 @@
     <Compile Include="Extensions\HashSetExtensions.cs" />
     <Compile Include="GrammarErrorException.cs" />
     <Compile Include="Parser\Ast\ScriptNamespaceDefinition.cs" />
+    <Compile Include="Parser\PreProcessor\PreProcessor.cs" />
+    <Compile Include="Runtime\Modules\IScriptModuleManager.cs" />
+    <Compile Include="Runtime\Modules\ScriptModuleManager.cs" />
     <Compile Include="Runtime\NamespaceScope.cs" />
     <Compile Include="Runtime\Promotion\StringIndexerBinding.cs" />
     <Compile Include="Runtime\RuntimeObject.cs" />

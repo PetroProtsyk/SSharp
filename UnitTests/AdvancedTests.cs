@@ -566,6 +566,33 @@ namespace UnitTests
         result.Execute();
     }
 
+    [TestMethod]
+    public void Modules() {
+        RuntimeHost.ModuleManager.RegisterModule("sqrt", "function sqrt(x) { return Math.Sqrt(x); }");
+
+        Script s = Script.Compile(@"
+            #include<sqrt>
+            return sqrt(4);
+        ");
+
+        Assert.AreEqual(2.0, s.Execute());
+    }
+
+    [TestMethod]
+    public void ModulesDoesNotWorkWithString() {
+        RuntimeHost.ModuleManager.RegisterModule("sqrt", "function sqrt(x) { return Math.Sqrt(x); }");
+
+        Script s = Script.Compile(@"s=@'
+            #include<sqrt>
+            ';
+            return s;
+        ");
+
+        Assert.AreEqual(@"
+            #include<sqrt>
+            ", s.Execute());
+    }
+
   }
 
   public class TestFunction : IInvokable

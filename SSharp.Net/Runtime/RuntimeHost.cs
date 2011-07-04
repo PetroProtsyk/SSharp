@@ -31,6 +31,7 @@ using Scripting.SSharp.Runtime.Promotion;
 using Scripting.SSharp.Runtime.Configuration;
 using Scripting.SSharp.Runtime.Operators;
 using Scripting.SSharp.Diagnostics;
+using Scripting.SSharp.Runtime.Modules;
 
 namespace Scripting.SSharp.Runtime
 {
@@ -73,6 +74,9 @@ namespace Scripting.SSharp.Runtime
 
     [Promote(false)]
     public static IAssemblyManager AssemblyManager { get; set; }
+
+    [Promote(false)]
+    public static IScriptModuleManager ModuleManager { get; set; }
 
     /// <summary>
     /// Activator which used to activate instances
@@ -137,6 +141,9 @@ namespace Scripting.SSharp.Runtime
 
         if (Activator == null)
           Activator = new ObjectActivator();
+
+        if (ModuleManager == null)
+          ModuleManager = new ScriptModuleManager();
 
         InitializeSettingItems();
         RegisterOperators();
@@ -216,6 +223,7 @@ namespace Scripting.SSharp.Runtime
         Binder = null;
         Activator = null;
         ScopeFactory = null;
+        ModuleManager = null;
 
         if (AssemblyManager != null)
         {
