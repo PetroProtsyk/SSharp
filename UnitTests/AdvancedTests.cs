@@ -367,7 +367,7 @@ namespace UnitTests
     }
 
     [TestMethod]
-    public void ConflictingLexicalTokens()
+    public void ConflictingLexicalTokens_Bug()
     {
       //Is a conflict between meta expression token <[   ]>
       //and array resolution with greater operator
