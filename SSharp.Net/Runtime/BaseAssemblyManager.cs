@@ -117,15 +117,26 @@ namespace Scripting.SSharp.Runtime
         //Register in namespaces
         if (!string.IsNullOrEmpty(type.Namespace))
         {
-          if (Namespaces.ContainsKey(type.Namespace))
+          string[] parts = type.Namespace.Split('.');
+          string current = null;
+          List<Type> types = null;
+
+          foreach (string part in parts)
           {
-            Namespaces[type.Namespace].Add(type);
+            if (current == null)
+              current = part;
+            else
+              current += "." + part;
+
+            if (!Namespaces.TryGetValue(current, out types))
+            {
+              types = new List<Type>();
+              Namespaces.Add(current, types);
+            }
           }
-          else
-          {
-            var types = new List<Type> { type };
-            Namespaces.Add(type.Namespace, types);
-          }
+
+          // Add type to the last namespace
+          types.Add(type);
         }
       }
 
@@ -148,9 +159,23 @@ namespace Scripting.SSharp.Runtime
         {
           List<Type> types = Namespaces[type.Namespace];
           types.Remove(type);
-          if (types.Count == 0)
-            Namespaces.Remove(type.Namespace);
+
+          // Remove all empty subnamespaces
+          string[] parts = type.Namespace.Split('.');
+          string current = null;
+
+          for (int i = 0; i < parts.Length; i++)
+          {
+            current = string.Join(".", parts.Take(parts.Length - i));
+
+            types = Namespaces[current];
+            if (types.Count == 0 && Namespaces.Keys.Where(p=>p.Contains(current+".")).Count()==0)
+            {
+              Namespaces.Remove(type.Namespace);
+            }
+          }
         }
+
       }
 
       if (ShortTypes.ContainsKey(type.Name))
@@ -246,7 +271,7 @@ namespace Scripting.SSharp.Runtime
 
       if (!WorkingAssemblies.Contains(assembly)) return;
 
-      foreach (Type type in assembly.GetTypes())
+      foreach (Type type in assembly.GetExportedTypes())
       {
         if (!type.IsPublic) continue;
 

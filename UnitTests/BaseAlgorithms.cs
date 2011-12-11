@@ -212,6 +212,8 @@ namespace UnitTests
       object rez = Script.RunCode(@"a = System.Text.RegularExpressions.Regex.CacheSize;");
 
       Assert.AreEqual(System.Text.RegularExpressions.Regex.CacheSize, rez);
+
+      Assert.AreEqual(Scripting.SSharp.Runtime.RuntimeHost.Activator, Script.RunCode("return Scripting.SSharp.Runtime.RuntimeHost.Activator;"));
     }
 
     [TestMethod]
