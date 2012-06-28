@@ -641,6 +641,25 @@ namespace UnitTests
     }
 
     [TestMethod]
+    public void BitOperators() {
+        object rez = Script.RunCode(@"
+         a = 1;
+         b = 2;
+         return a|b;
+      ");
+
+        Assert.AreEqual(3, rez);
+
+        rez = Script.RunCode(@"
+         a = 1;
+         b = 2;
+         return a&b;
+      ");
+
+        Assert.AreEqual(0, rez);
+    }
+
+    [TestMethod]
     public void ComparingCharProperties()
     {
       object rez = Script.RunCode(@"

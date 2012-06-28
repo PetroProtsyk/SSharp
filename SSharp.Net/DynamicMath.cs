@@ -190,7 +190,7 @@ namespace Scripting.SSharp
       return left / right;
     }
 
-    public static bool And(dynamic left, dynamic right)
+    public static dynamic And(dynamic left, dynamic right)
     {
       return left & right;
     }
@@ -200,7 +200,7 @@ namespace Scripting.SSharp
       return left && right;
     }
 
-    public static bool Or(dynamic left, dynamic right)
+    public static dynamic Or(dynamic left, dynamic right)
     {
       return left | right;
     }
