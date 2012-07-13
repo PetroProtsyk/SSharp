@@ -1,21 +1,4 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 using System;
-using System.Linq;
 using Scripting.SSharp.Runtime;
 
 namespace Scripting.SSharp.CustomFunctions
@@ -39,9 +22,9 @@ namespace Scripting.SSharp.CustomFunctions
     public object Invoke(IScriptContext context, object[] args)
     {
       if (args == null || args.Length == 0) return new object[0];
-
-      Array result;
-      var type = args[0] as Type;
+      
+      Array result = null;
+      Type type = args[0] as Type;
       if (type != null)
       {
         result = Array.CreateInstance(type, args.Length - 1);
@@ -50,9 +33,12 @@ namespace Scripting.SSharp.CustomFunctions
         return result;
       }
 
-      foreach (var item in args.Where(item => item != null))
+      type = null;
+      foreach (object item in args)
       {
-        if (type == null) { type = item.GetType(); continue; }
+        if (item == null) continue;
+        if (type == null) { type = item.GetType(); continue;}
+
         if (type != item.GetType()) return args.Clone();
       }
 

@@ -12,7 +12,7 @@ public class Configurations
    public static ScriptConfiguration CreateDefault()
    {
       ScriptConfiguration cf = new ScriptConfiguration();
-      cf.References.Add(new Reference("System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",true));
+      cf.References.Add(new Reference("System.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",true));
       
 
       cf.Types.Add(new TypeXml() { Alias = "string", QualifiedName = "System.String" });
@@ -25,7 +25,6 @@ public class Configurations
       cf.Types.Add(new TypeXml() { Alias = "decimal", QualifiedName = "System.Decimal" });
       cf.Types.Add(new TypeXml() { Alias = "float", QualifiedName = "System.Single" });
       cf.Types.Add(new TypeXml() { Alias = "object", QualifiedName = "System.Object" });
-      cf.Types.Add(new TypeXml() { Alias = "dynamic", QualifiedName = "Scripting.SSharp.Runtime.RuntimeObject" });
       cf.Types.Add(new TypeXml() { Alias = "Array", QualifiedName = "System.Collections.Generic.List`1[[System.Object]]" });
       cf.Types.Add(new TypeXml() { Alias = "Expando", QualifiedName = "Scripting.SSharp.Runtime.Promotion.Expando" });
       cf.Types.Add(new TypeXml() { Alias = "Wrapper", QualifiedName = "Scripting.SSharp.Runtime.Promotion.ExpandoWrapper" });
@@ -37,20 +36,20 @@ public class Configurations
       cf.Scopes.Add(new ScopeDefinition() { Id = 3, Type = "Scripting.SSharp.Runtime.EventScopeActivator" });
       cf.Scopes.Add(new ScopeDefinition() { Id = 5, Type = "Scripting.SSharp.Runtime.LocalScopeActivator" });
 
-      cf.Operators.Add(new OperatorDefinition() { Name = "Plus", Type = "Scripting.SSharp.Runtime.Operators.AddOperator" });
-      cf.Operators.Add(new OperatorDefinition() { Name = "Minus", Type = "Scripting.SSharp.Runtime.Operators.SubOperator" });
+      cf.Operators.Add(new OperatorDefinition() { Name = "Plus", Type = "Scripting.SSharp.Runtime.Operators.PlusOperator" });
+      cf.Operators.Add(new OperatorDefinition() { Name = "Minus", Type = "Scripting.SSharp.Runtime.Operators.MinusOperator" });
       cf.Operators.Add(new OperatorDefinition() { Name = "Mod", Type = "Scripting.SSharp.Runtime.Operators.ModOperator" });
       cf.Operators.Add(new OperatorDefinition() { Name = "Div", Type = "Scripting.SSharp.Runtime.Operators.DivOperator" });
       cf.Operators.Add(new OperatorDefinition() { Name = "Mul", Type = "Scripting.SSharp.Runtime.Operators.MulOperator" });
       cf.Operators.Add(new OperatorDefinition() { Name = "Pow", Type = "Scripting.SSharp.Runtime.Operators.PowOperator" });
       cf.Operators.Add(new OperatorDefinition() { Name = "Less", Type = "Scripting.SSharp.Runtime.Operators.LessOperator" });
-      cf.Operators.Add(new OperatorDefinition() { Name = "LessEquals", Type = "Scripting.SSharp.Runtime.Operators.LessOrEqualsOperator" });
-      cf.Operators.Add(new OperatorDefinition() { Name = "Greater", Type = "Scripting.SSharp.Runtime.Operators.GreaterOperator" });
-      cf.Operators.Add(new OperatorDefinition() { Name = "GreaterEquals", Type = "Scripting.SSharp.Runtime.Operators.GreaterOrEqualsOperator" });
+      cf.Operators.Add(new OperatorDefinition() { Name = "LessEquals", Type = "Scripting.SSharp.Runtime.Operators.LqOperator" });
+      cf.Operators.Add(new OperatorDefinition() { Name = "Greater", Type = "Scripting.SSharp.Runtime.Operators.GrOperator" });
+      cf.Operators.Add(new OperatorDefinition() { Name = "GreaterEquals", Type = "Scripting.SSharp.Runtime.Operators.GqOperator" });
       cf.Operators.Add(new OperatorDefinition() { Name = "And", Type = "Scripting.SSharp.Runtime.Operators.AndOperator" });
-      cf.Operators.Add(new OperatorDefinition() { Name = "And2", Type = "Scripting.SSharp.Runtime.Operators.ConditionalAndOperator" });
+      cf.Operators.Add(new OperatorDefinition() { Name = "And2", Type = "Scripting.SSharp.Runtime.Operators.And2Operator" });
       cf.Operators.Add(new OperatorDefinition() { Name = "Or", Type = "Scripting.SSharp.Runtime.Operators.OrOperator" });
-      cf.Operators.Add(new OperatorDefinition() { Name = "Or2", Type = "Scripting.SSharp.Runtime.Operators.ConditionalOrOperator" });
+      cf.Operators.Add(new OperatorDefinition() { Name = "Or2", Type = "Scripting.SSharp.Runtime.Operators.Or2Operator" });
       cf.Operators.Add(new OperatorDefinition() { Name = "Equals", Type = "Scripting.SSharp.Runtime.Operators.EqualsOperator" });
       cf.Operators.Add(new OperatorDefinition() { Name = "NotEquals", Type = "Scripting.SSharp.Runtime.Operators.NotEqualsOperator" });
       cf.Operators.Add(new OperatorDefinition() { Name = "Is", Type = "Scripting.SSharp.Runtime.Operators.IsOperator" });

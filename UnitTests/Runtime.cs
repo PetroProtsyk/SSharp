@@ -3,7 +3,6 @@ using System.IO;
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Scripting.SSharp.Runtime;
-using Scripting.SSharp.Runtime.Configuration;
 using Scripting.SSharp.Runtime.Promotion;
 using Scripting.SSharp;
 
@@ -19,7 +18,7 @@ namespace UnitTests
     public void TearDown()
     {
       RuntimeHost.CleanUp();
-      EventBroker.ClearAllSubscriptions();
+      EventBroker.ClearAllEvents();
     }
 
     public static Stream TestConfig
@@ -30,26 +29,6 @@ namespace UnitTests
         configStream.Seek(0, SeekOrigin.Begin);
         return configStream;
       }
-    }
-
-    // Ensures runtime host does not crash if Initialize is called multiple times
-    [TestMethod]
-    public void ShouldAllowMultipleInitializes()
-    {
-      RuntimeHost.Initialize();
-      RuntimeHost.Initialize();
-      RuntimeHost.Initialize(TestConfig);
-      RuntimeHost.Initialize(new ScriptConfiguration());
-    }
-
-    [TestMethod]
-    public void ShouldChangeInitializationState()
-    {
-      Assert.IsFalse(RuntimeHost.IsInitialized);
-      RuntimeHost.Initialize();
-      Assert.IsTrue(RuntimeHost.IsInitialized);
-      RuntimeHost.CleanUp();
-      Assert.IsFalse(RuntimeHost.IsInitialized);
     }
 
     [TestMethod]
@@ -66,7 +45,7 @@ namespace UnitTests
       RuntimeHost.AssemblyManager = new BaseAssemblyManager();
       RuntimeHost.AssemblyManager.BeforeAddAssembly +=
         (s, e) => {
-          if (e.Assembly.FullName != "System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")
+          if (!e.Assembly.FullName.StartsWith("System.Data,"))
             throw new Exception();
         };
       RuntimeHost.Initialize(TestConfig);

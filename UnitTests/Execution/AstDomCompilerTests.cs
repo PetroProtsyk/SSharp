@@ -9,7 +9,6 @@ using Scripting.SSharp;
 using Scripting.SSharp.Execution.Compilers.Dom;
 using Scripting.SSharp.Execution;
 using Scripting.SSharp.Execution.VM;
-using Scripting.SSharp.UnitTests.Execution;
 
 namespace UnitTests.Execution
 {
@@ -27,14 +26,14 @@ namespace UnitTests.Execution
     public void Setup()
     {
       RuntimeHost.Initialize();
-      EventBroker.ClearAllSubscriptions();
+      EventBroker.ClearAllEvents();
     }
 
     [TestCleanup]
     public void TearDown()
     {
       RuntimeHost.CleanUp();
-      EventBroker.ClearAllSubscriptions();
+      EventBroker.ClearAllEvents();
     }
 
     [TestMethod]
@@ -335,36 +334,6 @@ namespace UnitTests.Execution
       vm.Execute(context);
 
       Assert.AreEqual(a[4], b[4]);
-    }
-
-    [TestMethod]
-    public void AstDomCompiler_InvokeMember1()
-    {
-      VM_Test1 vt1 = new VM_Test1();
-      
-      IScriptContext context = new ScriptContext();
-      context.SetItem("v", vt1);
-
-      CodeProgram domTree = AstDomCompiler.Compile(Script.Compile("return v.GetNextLevel().GetNextLevel();", null, false).Ast);
-      ExecutableMachine vm = CodeDomCompiler.Compile(domTree);
-      vm.Execute(context);
-
-      Assert.AreEqual(2, ((VM_Test1)context.Result).Level);
-    }
-
-    [TestMethod]
-    public void AstDomCompiler_InvokeMember3()
-    {
-      VM_Test1 vt1 = new VM_Test1();
-
-      IScriptContext context = new ScriptContext();
-      context.SetItem("v", vt1);
-
-      CodeProgram domTree = AstDomCompiler.Compile(Script.Compile("return v.Next.Next;", null, false).Ast);
-      ExecutableMachine vm = CodeDomCompiler.Compile(domTree);
-      vm.Execute(context);
-
-      Assert.AreEqual(2, ((VM_Test1)context.Result).Level);
     }
   }
 }

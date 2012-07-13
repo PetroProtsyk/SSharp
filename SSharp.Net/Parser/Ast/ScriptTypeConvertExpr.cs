@@ -1,40 +1,25 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 using System;
+using Scripting.SSharp.Parser;
 
 namespace Scripting.SSharp.Parser.Ast
 {
-  using Runtime.Operators;
-  using Runtime;
+  using Scripting.SSharp.Runtime.Operators;
+  using Scripting.SSharp.Runtime;
   
   /// <summary>
   /// 
   /// </summary>
   internal class ScriptTypeConvertExpr : ScriptExpr
   {
-    private readonly ScriptExpr _expr;
-    private readonly ScriptExpr _typeExpr;
-    private readonly IOperator _operator;
+    private ScriptExpr expr;
+    private ScriptExpr typeExpr;
+    private IOperator @operator;
 
     public ScriptExpr Expression
     {
       get
       {
-        return _expr;
+        return expr;
       }
     }
 
@@ -42,19 +27,8 @@ namespace Scripting.SSharp.Parser.Ast
     {
       get
       {
-        return _typeExpr;
+        return typeExpr;
       }
-    }
-
-    protected internal override bool IsConst {
-        get {
-            if (TypeExpression == null) {
-                if (Expression != null) return Expression.IsConst;
-                return false;
-            }
-
-            return false;
-        }
     }
 
     public ScriptTypeConvertExpr(AstNodeArgs args)
@@ -66,56 +40,56 @@ namespace Scripting.SSharp.Parser.Ast
             !(args.ChildNodes[1] is ScriptExpr))
         {
           // ( Expr )
-          _expr = args.ChildNodes[0] as ScriptExpr;
-          _typeExpr = null;
+          expr = args.ChildNodes[0] as ScriptExpr;
+          typeExpr = null;
         }
         else
         {
           //(Type) Expr
-          _typeExpr = args.ChildNodes[0] as ScriptExpr;
-          _expr = args.ChildNodes[1] as ScriptExpr;         
+          typeExpr = args.ChildNodes[0] as ScriptExpr;
+          expr = args.ChildNodes[1] as ScriptExpr;         
         }
       }
       else
       {
-        throw new ScriptSyntaxErrorException(Strings.GrammarErrorExceptionMessage);
+        throw new ScriptException("Grammar error!");
       }
 
-      _operator = RuntimeHost.GetBinaryOperator("+");
-      if (_operator == null)
-        throw new ScriptRuntimeException(string.Format(Strings.MissingOperatorError, "+"));
+      @operator = RuntimeHost.GetBinaryOperator("+");
+      if (@operator == null)
+        throw new ScriptException("RuntimeHost did not initialize property. Can't find binary operators.");
     }
 
     public override void Evaluate(IScriptContext context)
     {
       // ( Expr )
-      if (_typeExpr == null)
+      if (typeExpr == null)
       {
-        _expr.Evaluate(context);
+        expr.Evaluate(context);
       }
       // (Type) Expr
       else
       {
-        _typeExpr.Evaluate(context);
+        typeExpr.Evaluate(context);
 
-        var type = context.Result as Type;
+        Type type = context.Result as Type;
         if (type == null)
         {
           //NOTE: Handling special case of unary minus operator:
           //      (3+2)-2;
-          var unary = _expr as ScriptUnaryExpr;
+          ScriptUnaryExpr unary = expr as ScriptUnaryExpr;
 
           if (unary == null || unary.OperationSymbol != "-")
-            throw new ScriptSyntaxErrorException(Strings.TypeExpressionIsNotSyntacticallyCorrect);
+            throw new ScriptException("Wrong type expression!");
 
           //NOTE: expr + (unary expr)
-          var left = context.Result;
+          object left = context.Result;
           unary.Evaluate(context);
-          context.Result = _operator.Evaluate(left, context.Result);
+          context.Result = @operator.Evaluate(left, context.Result);
           return;
         }
 
-        _expr.Evaluate(context);
+        expr.Evaluate(context);
         context.Result = RuntimeHost.Binder.ConvertTo(context.Result, type);
       }
 

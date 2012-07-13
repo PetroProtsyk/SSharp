@@ -19,14 +19,14 @@ namespace UnitTests
     public void Setup()
     {
       RuntimeHost.Initialize();
-      EventBroker.ClearAllSubscriptions();
+      EventBroker.ClearAllEvents();
     }
 
     [TestCleanup]
     public void TearDown()
     {
       RuntimeHost.CleanUp();
-      EventBroker.ClearAllSubscriptions();
+      EventBroker.ClearAllEvents();
     }
 
     public LimitationsTests()

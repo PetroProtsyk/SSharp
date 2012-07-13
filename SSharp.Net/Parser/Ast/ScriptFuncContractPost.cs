@@ -1,19 +1,4 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+using Scripting.SSharp.Parser;
 using Scripting.SSharp.Runtime;
 
 namespace Scripting.SSharp.Parser.Ast
@@ -23,27 +8,27 @@ namespace Scripting.SSharp.Parser.Ast
   /// </summary>
   internal class ScriptFuncContractPost : ScriptExpr
   {
-    private readonly ScriptExprList _list;
+    private ScriptExprList list;
 
     public ScriptFuncContractPost(AstNodeArgs args)
       : base(args)
     {
-      _list = ChildNodes[1] as ScriptExprList;
+      list = ChildNodes[1] as ScriptExprList;
     }
 
     public override void Evaluate(IScriptContext context)
     {
-      var result = true;
-      if (_list == null)
+      bool result = true;
+      if (list == null)
       {
         context.Result = true;
         return;
       }
 
-      _list.Evaluate(context);
+      list.Evaluate(context);
 
-      var rez = (object[])context.Result;
-      foreach (var o in rez)
+      object[] rez = (object[])context.Result;
+      foreach (object o in rez)
       {
         try
         {
@@ -51,7 +36,7 @@ namespace Scripting.SSharp.Parser.Ast
         }
         catch
         {
-          throw new ScriptVerificationException(Strings.VerificationNonBoolean);
+          throw new ScriptException("Non boolean expression in post condition");
         }
       }
 

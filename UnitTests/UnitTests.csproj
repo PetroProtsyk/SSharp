@@ -17,17 +17,6 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <IsWebBootstrapper>true</IsWebBootstrapper>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>scriptdotnet.snk</AssemblyOriginatorKeyFile>
     <PublishUrl>http://localhost/UnitTests/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -40,14 +29,26 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\Binaries\NET\$(Platform)-$(Configuration)</OutputPath>
+    <OutputPath>..\Binaries\NET\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -55,12 +56,11 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
     <Optimize>true</Optimize>
-    <OutputPath>..\Binaries\NET\$(Platform)-$(Configuration)</OutputPath>
+    <OutputPath>..\bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -73,11 +73,9 @@
     <Compile Include="Arithmetics.cs" />
     <Compile Include="BaseAlgorithms.cs" />
     <Compile Include="Acceptance Tests I.cs" />
-    <Compile Include="ErrorNotification.cs" />
     <Compile Include="Execution\AstDomCompilerTests.cs" />
     <Compile Include="Execution\DomTests.cs" />
     <Compile Include="Execution\MachineTests.cs" />
-    <Compile Include="Execution\TestClasses.cs" />
     <Compile Include="Expressions.cs" />
     <Compile Include="FixedBugs.cs" />
     <Compile Include="Constructors.cs" />
@@ -85,7 +83,6 @@
     <Compile Include="FunctionScopes.cs" />
     <Compile Include="Limitations.cs" />
     <Compile Include="MetaFeatures.cs" />
-    <Compile Include="MethodOverloads.cs" />
     <Compile Include="Runtime\BaseAssemblyManagerTest.cs" />
     <Compile Include="Runtime\FunctionTableTest.cs" />
     <Compile Include="ScriptableObjects.cs" />
@@ -98,11 +95,6 @@
     <Compile Include="UsingScopeTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
       <Visible>False</Visible>
       <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
@@ -118,19 +110,9 @@
       <ProductName>.NET Framework 3.5</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TestConfig.xml">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="scriptdotnet.snk" />
+    <EmbeddedResource Include="TestConfig.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SSharp.Net\SSharp.Net.csproj">

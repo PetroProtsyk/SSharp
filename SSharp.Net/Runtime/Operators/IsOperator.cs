@@ -1,20 +1,4 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 
 namespace Scripting.SSharp.Runtime.Operators
 {
@@ -23,6 +7,10 @@ namespace Scripting.SSharp.Runtime.Operators
   /// </summary>
   public sealed class IsOperator : IOperator
   {
+    public IsOperator()
+    { 
+    }
+
     #region IOperator Members
 
     public string Name
@@ -44,8 +32,8 @@ namespace Scripting.SSharp.Runtime.Operators
     {
       if (!(right is Type)) throw new ArgumentException("must be Type");
 
-      var t1 = left.GetType();
-      var t2 = (Type)right;
+      Type t1 = left.GetType();
+      Type t2 = (Type)right;
 
       return t1.IsSubclassOf(t2) || t1 == t2;
     }

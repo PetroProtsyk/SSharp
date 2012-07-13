@@ -1,24 +1,7 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Scripting.SSharp.Runtime.Reflection;
 
 namespace Scripting.SSharp.Runtime.Promotion
 {
@@ -31,7 +14,7 @@ namespace Scripting.SSharp.Runtime.Promotion
     /// <summary>
     /// Strategies for converting parameters during method binding
     /// </summary>
-    protected readonly List<ComposeParameterStrategy> ParameterStrategies = new List<ComposeParameterStrategy>();
+    protected readonly List<ComposeParameterStrategy> parameterStrategies = new List<ComposeParameterStrategy>();
     /// <summary>
     /// Chain of getters
     /// </summary>
@@ -77,9 +60,9 @@ namespace Scripting.SSharp.Runtime.Promotion
     [Promote(false)]
     public ObjectBinding()
     {
-      ParameterStrategies.Add(new ComposeParameterStrategy(ComposeParametersExactPredicate, ComposeParametersExactConverter));
-      ParameterStrategies.Add(new ComposeParameterStrategy(ComposeParametersStrictPredicate, ComposeParametersStrictConverter));
-      ParameterStrategies.Add(new ComposeParameterStrategy(ComposeParametersWeekPredicate, ComposeParametersWeekConverter));
+      parameterStrategies.Add(new ComposeParameterStrategy(ComposeParametersExactPredicate, ComposeParametersExactConverter));
+      parameterStrategies.Add(new ComposeParameterStrategy(ComposeParametersStrictPredicate, ComposeParametersStrictConverter));
+      parameterStrategies.Add(new ComposeParameterStrategy(ComposeParametersWeekPredicate, ComposeParametersWeekConverter));
 
       IHandler property = new PropertyHandler(this);
       IHandler field = new FieldHandler(this);
@@ -92,6 +75,7 @@ namespace Scripting.SSharp.Runtime.Promotion
       Getters.Add(@event);
       Getters.Add(new MethodGetter(this));
       Getters.Add(sriptable);
+      //Getters.Add(mutant);
       Getters.Add(new NestedTypeGetter(this));
       //Getters.Add(new NameSpaceGetter());
 
@@ -99,6 +83,7 @@ namespace Scripting.SSharp.Runtime.Promotion
       Setters.Add(field);
       Setters.Add(@event);
       Setters.Add(sriptable);
+      //Setters.Add(mutant);
     }
     #endregion
 
@@ -123,16 +108,18 @@ namespace Scripting.SSharp.Runtime.Promotion
         return new ConstructorBinding(defaultConstructor, null);
       }
 
-      var constructors = targetType.GetConstructors(ConstructorFilter).Where(CanBind);
+      IEnumerable<ConstructorInfo> constructors = targetType
+        .GetConstructors(ConstructorFilter)
+        .Where(c => CanBind(c));
 
-      for (int i = 0; i < ParameterStrategies.Count; i++)
+      for (int i = 0; i < parameterStrategies.Count; i++)
       {
-        var strategy = ParameterStrategies[i];
+        ComposeParameterStrategy strategy = parameterStrategies[i];
 
-        foreach (var constructor in constructors)
+        foreach (ConstructorInfo constructor in constructors)
         {
-          var parameterInfos = constructor.GetParameters();
-          var convertedArguments = ComposeParameters(arguments, parameterInfos, strategy.Predicate, strategy.Converter);
+          ParameterInfo[] parameterInfos = constructor.GetParameters();
+          object[] convertedArguments = ComposeParameters(arguments, parameterInfos, strategy.Predicate, strategy.Converter);
 
           if (convertedArguments != null)
           {
@@ -144,7 +131,7 @@ namespace Scripting.SSharp.Runtime.Promotion
       return null;
       //return new ConstructorBind(target, null, null);
     }
-        
+
     /// <summary>
     /// Binds to method
     /// </summary>
@@ -155,22 +142,6 @@ namespace Scripting.SSharp.Runtime.Promotion
     /// <returns>MethodBind or null if binding is not possible</returns>
     public IBinding BindToMethod(object target, string methodName, Type[] genericParameters, object[] arguments)
     {
-      // TODO: Denis: just a quick dirty optimization of "empty" methods
-      //if (genericParameters == null && arguments.Length == 0)
-      //{        
-      //  Type targetType = target as Type;
-      //  if (targetType == null) targetType = target.GetType();
-      //  IBinding cachedBinding = MethodProvider.GetBinding(targetType, methodName);
-      //  if (cachedBinding != null)
-      //    return cachedBinding;
-      //  else
-      //  {
-      //    IBinding binding = BindToMethod(target, mi => mi.Name == methodName && mi.GetParameters().Length == arguments.Length && CanBind(mi), genericParameters, arguments);
-      //    MethodProvider.AddBinding(targetType, methodName, binding);
-      //    return binding;
-      //  }
-      //}
-
       return BindToMethod(target, mi => mi.Name == methodName && mi.GetParameters().Length == arguments.Length && CanBind(mi), genericParameters, arguments);
     }
 
@@ -183,9 +154,9 @@ namespace Scripting.SSharp.Runtime.Promotion
     /// <returns>MethodBind or null if binding is not possible</returns>
     public IBinding BindToMethod(object target, MethodInfo method, object[] arguments)
     {
-      for (int i = 0; i < ParameterStrategies.Count; i++)
+      for (int i = 0; i < parameterStrategies.Count; i++)
       {
-        ComposeParameterStrategy strategy = ParameterStrategies[i];
+        ComposeParameterStrategy strategy = parameterStrategies[i];
 
         ParameterInfo[] parameterInfos = method.GetParameters();
         object[] convertedArguments = ComposeParameters(arguments, parameterInfos, strategy.Predicate, strategy.Converter);
@@ -217,7 +188,10 @@ namespace Scripting.SSharp.Runtime.Promotion
         processInterface = true;
       }
 
-      IEnumerable<MethodInfo> methods = targetType.GetMethods(MethodFilter).Where(methodSelector);
+      IEnumerable<MethodInfo> methods = targetType
+        .GetMethods(MethodFilter)
+        .Where(methodSelector);
+
       //Process interfaces only if target is not a Type
       if (processInterface)
       {
@@ -227,30 +201,29 @@ namespace Scripting.SSharp.Runtime.Promotion
         }
       }
 
-      return BindToMethods(target, genericParameters, arguments, methods);
-    }
+      for (int i = 0; i < parameterStrategies.Count; i++)
+      {
+        ComposeParameterStrategy strategy = parameterStrategies[i];
 
-    protected IBinding BindToMethods(object target, Type[] genericParameters, object[] arguments, IEnumerable<MethodInfo> methods) {
-        for (int i = 0; i < ParameterStrategies.Count; i++) {
-            ComposeParameterStrategy strategy = ParameterStrategies[i];
+        foreach (MethodInfo method in methods)
+        {
+          MethodInfo actualMethod = method;
+          if (method.IsGenericMethod)
+          {
+            actualMethod = method.MakeGenericMethod(genericParameters);
+          }
 
-            foreach (MethodInfo method in methods) {
-                MethodInfo actualMethod = method;
-                if (method.IsGenericMethod) {
-                    if (genericParameters == null || method.GetGenericArguments().Length != genericParameters.Length) continue;
-                    actualMethod = method.MakeGenericMethod(genericParameters);
-                }
+          ParameterInfo[] parameterInfos = actualMethod.GetParameters();
+          object[] convertedArguments = ComposeParameters(arguments, parameterInfos, strategy.Predicate, strategy.Converter);
 
-                ParameterInfo[] parameterInfos = actualMethod.GetParameters();
-                object[] convertedArguments = ComposeParameters(arguments, parameterInfos, strategy.Predicate, strategy.Converter);
-
-                if (convertedArguments != null) {
-                    return new MethodBinding(actualMethod, target, convertedArguments);
-                }
-            }
+          if (convertedArguments != null)
+          {
+            return new MethodBinding(actualMethod, target, convertedArguments);
+          }
         }
+      }
 
-        return null;
+      return null;
     }
 
     /// <summary>
@@ -260,14 +233,18 @@ namespace Scripting.SSharp.Runtime.Promotion
     /// <param name="arguments">arguments</param>
     /// <param name="setter">if true binds to setter, otherwise to getter</param>
     /// <returns>MethodBind or null if binding is not possible</returns>
-    public IBinding BindToIndex(object target, object[] arguments, bool setter) {
-        if (setter) {
-            return BindToMethod(target, mi => (mi.Name == "set_Item" || mi.Name == "Set" ) && mi.GetParameters().Length == arguments.Length, null, arguments);
-        } else {
-            return BindToMethod(target, mi => (mi.Name == "get_Item" || mi.Name == "Get" ) && mi.GetParameters().Length == arguments.Length, null, arguments);
-        }
-    }      
-  
+    public IBinding BindToIndex(object target, object[] arguments, bool setter)
+    {
+      if (setter)
+      {
+        return BindToMethod(target, mi => (mi.Name == "set_Item" || mi.Name == "Set") && mi.GetParameters().Length == arguments.Length, null, arguments);
+      }
+      else
+      {
+        return BindToMethod(target, mi => (mi.Name == "get_Item" || mi.Name == "Get") && mi.GetParameters().Length == arguments.Length, null, arguments);
+      }
+    }
+
     /// <summary>
     /// Late binding to any member of a given object
     /// </summary>
@@ -285,7 +262,6 @@ namespace Scripting.SSharp.Runtime.Promotion
     /// </summary>
     /// <param name="name">member name</param>
     /// <param name="instance">instance</param>
-    /// <param name="throwNotFound"></param>
     /// <param name="arguments">optional arguments</param>
     /// <returns>value</returns>
     protected internal object Get(string name, object instance, bool throwNotFound, params object[] arguments)
@@ -293,19 +269,20 @@ namespace Scripting.SSharp.Runtime.Promotion
       if (instance == null) throw new ArgumentNullException("instance");
       if (string.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
 
-      var type = instance as Type ?? instance.GetType();
+      Type type = instance as Type;
+      if (type == null) type = instance.GetType();
 
-      foreach (var getter in Getters)
+      foreach (IGetter getter in Getters)
       {
-        var rez = getter.Get(name, instance, type, arguments);
+        object rez = getter.Get(name, instance, type, arguments);
         if (rez != NoResult)
           return rez;
       }
 
       if (throwNotFound)
-        throw new ScriptIdNotFoundException(string.Format(Strings.MemberNotFound, name));
-
-      return RuntimeHost.NullValue;
+        throw new ScriptIdNotFoundException("Member " + name + " not found");
+      else
+        return RuntimeHost.NullValue;
     }
 
     /// <summary>
@@ -322,19 +299,21 @@ namespace Scripting.SSharp.Runtime.Promotion
       if (instance == null) throw new ArgumentNullException("instance");
       if (string.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
 
-      var type = instance as Type ?? instance.GetType();
+      Type type = instance as Type;
+      if (type == null) type = instance.GetType();
 
-      foreach (var setter in Setters)
+      foreach (ISetter setter in Setters)
       {
-        var rez = setter.Set(name, instance, type, value, arguments);
+        object rez = setter.Set(name, instance, type, value, arguments);
         if (rez != NoResult)
           return rez;
       }
 
       if (throwNotFound)
-        throw new ScriptIdNotFoundException(string.Format(Strings.MemberNotFound, name));
+        throw new ScriptIdNotFoundException("Member " + name + " not found");
+      else
+        return RuntimeHost.NullValue;
 
-      return RuntimeHost.NullValue;
     }
 
     /// <summary>
@@ -348,8 +327,6 @@ namespace Scripting.SSharp.Runtime.Promotion
       return ConvertToStatic(value, targetType);
     }
 
-
-
     /// <summary>
     /// Method used to convert value to target type. Should be used for any conversion during script execution.
     ///
@@ -360,8 +337,6 @@ namespace Scripting.SSharp.Runtime.Promotion
     /// <returns>Converted value or NoResult constant if conversion impossible</returns>
     protected static object ConvertToStatic(object value, Type targetType)
     {
-      //TODO: Cache conversion method
-
       if (value == null) return value;
       if (targetType == typeof(object)) return value;
 
@@ -385,39 +360,30 @@ namespace Scripting.SSharp.Runtime.Promotion
       }
 
       //Conversion operators
-      var mi = MethodProvider.GetConversionMethod(valueType,targetType);
+      MethodInfo mi = valueType.GetMethod("op_Implicit", BindingFlags.Static | BindingFlags.Public, null, new Type[] { valueType }, null);
+      if (mi == null)
+      {
+        mi = valueType.GetMethod("op_Explicit", BindingFlags.Static | BindingFlags.Public, null, new Type[] { valueType }, null);
+      }
 
-      if (mi != null)
-        return mi.Invoke(value, new[] { value });
+      if (mi != null && mi.ReturnType == targetType)
+      {
+        return mi.Invoke(value, new object[] { value });
+      }
 
       //NOTE: ref, out
       if (targetType.IsByRef)
       {
-        return targetType.GetElementType() == valueType ? value : ConvertToStatic(value, targetType.GetElementType());
+        if (targetType.GetElementType() == valueType)
+          return value;
+        else
+          return ConvertToStatic(value, targetType.GetElementType());
       }
 
       //Convertible
       if (value is IConvertible)
       {
-        try
-        {
-          return Convert.ChangeType(value, targetType, System.Globalization.CultureInfo.CurrentCulture);
-        }
-        catch (InvalidCastException)
-        {
-          return NoResult;
-        }
-      }
-
-      //TODO: Improve
-      Scripting.SSharp.Parser.Ast.ScriptFunctionDefinition f = value as Scripting.SSharp.Parser.Ast.ScriptFunctionDefinition;
-      if (f != null) {
-          try {
-              return f.AsDelegate(targetType);
-          }
-          catch (InvalidCastException) {
-              return NoResult;
-          }
+        return Convert.ChangeType(value, targetType, System.Globalization.CultureInfo.CurrentCulture);
       }
 
       return NoResult;
@@ -431,8 +397,13 @@ namespace Scripting.SSharp.Runtime.Promotion
     /// <param name="member">Instance of MemberInfo</param>
     /// <returns>true if member could participate in binding</returns>
     public virtual bool CanBind(MemberInfo member)
-    {            
-      return PromotionProvider.IsPromoted(member);
+    {
+      PromoteAttribute bindable = member.GetCustomAttributes(typeof(PromoteAttribute), true).OfType<PromoteAttribute>().FirstOrDefault();
+      if (bindable == null)
+        bindable = member.DeclaringType.GetCustomAttributes(typeof(PromoteAttribute), true).OfType<PromoteAttribute>().FirstOrDefault();
+
+      if (bindable == null) return true;
+      return bindable.Promote;
     }
     #endregion
 
@@ -445,12 +416,12 @@ namespace Scripting.SSharp.Runtime.Promotion
     {
       if (arguments.Length != parameters.Length) return null;
 
-      var result = new object[arguments.Length];
+      object[] result = new object[arguments.Length];
 
       for (int i = 0; i < parameters.Length; i++)
       {
-        var parameterType = parameters[i].ParameterType;
-        var argument = arguments[i];
+        Type parameterType = parameters[i].ParameterType;
+        object argument = arguments[i];
 
         //NOTE: ref, out
         //out and ref parameters handling
@@ -463,8 +434,8 @@ namespace Scripting.SSharp.Runtime.Promotion
 
         if (predicate(argument, parameterType))
         {
-          var converted = converter(argument, parameterType);
-          if (converted == NoResult) return null;
+          object converted = converter(argument, parameterType);
+          if (converted == ObjectBinding.NoResult) return null;
 
           //NOTE: ref, out
           if (vr == null)

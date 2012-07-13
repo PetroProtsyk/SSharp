@@ -1,21 +1,6 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 using System;
 using System.Diagnostics;
+using Scripting.SSharp.Parser;
 using Scripting.SSharp.Runtime;
 
 namespace Scripting.SSharp.Parser.Ast
@@ -25,14 +10,14 @@ namespace Scripting.SSharp.Parser.Ast
   /// </summary>
   internal class ScriptFlowControlStatement : ScriptStatement
   {
-    private readonly string _operation;
-    private readonly ScriptAst _expression;
+    private string operation;
+    ScriptAst expression;
 
     public string Symbol
     {
       get
       {
-        return _operation;
+        return operation;
       }
     }
 
@@ -40,25 +25,25 @@ namespace Scripting.SSharp.Parser.Ast
     {
       get
       {
-        return _expression;
+        return expression;
       }
     }
 
     public ScriptFlowControlStatement(AstNodeArgs args)
         : base(args)
     {
-      var oper = ChildNodes[0] as TokenAst;
-      _operation = oper.Text;
+      TokenAst oper = ChildNodes[0] as TokenAst;
+      operation = oper.Text;
       Debug.Assert(oper.Text == "return" || oper.Text == "break" || oper.Text == "continue" || oper.Text == "throw");
 
-      if (_operation == "return" || _operation == "throw")
-        _expression = (ScriptExpr)ChildNodes[1];
+      if (operation == "return" || operation == "throw")
+        expression = (ScriptExpr)ChildNodes[1];
     }
 
     //TODO: reorganize switch
     public override void Evaluate(IScriptContext context)
     {
-      switch (_operation)
+      switch (operation)
       {
         case "break":
           if (context.Result == null)
@@ -71,14 +56,14 @@ namespace Scripting.SSharp.Parser.Ast
           context.SetContinue(true);
           break;
         case "return":
-          _expression.Evaluate(context);
+          expression.Evaluate(context);
           context.SetReturn(true);
           break;
         case "throw":
-          _expression.Evaluate(context);
+          expression.Evaluate(context);
           throw (Exception)context.Result;
         default:
-          throw new ScriptSyntaxErrorException(_operation);
+          throw new ScriptException("This should never happen");
       }
     }
   }

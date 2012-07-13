@@ -12,7 +12,7 @@ namespace Debug.Silverlight
 
       RuntimeHost.Initialize();
 
-      string code =
+      string code = 
         @"a = [17,-2, 0,-3, 5, 3,1, 2, 55];
 
          for (i=0; i < a.Length; i=i+1)
@@ -32,9 +32,8 @@ namespace Debug.Silverlight
              s += a[i];";
 
       Script s = Script.Compile(code);
+      s.Context.SetItem("Console", this);
       object rez = s.Execute();
-
-      textBox1.Text = rez.ToString();
     }
   }
 }

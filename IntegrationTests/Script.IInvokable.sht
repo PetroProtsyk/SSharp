@@ -1,3 +1,0 @@
-s = Script.Compile("return 1+1;");
-
-Test.AreEqual(2, s());

@@ -1,20 +1,4 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-namespace Scripting.SSharp.Runtime
+﻿namespace Scripting.SSharp.Runtime
 {
   /// <summary>
   /// Scope with contracts on variables
@@ -38,22 +22,26 @@ namespace Scripting.SSharp.Runtime
     #region Methods
     public override object GetItem(string id, bool throwException)
     {
-      var args = new ScopeArgs(id, RuntimeHost.NullValue);
+      ScopeArgs args = new ScopeArgs(id, RuntimeHost.NullValue);
 
       OnBeforeGetItem(args);
       if (args.Cancel)
       {
         if (args.Value != RuntimeHost.NullValue)
+        {
           return args.Value;
-
-        throw new ScriptIdNotFoundException(id);
+        }
+        else
+        {
+          throw new ScriptIdNotFoundException(id);
+        }
       }
       args.Value = base.GetItem(id, throwException);
 
       OnAfterGetItem(args);
       if (args.Cancel)
       {
-        throw new ScriptIdNotFoundException(string.Format(Strings.IdProcessingCanceledByUser, id));
+        throw new ScriptException("Canceled by event-handler");
       }
 
       return args.Value;
@@ -61,7 +49,7 @@ namespace Scripting.SSharp.Runtime
 
     public override void SetItem(string id, object value)
     {
-      var args = new ScopeArgs(id, value);
+      ScopeArgs args = new ScopeArgs(id, value);
 
       OnBeforeSetItem(args);    
       if (args.Cancel) return;
@@ -71,7 +59,7 @@ namespace Scripting.SSharp.Runtime
       OnAfterSetItem(args);
       if (args.Cancel)
       {
-        throw new ScriptIdNotFoundException(string.Format(Strings.IdProcessingCanceledByUser, id));
+        throw new ScriptException("Canceled by event-handler");
       }
     }
 
@@ -80,6 +68,7 @@ namespace Scripting.SSharp.Runtime
       return null;
     }
     #endregion
+
 
     #region INotifyingScope Members
 
@@ -132,17 +121,6 @@ namespace Scripting.SSharp.Runtime
     public event ScopeSetEvent AfterSetItem;
 
     #endregion
-
-    protected override void Cleanup()
-    {
-      try
-      {
-      }
-      finally
-      {
-        base.Cleanup();
-      }
-    }
   }
 
   /// <summary>

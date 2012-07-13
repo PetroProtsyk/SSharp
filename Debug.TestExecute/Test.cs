@@ -14,14 +14,7 @@ namespace Debug.TestExecute
 
     public static void AreEqual(object v1, object v2)
     {
-      if (!object.Equals(v1, v2)) throw new TestException("Equality condition failed, expected: " + AsString(v1) + " ,actual: "+ AsString(v2));
-    }
-
-    private static string AsString(object v1)
-    {
-      if (v1 == null) return "null";
-
-      return v1.ToString();
+      if (!object.Equals(v1, v2)) throw new TestException("Equality condition failed");
     }
   }
 

@@ -7,7 +7,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Scripting.SSharp.Runtime;
 using Scripting.SSharp.Runtime.Promotion;
 using Scripting.SSharp;
-using Microsoft.CSharp.RuntimeBinder;
 
 namespace UnitTests
 {
@@ -25,14 +24,14 @@ namespace UnitTests
     public void Setup()
     {
       RuntimeHost.Initialize();
-      EventBroker.ClearAllSubscriptions();
+      EventBroker.ClearAllEvents();
     }
 
     [TestCleanup]
     public void TearDown()
     {
       RuntimeHost.CleanUp();
-      EventBroker.ClearAllSubscriptions();
+      EventBroker.ClearAllEvents();
     }
 
     [TestMethod]
@@ -65,7 +64,7 @@ namespace UnitTests
       Assert.AreEqual((double)1.2 - 1, rez);
     }
 
-    [ExpectedException(typeof(RuntimeBinderException))]
+    [ExpectedException(typeof(NotSupportedException))]
     [TestMethod]
     public void BaseOperators_Minus1()
     {

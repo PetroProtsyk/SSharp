@@ -18,14 +18,14 @@ namespace UnitTests
     public void Setup()
     {
       RuntimeHost.Initialize();
-      EventBroker.ClearAllSubscriptions();
+      EventBroker.ClearAllEvents();
     }
 
     [TestCleanup]
     public void TearDown()
     {
       RuntimeHost.CleanUp();
-      EventBroker.ClearAllSubscriptions();
+      EventBroker.ClearAllEvents();
     }
 
     [TestMethod]
@@ -584,48 +584,56 @@ namespace UnitTests
       Assert.AreEqual(4, context.GetItem("b", false));
     }
 
+
     [TestMethod]
-    public void DuplicateEvents() {
-        Script s = Script.Compile(
-           @"
-            invoked_count = 0;
- 
-            function handler(s,e) global(invoked_count) {
-             invoked_count++;
-            }
+    public void ClassesTest()
+    {
+      IScriptContext context = new ScriptContext();
 
-            function handler2(s,e) global(invoked_count) {
-             invoked_count+=2;
-            }
+      object resultVal =
+       Script.RunCode(
+       @"
+         school =
+          [
+            classes ->
+              [
+                A->['Alexey', 'Ivan','John'],
+                B->['Petr','Valya','Masha','Joe']
+              ],
 
-            ce = new ContextEvent();
+             GetClasses->function ()
+              {
+                s='';
+                foreach(class in body.classes.Fields)
+                   s+=' '+class;
+                return s;
+              },
 
-            ce.NameChanged += handler;
-            ce.NameChanged += handler;
-            ce.NameChanged += handler2;
+             GetClass->function (name)
+              {
+                s='';
+                foreach(student in body.classes[name] )
+                   s+=' '+student;
+                return s;
+              }
 
-            ce.Name = 'TestName';
-            ce.Name = 'TestName0';
+          ];
 
-            // Remove events in different order
-            ce.NameChanged -= handler2;
-            ce.NameChanged -= handler;
-            ce.NameChanged -= handler;
+         A = school.GetClasses();
+         B = school.GetClass('B');
+          ", context
+       );
 
-            // Change again
-            ce.Name = 'TestName1';
-
-            "
-           );
-
-        s.Execute();
-        Assert.AreEqual(8, (int)s.Context.GetItem("invoked_count", false));
-        Assert.IsTrue(((ContextEvent)s.Context.GetItem("ce", false)).IsNullEvent);
+      Assert.AreEqual(" Petr Valya Masha Joe", context.GetItem("B", true));
+      Assert.AreEqual(" A B", context.GetItem("A", true));
     }
 
     [TestMethod]
     public void ContextDependantEvents()
-    {      
+    {
+      RuntimeHost.ContextEnabledEvents = true;
+      RuntimeHost.UnsubscribeAllEvents = false;
+
       Script s = Script.Compile(
          @"
             invoked = false;
@@ -651,49 +659,17 @@ namespace UnitTests
     }
 
     [TestMethod]
-    public void ContextDependantEventsAndContextSwitching()
+    public void CommentsWithDoubleSlashes()
     {
-      ScriptContext c = new ScriptContext();
-      c.SetItem("invoked", 0);
+      object rez = Script.RunCode(
+       @"
+           //Script.NET examples
+           //(c)2007-2009, Protsyk Petro, http://www.protsyk.com
 
-      ScriptContext c1 = new ScriptContext();
-      c1.SetItem("invoked", 10);
+           return true;
+          ");
 
-
-      Script s = Script.Compile(
-         @"
-            function handler(s,e) global(invoked) {
-             invoked++;
-            }
-
-            ce = new ContextEvent();
-            ce.NameChanged += handler;
-
-            return ce;
-          "
-         );
-      s.Context = c;
-
-      ContextEvent resultVal = (ContextEvent)s.Execute();
-      resultVal.Name = "TestName";
-
-      Assert.AreEqual(1, c.GetItem("invoked", false));
-
-      s.Context = c1;
-      resultVal.Name = "TestName2";
-
-      Assert.AreEqual(11, c1.GetItem("invoked", false));
-
-      s.Dispose();
-      //TODO: Event Broker should be refactored
-      try
-      {
-        resultVal.Name = "TestName 4";
-      }
-      catch (ScriptEventException e)
-      {
-        Assert.AreEqual(Strings.ContextNotFoundExceptionMessage, e.Message);
-      }
+      Assert.IsTrue((bool)rez);
     }
 }
 
@@ -713,12 +689,6 @@ namespace UnitTests
         if (NameChanged != null)
           NameChanged.Invoke(this, EventArgs.Empty);
       }
-    }
-
-    public bool IsNullEvent {
-        get {
-            return NameChanged == null;
-        }
     }
 
     public event EventHandler<EventArgs> NameChanged;

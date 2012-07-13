@@ -1,20 +1,4 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 
 namespace Scripting.SSharp.Runtime
 {
@@ -27,18 +11,18 @@ namespace Scripting.SSharp.Runtime
   ///    
   /// ScriptContext objects also evaluates operators
   /// </summary>
-  public interface IScriptContext : IDisposable
+  public interface IScriptContext //: IEvaluationContext
   {
     #region Scopes
     /// <summary>
     /// Create scope
     /// </summary>
-    IScriptScope CreateScope();
+    void CreateScope();
     /// <summary>
     /// Add given scope to hierarchy
     /// </summary>
     /// <param name="scope">new scope</param>
-    IScriptScope CreateScope(IScriptScope scope);
+    void CreateScope(IScriptScope scope);
     /// <summary>
     /// Removes local scope
     /// </summary>
@@ -52,14 +36,15 @@ namespace Scripting.SSharp.Runtime
     /// Returns item from scope hierarchy
     /// </summary>
     /// <param name="id">name</param>
-    /// <param name="throwException"></param>
+    /// <param name="contextItemType">type</param>
     /// <returns>value</returns>
     object GetItem(string id, bool throwException);
-
+    
     /// <summary>
     /// Sets item to scope hierarchy
     /// </summary>
     /// <param name="id">name</param>
+    /// <param name="contextItemType">type</param>
     /// <param name="value">value</param>
     void SetItem(string id, object value);
 
@@ -69,17 +54,7 @@ namespace Scripting.SSharp.Runtime
     /// <param name="id"></param>
     /// <returns></returns>
     IValueReference Ref(string id);
-  
-    /// <summary>
-    /// Occurs before referencing process, giving ability to cancel it and return custom result
-    /// </summary>
-    event EventHandler<ReferencingEventArgs> Referencing;
-
-    /// <summary>
-    /// Occurs when referencing successful just before returning value
-    /// </summary>
-    event EventHandler<ReferencingEventArgs> Referenced;
-
+    
     /// <summary>
     /// Finds function definition
     /// </summary>
@@ -92,19 +67,19 @@ namespace Scripting.SSharp.Runtime
     void SetReturn(bool val);
     void SetBreak(bool val);
     void SetContinue(bool val);
-    
     bool IsReturn();
     bool IsBreak();
     bool IsContinue();
-
-    /// <summary>
-    /// Reset all flags that control execution. Called on each context 
-    /// before and after script execution
-    /// </summary>
-    void ResetControlFlags();
     #endregion
 
-    #region Common
+    /// <summary>
+    /// Source code
+    /// </summary>
+    string SourceCode
+    {
+      get;
+    }
+
     /// <summary>
     /// Result of script execution
     /// </summary>
@@ -113,11 +88,5 @@ namespace Scripting.SSharp.Runtime
       get;
       set;
     }
-
-    Script Owner
-    {
-      get;
-    }
-    #endregion
   }
 }

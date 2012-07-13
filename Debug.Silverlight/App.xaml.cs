@@ -33,7 +33,6 @@ namespace Debug.Silverlight
     {
 
     }
-
     private void Application_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
     {
       // If the app is running outside of the debugger then report the exception using
@@ -50,7 +49,6 @@ namespace Debug.Silverlight
         Deployment.Current.Dispatcher.BeginInvoke(delegate { ReportErrorToDOM(e); });
       }
     }
-
     private void ReportErrorToDOM(ApplicationUnhandledExceptionEventArgs e)
     {
       try

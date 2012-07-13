@@ -1,56 +1,41 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-namespace Scripting.SSharp.Execution.Compilers
+﻿namespace Scripting.SSharp.Execution.Compilers
 {
   using Dom;
   using VM;
   using VM.Operations;
 
   [CompilerType(typeof(CodeObjectReference))]
-  internal class CodeObjectReferenceCompiler : IVMCompiler
+  public class CodeObjectReferenceCompiler : IVMCompiler
   {
     #region IVMCompiler Members
 
     public ExecutableMachine Compile(CodeObject code, ExecutableMachine machine)
     {
-      var codeExpression = (CodeObjectReference)code;
+      CodeObjectReference codeExpression = (CodeObjectReference)code;
 
       if (codeExpression.Modifiers.Count == 0)
       {
-        var op = machine.CreateOperation<GetValueOperation>();
-        op.Id = codeExpression.Id;        
+        GetValueOperation op = machine.CreateOperation<GetValueOperation>();
+        op.Id = codeExpression.Id;
+        machine.CreateOperation<PushOperation>();
       }
       else
       {
-        foreach (var modifier in codeExpression.Modifiers)
+        foreach (CodeObject modifier in codeExpression.Modifiers)
         {
-          var functionCall = modifier as CodeObjectFunctionCall;
-          if (functionCall == null) continue;
+          CodeObjectFunctionCall functionCall = modifier as CodeObjectFunctionCall;
+          if (functionCall != null)
+          {
+            CodeDomCompiler.Compile(modifier, machine);
 
-          CodeDomCompiler.Compile(modifier, machine);
-
-          var callOp = machine.CreateOperation<ObjectMemberOperation>();
-          callOp.MemberName = codeExpression.Id;
+            ObjectMemberOperation callOp = machine.CreateOperation<ObjectMemberOperation>();
+            callOp.MemberName = codeExpression.Id;
+          }
         }
       }
 
       if (codeExpression.Next != null)
       {
-        machine.CreateOperation<PushOperation>();
         CodeDomCompiler.Compile(codeExpression.Next, machine);
       }
 

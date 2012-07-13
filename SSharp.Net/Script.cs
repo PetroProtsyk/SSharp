@@ -1,38 +1,24 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Scripting.SSharp.Parser;
 using Scripting.SSharp.Processing;
 using Scripting.SSharp.Runtime;
 using Scripting.SSharp.Parser.Ast;
+using Scripting.SSharp.Runtime.Promotion;
 
 namespace Scripting.SSharp
 {
   /// <summary>
   /// Compiled script
   /// </summary>
-  public class Script : IDisposable, IInvokable
+  public class Script : IDisposable
   {
     #region Properties
     /// <summary>
     /// Ast of the given Source Code
     /// </summary>
-    internal ScriptAst Ast { get; set; }
+    public ScriptAst Ast { get; set; }
 
     /// <summary>
     /// Code of the script
@@ -42,23 +28,7 @@ namespace Scripting.SSharp
     /// <summary>
     /// Execution context
     /// </summary>
-    private IScriptContext _context;
-    public IScriptContext Context
-    {
-      get
-      {
-        return _context;
-      }
-      set
-      {
-        if (_context == value) return;
-        SwitchContext(_context as ScriptContext, false);
-        _context = value;
-        SwitchContext(_context as ScriptContext, true);
-      }
-    }
-
-    private readonly List<IValueReference> _referenceCache = new List<IValueReference>(64);
+    public IScriptContext Context { get; set; }
     #endregion
 
     #region Constructors
@@ -67,20 +37,19 @@ namespace Scripting.SSharp
     /// </summary>
     protected Script()
     {
-      var ctxt = new ScriptContext();
-      RuntimeHost.InitializeScript(ctxt);
-      Context = ctxt;
+        Context = new ScriptContext();
+        Runtime.RuntimeHost.InitializeScript(Context);
     }
 
     /// <summary>
     /// Script Constructor
     /// </summary>
-    /// <param name="context">Context in which script will execute</param>
+    /// <param name="Context">Context in which script will execute</param>
     protected Script(IScriptContext context)
     {
       if (context == null)
         throw new ArgumentNullException("context");
-      Context = context;
+      this.Context = context;
     }
     #endregion
 
@@ -91,7 +60,9 @@ namespace Scripting.SSharp
     /// <returns>result of execution</returns>
     public object Execute()
     {
-      return Ast.Execute(Context);
+      object rez = Ast.Execute(Context);
+      EventBroker.ClearAllEventsIfNeeded();
+      return rez;
     }
 
     /// <summary>
@@ -99,7 +70,7 @@ namespace Scripting.SSharp
     /// </summary>
     /// <param name="node">Node</param>
     /// <returns>source code</returns>
-    internal string Code(ScriptAst node)
+    public string Code(ScriptAst node)
     {
       return SourceCode.Substring(node.Span.Start.Position, node.Span.Length);
     }
@@ -117,17 +88,16 @@ namespace Scripting.SSharp
     #endregion
 
     #region Service Methods
-
     /// <summary>
     /// Compiles code and performs post processing
     /// </summary>
     /// <param name="code"></param>
     /// <param name="postProcessings">instance of vistor</param>
-    /// <param name="isExpression"></param>
     /// <returns></returns>
-    internal static Script Compile(string code, IEnumerable<IPostProcessing> postProcessings, bool isExpression)
+    public static Script Compile(string code, IEnumerable<IPostProcessing> postProcessings, bool isExpression)
     {
-      var script = new Script { SourceCode = code };
+      Script script = new Script();
+      script.SourceCode = code;
 
       RuntimeHost.Lock();
       try
@@ -139,7 +109,7 @@ namespace Scripting.SSharp
           foreach (var postProcessing in postProcessings)
           {
             postProcessing.BeginProcessing(script);
-            script.Ast.AcceptVisitor(postProcessing);
+             script.Ast.AcceptVisitor(postProcessing);
             postProcessing.EndProcessing(script);
           }
         }
@@ -193,29 +163,32 @@ namespace Scripting.SSharp
       if (context != null)
         script.Context = context;
 
-      object result = script.Execute();
-      script.Context = null;
-      script.Dispose();
-
-      return result;
+      return script.Execute();
     }
 
     /// <summary>
     /// Parses code
     /// </summary>
     /// <param name="code">Script code</param>
-    /// <param name="isExpression"></param>
     /// <returns>AstNode or throws:ArgumentException, ScriptSyntaxErrorException</returns>
-    internal static AstNode Parse(string code, bool isExpression)
+    protected internal static AstNode Parse(string code, bool isExpression)
     {
       if (string.IsNullOrEmpty(code)) throw new ArgumentNullException("code");
 
-      var result = isExpression ? RuntimeHost.Parser.Parse("return " + code + ";") : RuntimeHost.Parser.Parse(code);
-
+      AstNode result = null;
+      if (isExpression)
+      {
+        result = RuntimeHost.Parser.Parse("return " + code + ";");
+      }
+      else
+      {
+        result = RuntimeHost.Parser.Parse(code);
+      }
+      
       if (result == null)
       {
-        var errorMessage = new StringBuilder("Parsing error:");
-        foreach (var error in RuntimeHost.Parser.Context.Errors)
+        StringBuilder errorMessage = new StringBuilder("Parsing error:");
+        foreach (SyntaxError error in RuntimeHost.Parser.Context.Errors)
         {
           errorMessage.AppendLine(error.Message);
           errorMessage.AppendLine(string.Format("at line:{0} position:{1} in code:",
@@ -230,113 +203,13 @@ namespace Scripting.SSharp
       return result;
     }
 
-    private void SwitchContext(ScriptContext ctxt, bool isAssigning)
-    {
-      if (ctxt == null) return;
-
-      if (isAssigning)
-      {
-        ctxt.SetOwner(this);
-      }
-      else
-      {
-        var refs = _referenceCache.ToArray();
-        foreach (var r in refs) r.Remove();
-
-        //Verify all references were cleared
-        Diagnostics.Assumes.IsTrue(_referenceCache.Count == 0);
-
-        ctxt.SetOwner(null);
-      }
-    }
-
-    internal void NotifyReferenceCreated(IValueReference reference)
-    {
-      if (_referenceCache.Contains(reference)) return;
-      _referenceCache.Add(reference);
-      reference.Removed += ReferenceRemovedHandler;
-    }
-
-    private void ReferenceRemovedHandler(object sender, EventArgs e)
-    {
-      var reference = (IValueReference)sender;
-      reference.Removed -= ReferenceRemovedHandler;
-      _referenceCache.Remove(reference);
-    }
     #endregion
 
     #region IDisposable Members
-    private bool _disposed;
-    protected bool Disposed
-    {
-      get
-      {
-        lock (this)
-        {
-          return _disposed;
-        }
-      }
-    }
 
     public void Dispose()
     {
-      lock (this)
-      {
-        if (_disposed) return;
-        Cleanup();
-        _disposed = true;
-        GC.SuppressFinalize(this);
-      }
-    }
-
-    protected virtual void Cleanup()
-    {
       EventBroker.ClearMapping(this);
-
-      if (_context != null)
-      {
-        //Clear context owner and everything related
-        SwitchContext(_context as ScriptContext, false);
-        _context.Dispose();
-        _context = null;
-      }
-
-      Ast = null;
-      SourceCode = null;
-    }
-
-    ~Script()
-    {
-      Cleanup();
-    }
-    #endregion
-
-    #region IInvokable Members
-
-    public bool CanInvoke()
-    {
-      return Ast != null && !Disposed;
-    }
-
-    public object Invoke(IScriptContext context, object[] args)
-    {
-      if (!CanInvoke()) throw new InvalidOperationException("Script is empty");
-
-      //Switch context
-      var oldContext = Context;
-      Context = context;
-
-      var result = RuntimeHost.NullValue;
-      try
-      {
-        result = Execute();
-      }
-      finally
-      {
-        Context = oldContext;
-      }
-
-      return result;
     }
 
     #endregion

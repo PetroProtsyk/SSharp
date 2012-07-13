@@ -1,22 +1,5 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Scripting.SSharp.Diagnostics;
 using Scripting.SSharp.Runtime.Configuration;
@@ -60,9 +43,9 @@ namespace Scripting.SSharp.Runtime
     [Promote(false)]
     public virtual void Initialize(ScriptConfiguration configuration)
     {
-      Requires.NotNull(configuration, "configuration");
+      Requires.NotNull<ScriptConfiguration>(configuration, "configuration");
 
-      Configuration = configuration;
+      this.Configuration = configuration;
       FindAliasTypes();
 
       LoadAssemblies();
@@ -71,13 +54,6 @@ namespace Scripting.SSharp.Runtime
     #endregion
 
     #region Methods
-    public virtual IEnumerable<MethodInfo> GetExtensionMethods(Type type) {
-        return Enumerable.Empty<MethodInfo>();
-    }
-
-    public virtual IEnumerable<MethodInfo> GetExtensionMethods(Type type, string methodName) {
-        return GetExtensionMethods(type).Where(m => m.Name == methodName);
-    }
     /// <summary>
     /// Loads assemblies from configuration to memory and generate 
     /// LoadedAssemblies list which will be scanned for types
@@ -108,7 +84,7 @@ namespace Scripting.SSharp.Runtime
 
     protected virtual void RegisterType(Type type)
     {
-      Requires.NotNull(type, "type");
+      Requires.NotNull<Type>(type, "type");
 
       if (!Types.ContainsKey(type.FullName))
       {
@@ -123,7 +99,7 @@ namespace Scripting.SSharp.Runtime
           }
           else
           {
-            var types = new List<Type> { type };
+            List<Type> types = new List<Type>() { type };
             Namespaces.Add(type.Namespace, types);
           }
         }
@@ -137,7 +113,7 @@ namespace Scripting.SSharp.Runtime
 
     protected virtual void UnRegisterType(Type type)
     {
-      Requires.NotNull(type, "type");
+      Requires.NotNull<Type>(type, "type");
 
       if (Types.ContainsKey(type.FullName))
       {
@@ -161,9 +137,13 @@ namespace Scripting.SSharp.Runtime
       //Remove all aliases
       if (ShortTypes.ContainsValue(type))
       {
-        var keysToRemove = (from value in ShortTypes where value.Value == type select value.Key).ToList();
+        List<string> keysToRemove = new List<string>();
+        foreach (KeyValuePair<string, Type> value in ShortTypes)
+        {
+          if (value.Value == type) keysToRemove.Add(value.Key);
+        }
 
-        foreach (var key in keysToRemove)
+        foreach (string key in keysToRemove)
           ShortTypes.Remove(key);
       }
     }
@@ -182,9 +162,9 @@ namespace Scripting.SSharp.Runtime
 
     protected virtual AssemblyHandlerEventArgs OnBeforeAddAssembly(Assembly assembly)
     {
-      Requires.NotNull(assembly, "assembly");
+      Requires.NotNull<Assembly>(assembly, "assembly");
 
-      var args = new AssemblyHandlerEventArgs(assembly);
+      AssemblyHandlerEventArgs args = new AssemblyHandlerEventArgs(assembly);
 
       var hanlder = BeforeAddAssembly;
       if (hanlder != null) hanlder(this, args);
@@ -196,10 +176,10 @@ namespace Scripting.SSharp.Runtime
 
     protected virtual AssemblyTypeHandlerEventArgs OnBeforeAddType(Assembly assembly, Type type)
     {
-      Requires.NotNull(assembly, "assembly");
-      Requires.NotNull(type, "type");
+      Requires.NotNull<Assembly>(assembly, "assembly");
+      Requires.NotNull<Type>(type, "type");
 
-      var args = new AssemblyTypeHandlerEventArgs(assembly, type);
+      AssemblyTypeHandlerEventArgs args = new AssemblyTypeHandlerEventArgs(assembly, type);
       var handler = BeforeAddType;
       if (handler != null) handler(this, args);
 
@@ -213,10 +193,7 @@ namespace Scripting.SSharp.Runtime
     #region Public Interface
     public virtual void AddAssembly(Assembly assembly)
     {
-      Requires.NotNull(assembly, "assembly");
-
-      // Skip processing dynamic assemblies
-      if (assembly.IsDynamic) return;
+      Requires.NotNull<Assembly>(assembly, "assembly");
 
       if (OnBeforeAddAssembly(assembly).Cancel)
       {
@@ -229,7 +206,7 @@ namespace Scripting.SSharp.Runtime
         WorkingAssemblies.Add(assembly);
       }
 
-      foreach (Type type in assembly.GetExportedTypes())
+      foreach (Type type in assembly.GetTypes())
       {
         if (!type.IsPublic) continue;
 
@@ -242,7 +219,7 @@ namespace Scripting.SSharp.Runtime
 
     public virtual void RemoveAssembly(Assembly assembly)
     {
-      Requires.NotNull(assembly, "assembly");
+      Requires.NotNull<Assembly>(assembly, "assembly");
 
       if (!WorkingAssemblies.Contains(assembly)) return;
 
@@ -260,7 +237,7 @@ namespace Scripting.SSharp.Runtime
     /// </summary>
     /// <param name="name">Short, Alias or FullType name</param>
     /// <returns>Type</returns>
-    /// <exception cref="ScriptIdNotFoundException">
+    /// <exception cref="ScriptNET.ScriptException">
     ///  If type not found
     /// </exception>
     public Type GetType(string name)
@@ -272,7 +249,7 @@ namespace Scripting.SSharp.Runtime
       if (ShortTypes.TryGetValue(name, out result)) return result;
       if (Types.TryGetValue(name, out result)) return result;
 
-      throw new ScriptIdNotFoundException(string.Format(Strings.TypeNotFoundError, name));
+      throw new ScriptException(string.Format("Type with given name \"{0}\"is not found", name));
     }
 
     public bool HasType(string name)
@@ -290,7 +267,7 @@ namespace Scripting.SSharp.Runtime
     public void AddType(string alias, Type type)
     {
       Requires.NotNullOrEmpty(alias, "alias");
-      Requires.NotNull(type, "type");
+      Requires.NotNull<Type>(type, "type");
 
       RuntimeHost.Lock();
       try

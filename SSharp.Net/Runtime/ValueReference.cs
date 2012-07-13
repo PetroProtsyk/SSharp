@@ -1,25 +1,7 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
-using System.Diagnostics;
+﻿using System;
 
 namespace Scripting.SSharp.Runtime
 {
-  [DebuggerDisplay("({Id},{Value})")]
   public class ValueReference : IValueReference
   {
     #region IValueReference Members
@@ -36,7 +18,7 @@ namespace Scripting.SSharp.Runtime
       private set;
     }
 
-    public IScriptScope Scope { get; set; }
+    public object Scope { get; set; }
 
     public void Reset()
     {
@@ -45,7 +27,6 @@ namespace Scripting.SSharp.Runtime
 
     public ValueReference(string id)
     {
-      Id = id;
       Value = RuntimeHost.NoVariable;
     }
 
@@ -59,13 +40,13 @@ namespace Scripting.SSharp.Runtime
 
     protected virtual void OnRemoved()
     {
-      var handler = Removed;
+      EventHandler<EventArgs> handler = Removed;
       if (handler != null) handler(this, EventArgs.Empty);
     }
 
     public void Remove()
     {
-      //Value = RuntimeHost.NoVariable;
+      Value = RuntimeHost.NoVariable;
       OnRemoved();
     }
     #endregion

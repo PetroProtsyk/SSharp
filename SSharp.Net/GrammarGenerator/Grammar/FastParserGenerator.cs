@@ -1,21 +1,6 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Scripting.SSharp.Parser
@@ -27,16 +12,16 @@ namespace Scripting.SSharp.Parser
   {
     public static string Build()
     {
-      var g = new GrammarDataBuilder(Grammar.CreateScriptGrammar(false)).Build();
+      ParserData g = new GrammarDataBuilder(Grammar.CreateScriptGrammar(false)).Build();
       if (2 != g.Errors.Count)
       {
         Console.WriteLine("Grammar changed!");
         return null;
       }
 
-      var code = new StringBuilder();
+      StringBuilder code = new StringBuilder();
 
-      const string template = @"
+      string template = @"
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,37 +40,37 @@ namespace Scripting.SSharp.Parser.FastGrammar
   }
 }
 ";
-      var stateIndex = new Dictionary<long, int>();
+      Dictionary<long, int> stateIndex = new Dictionary<long, int>();
 
-      int startIndex = -1, endIndex = -1, index = 0;
-
+      int startIndex = -1, endIndex = -1,index=0;
+      
       foreach (var state in g.States)
       {
         if (state == g.InitialState) startIndex = index;
         if (state == g.FinalState) endIndex = index;
 
-        code.AppendLine("     ParserState state_" + index + " = new ParserState(" + state.Id + ");");
-        stateIndex.Add(state.Id, index);
+        code.AppendLine("     ParserState state_" + index + " = new ParserState(" + state.ID + ");");
+        stateIndex.Add(state.ID, index);
         index++;
       }
 
 
-      var terms = new Dictionary<int, GrammarTerm>();
-
+      Dictionary<int, GrammarTerm> Terms = new Dictionary<int, GrammarTerm>();
+      
       foreach (var state in g.States)
       {
         foreach (var ak in state.Actions)
         {
-          if (ak.Value.NonTerminal != null && !terms.ContainsKey(ak.Value.NonTerminal.id))
+          if (ak.Value.NonTerminal != null && !Terms.ContainsKey(ak.Value.NonTerminal.id))
           {
-            string ncode = string.Format("new NonTerminal(\"{0}\", typeof({1}),\"{2}\",{3},{4})",
-              NormalizeName(ak.Value.NonTerminal.Name),
-              ak.Value.NonTerminal.NodeType == null ? "AstNode" : ak.Value.NonTerminal.NodeType.FullName,
-              NormalizeName(ak.Value.NonTerminal.Key),
-              GetOptions(ak.Value.NonTerminal.Options),
-              ak.Value.NonTerminal.id);
+           string ncode = string.Format("new NonTerminal(\"{0}\", typeof({1}),\"{2}\",{3},{4})",
+             NormalizeName(ak.Value.NonTerminal.Name),
+             ak.Value.NonTerminal.NodeType == null ? "AstNode" : ak.Value.NonTerminal.NodeType.FullName,
+             NormalizeName(ak.Value.NonTerminal.Key),
+             GetOptions(ak.Value.NonTerminal.Options),
+             ak.Value.NonTerminal.id);
 
-            terms.Add(ak.Value.NonTerminal.id, ak.Value.NonTerminal);
+            Terms.Add(ak.Value.NonTerminal.id, ak.Value.NonTerminal);
 
             code.AppendLine(string.Format("NonTerminal Terms_{0} = {1};", ak.Value.NonTerminal.id, ncode));
 
@@ -97,14 +82,13 @@ namespace Scripting.SSharp.Parser.FastGrammar
       index = 0;
       code.AppendLine("ActionsRecord fd;");
 
-      var aRecords = new Dictionary<string, int>();
+      Dictionary<string, int> aRecords = new Dictionary<string, int>();
       int aIndex = 0;
 
       foreach (var state in g.States)
       {
-        int sIndex = stateIndex[state.Id];
+        int sIndex = stateIndex[state.ID];
         string stateName = string.Format("state_{0}", sIndex);
-        code.AppendLine("fd = " +stateName + ".Actions;");
 
         foreach (var ak in state.Actions)
         {
@@ -114,8 +98,8 @@ namespace Scripting.SSharp.Parser.FastGrammar
           //string.Format("Terms[{0}]", ak.Value.NonTerminal.id);
 
           string acode = string.Format("new ActionRecord({0},{1},{2},{3})",
-          "ParserActionType." + ak.Value.ActionType,
-          ak.Value.NewState == null ? "null" : "state_" + stateIndex[ak.Value.NewState.Id] + "",
+          "ParserActionType." + ak.Value.ActionType.ToString(),
+          ak.Value.NewState == null ? "null" : "state_" + stateIndex[ak.Value.NewState.ID] + "",
           ncode,
           ak.Value.PopCount);
 
@@ -133,7 +117,7 @@ namespace Scripting.SSharp.Parser.FastGrammar
             aIndex++;
           }
 
-          code.AppendLine(string.Format("fd.Add(\"{0}\", {1});", NormalizeName(ak.Key), aName));
+          code.AppendLine(string.Format(stateName+".Actions.Add(\"{0}\", {1});", NormalizeName(ak.Key), aName));
         }
 
         //code.AppendLine("fd = new ActionsRecord(");
@@ -163,7 +147,7 @@ namespace Scripting.SSharp.Parser.FastGrammar
 
         //code.AppendLine("})      });");
         //code.AppendLine("ts.Actions = fd;");
-
+        
         index++;
       }
 
@@ -184,17 +168,19 @@ namespace Scripting.SSharp.Parser.FastGrammar
         {
           if (tm is NumberLiteral) code.Append("n,");
           else
-            if (tm is IdentifierTerminal) code.Append("v,");
+          if (tm is IdentifierTerminal) code.Append("v,");
+          else
+          if (tm is StringLiteral) code.Append("s,");
+          else
+          if (tm is CommentTerminal)
+          {
+            CommentTerminal cm = (CommentTerminal)tm;
+            if (cm.Name == "Comment") code.Append("Comment,");
             else
-              if (tm is StringLiteral) code.Append("s,");
-              else
-                if (tm is CommentTerminal)
-                {
-                  var cm = (CommentTerminal)tm;
-                  code.Append(cm.Name == "Comment" ? "Comment," : "LineComment,");
-                }
-                else
-                  code.Append("SymbolTerminal.GetSymbol(\"" + ((SymbolTerminal)tm).Symbol + "\"),");
+              code.Append("LineComment,");
+          }
+          else
+            code.Append("SymbolTerminal.GetSymbol(\"" + ((SymbolTerminal)tm).Symbol + "\"),");
         }
         code.AppendLine("};");
         code.AppendLine("Scanner.TerminalsLookup.Add((char)" + (int)t.Key + ",tl);");

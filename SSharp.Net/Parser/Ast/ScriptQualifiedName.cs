@@ -1,26 +1,10 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Dynamic;
 using System.Linq;
-using Scripting.SSharp.Runtime;
+using Scripting.SSharp.Parser;
 using Scripting.SSharp.Runtime.Promotion;
+using Scripting.SSharp.Runtime;
 
 namespace Scripting.SSharp.Parser.Ast
 {
@@ -30,21 +14,21 @@ namespace Scripting.SSharp.Parser.Ast
   internal class ScriptQualifiedName : ScriptExpr
   {
     #region Members
-    private readonly string _identifier;
-    private readonly List<ScriptAst> _modifiers;
-    private readonly ScriptQualifiedName _namePart;
+    private string identifier;
+    private List<ScriptAst> modifiers;
+    private ScriptQualifiedName namePart;
 
     private delegate void EvaluateFunction(IScriptContext context);
     private delegate void AssignFunction(object value, IScriptContext context);
 
-    private readonly EvaluateFunction _evaluation;
-    private readonly AssignFunction _assignment;
+    private EvaluateFunction evaluation;
+    private AssignFunction assignment;
 
     public ReadOnlyCollection<ScriptAst> Modifiers
     {
       get
       {
-        return new ReadOnlyCollection<ScriptAst>(_modifiers);
+        return new ReadOnlyCollection<ScriptAst>(modifiers);
       }
     }
 
@@ -52,11 +36,11 @@ namespace Scripting.SSharp.Parser.Ast
     {
       get
       {
-        return _namePart;
+        return namePart;
       }
     }
 
-    internal bool NextFirst
+    public bool NextFirst
     {
       get;
       private set;
@@ -66,7 +50,7 @@ namespace Scripting.SSharp.Parser.Ast
     {
       get
       {
-        return _identifier;
+        return identifier;
       }
     }
 
@@ -102,53 +86,53 @@ namespace Scripting.SSharp.Parser.Ast
 
       if (ChildNodes.Count == 2 && ChildNodes[1].ChildNodes.Count == 0)
       {
-        _identifier = ExtractId(((TokenAst)ChildNodes[0]).Text);
+        identifier = ExtractId(((TokenAst)ChildNodes[0]).Text);
         IsVariable = true;
 
-        _evaluation = EvaluateIdentifier;
-        _assignment = AssignIdentifier;
+        evaluation = EvaluateIdentifier;
+        assignment = AssignIdentifier;
       }
       else
         if (ChildNodes[0] is TokenAst && ChildNodes[1].ChildNodes.Count != 0)
         {
-          _identifier = ExtractId(((TokenAst)ChildNodes[0]).Text);
+          identifier = ExtractId(((TokenAst)ChildNodes[0]).Text);
 
           //NOTE: There might be two cases:
           //      1) a()[]...() 
           //      2) a<>.(NamePart)    
-          _modifiers = new List<ScriptAst>();
+          modifiers = new List<ScriptAst>();
           foreach (ScriptAst node in ChildNodes[1].ChildNodes)
-            _modifiers.Add(node);
+            modifiers.Add(node);
 
-          var generic = _modifiers.FirstOrDefault() as ScriptGenericsPostfix;
-          if (generic != null && _modifiers.Count == 1)
+          ScriptGenericsPostfix generic = modifiers.FirstOrDefault() as ScriptGenericsPostfix;
+          if (generic != null && modifiers.Count == 1)
           {
             //Case 2
-            _evaluation = EvaluateGenericType;
-            _assignment = null;
+            evaluation = EvaluateGenericType;
+            assignment = null;
           }
           else
           {
             //Case 1
-            _evaluation = EvaluateFunctionCall;
-            _assignment = AssignArray;
+            evaluation = EvaluateFunctionCall;
+            assignment = AssignArray;
           }
         }
         else
         {
-          _namePart = ChildNodes[0] as ScriptQualifiedName;
-          _identifier = ExtractId(((TokenAst)ChildNodes[2]).Text);
+          namePart = ChildNodes[0] as ScriptQualifiedName;
+          identifier = ExtractId(((TokenAst)ChildNodes[2]).Text);
           NextFirst = true;
           if (ChildNodes.Count == 4 && ChildNodes[3].ChildNodes.Count != 0)
           {
-            _modifiers = new List<ScriptAst>();
+            modifiers = new List<ScriptAst>();
             foreach (ScriptAst node in ChildNodes[3].ChildNodes)
             {
-              _modifiers.Add(node);
+              modifiers.Add(node);
             }
           }
-          _evaluation = EvaluateNamePart;
-          _assignment = AssignNamePart;
+          evaluation = EvaluateNamePart;
+          assignment = AssignNamePart;
         }
     }
     #endregion
@@ -156,30 +140,29 @@ namespace Scripting.SSharp.Parser.Ast
     #region Public Methods
     public override void Evaluate(IScriptContext context)
     {
-      _evaluation(context);
+      evaluation(context);
     }
 
     public void Assign(object value, IScriptContext context)
     {
-      _assignment(value, context);
+      assignment(value, context);
     }
     #endregion
 
     #region Identifier
-    IValueReference _variable;
+    IValueReference variable = null;
     
     private void EvaluateIdentifier(IScriptContext context)
     {
       object result;
 
-      // if variable was previously cached and it still belongs to the given scope return the cached value
-      if (_variable != null && _variable.Scope.Equals(context.Scope))
+      if (variable != null)
       {
-        result = _variable.Value;
+        result = variable.Value;
       }
       else
       {
-        result = GetIndentifierValue(context, _identifier);
+        result = GetIndentifierValue(context, identifier);
       }
 
       context.Result = result;
@@ -192,7 +175,8 @@ namespace Scripting.SSharp.Parser.Ast
 
       if (IsGlobal)
       {
-        _variable = null;
+
+        variable = null;
         IScriptScope scope = context.Scope.Parent;
         while (scope != null)
         {
@@ -202,13 +186,12 @@ namespace Scripting.SSharp.Parser.Ast
           }
           scope = scope.Parent;
         }
+
       }
       else
       {
-        if (_variable != null && _variable.Value != null) return _variable.Value;
-
-        object result;         
-        _variable = CreateRef(identifier, context, true, out result);
+        object result;
+        variable = CreateRef(identifier, context, true, out result);
 
         if (result != RuntimeHost.NoVariable)
         {
@@ -216,37 +199,38 @@ namespace Scripting.SSharp.Parser.Ast
         }
       }
 
-      return RuntimeHost.HasType(identifier)
-               ? (object) RuntimeHost.GetType(identifier)
-               : NamespaceResolver.Get(identifier);
+      if (RuntimeHost.HasType(identifier))
+        return RuntimeHost.GetType(identifier);
+      else
+        return NamespaceResolver.Get(identifier);
     }
 
     private void AssignIdentifier(object value, IScriptContext context)
     {
       if (IsGlobal)
       {
-        SetToParentScope(context.Scope.Parent, _identifier, value);
-        _variable = null;
+        SetToParentScope(context.Scope.Parent, identifier, value);
+        variable = null;
         return;
       }
 
-      var scope = context.Scope as LocalScope;
+      LocalScope scope = context.Scope as LocalScope;
       if (IsVar && scope != null)
       {
-        scope.CreateVariable(_identifier, value);
+        scope.CreateVariable(identifier, value);
         return;
       }
 
-      if (_variable != null)
+      if (variable != null)
       {
-        _variable.Value = value;
+        variable.Value = value;
       }
       else
       {
-        context.SetItem(_identifier, value);
+        context.SetItem(identifier, value);
         
         object tmp;
-        _variable = CreateRef(_identifier, context, false, out tmp);
+        variable = CreateRef(identifier, context, false, out tmp);
       }
     }
 
@@ -265,7 +249,7 @@ namespace Scripting.SSharp.Parser.Ast
       else
       {
         if (resolve)
-          value = context.GetItem(_identifier, false);
+          value = context.GetItem(identifier, false);
       }
 
       return result;
@@ -273,23 +257,22 @@ namespace Scripting.SSharp.Parser.Ast
 
     private void ReferenceRemoved(object sender, EventArgs e)
     {
-      if (sender == _variable)
+      if (sender == variable)
       {
-        _variable.Removed -= ReferenceRemoved;
-        _variable = null;
+        variable.Removed -= ReferenceRemoved;
+        variable = null;
       }
     }
 
     /// <summary>
     /// Sets variable to the first scope in hierarchy which already has this variable
     /// </summary>
-    /// <param name="parent"></param>
     /// <param name="id"></param>
     /// <param name="value"></param>
     /// <returns></returns>
     internal static void SetToParentScope(IScriptScope parent, string id, object value)
     {
-      var scope = parent;
+      IScriptScope scope = parent;
       while (scope != null)
       {
         if (scope.HasVariable(id))
@@ -300,19 +283,19 @@ namespace Scripting.SSharp.Parser.Ast
         scope = scope.Parent;
       }
 
-      throw new ScriptIdNotFoundException(string.Format(Strings.GlobalNameNotFound, id));
+      throw new ScriptIdNotFoundException(string.Format("Global name {0} was not found in scopes", id));
     }
     #endregion
 
     #region Single Call
     private void EvaluateGenericType(IScriptContext context)
     {
-      var genericPostfix = (ScriptGenericsPostfix)_modifiers.First();
+      ScriptGenericsPostfix genericPostfix = (ScriptGenericsPostfix)modifiers.First();
 
-      var genericType = GetIndentifierValue(context, genericPostfix.GetGenericTypeName(_identifier)) as Type;
+      Type genericType = GetIndentifierValue(context, genericPostfix.GetGenericTypeName(identifier)) as Type;
       if (genericType == null || !genericType.IsGenericType)
       {
-        throw new ScriptExecutionException(string.Format(Strings.TypeIsNotGeneric, Code(context), genericType.Name));
+        throw new ScriptException("Given type is not generic");
       }
 
       genericPostfix.Evaluate(context);
@@ -323,26 +306,26 @@ namespace Scripting.SSharp.Parser.Ast
     {
       EvaluateIdentifier(context);
 
-      foreach (var node in _modifiers)
+      foreach (ScriptAst node in modifiers)
       {
-        var funcCall = node as ScriptFunctionCall;
+        ScriptFunctionCall funcCall = node as ScriptFunctionCall;
         if (funcCall != null)
         {
-          var function = context.Result as IInvokable;
+          IInvokable function = context.Result as IInvokable;
           if (function == null)
-            throw new ScriptExecutionException(string.Format(Strings.ObjectDoesNotImplementIInvokable, Code(context), node.Code(context), Span.Start.Line, Span.Start.Position));
+            throw new ScriptException("Is not a function type");
           context.Result = CallFunction(function, funcCall, context);
           continue;
         }
 
-        var arrayResolution = node as ScriptArrayResolution;
+        ScriptArrayResolution arrayResolution = node as ScriptArrayResolution;
         if (arrayResolution != null)
         {
           GetArrayValue(context.Result, arrayResolution, context);
           continue;
         }
 
-        var genericPostfix = node as ScriptGenericsPostfix;
+        ScriptGenericsPostfix genericPostfix = node as ScriptGenericsPostfix;
         if (genericPostfix != null)
         {
           throw new NotSupportedException();
@@ -355,25 +338,25 @@ namespace Scripting.SSharp.Parser.Ast
 
     private void AssignArray(object value, IScriptContext context)
     {
-      var obj = context.GetItem(_identifier, true);
+      object obj = context.GetItem(identifier, true);
 
-      foreach (var node in _modifiers)
+      foreach (ScriptAst node in modifiers)
       {
-        var functionCall = node as ScriptFunctionCall;
+        ScriptFunctionCall functionCall = node as ScriptFunctionCall;
         if (functionCall != null)
         {
-          obj = CallFunction(context.GetFunctionDefinition(_identifier), functionCall, context);
+          obj = CallFunction(context.GetFunctionDefinition(identifier), functionCall, context);
           continue;
         }
 
-        var arrayResolution = node as ScriptArrayResolution;
+        ScriptArrayResolution arrayResolution = node as ScriptArrayResolution;
         if (arrayResolution != null)
         {
           SetArrayValue(obj, arrayResolution, context, value);
           continue;
         }
 
-        var genericPostfix = node as ScriptGenericsPostfix;
+        ScriptGenericsPostfix genericPostfix = node as ScriptGenericsPostfix;
         if (genericPostfix != null)
         {
           throw new NotSupportedException();
@@ -381,77 +364,65 @@ namespace Scripting.SSharp.Parser.Ast
       }
     }
 
-    private static void SetArrayValue(object obj, ScriptArrayResolution scriptArrayResolution, IScriptContext context, object value) {
-        scriptArrayResolution.Evaluate(context);
+    private static void SetArrayValue(object obj, ScriptArrayResolution scriptArrayResolution, IScriptContext context, object value)
+    {
+      scriptArrayResolution.Evaluate(context);
 
-        object[] indexParameters = (object[])context.Result;
-        object[] setterParameters = new object[indexParameters.Length + 1];
-        indexParameters.CopyTo(setterParameters, 0);
-        setterParameters[indexParameters.Length] = value;
+      object[] indexParameters = (object[])context.Result;
+      object[] setterParameters = new object[indexParameters.Length + 1];
+      indexParameters.CopyTo(setterParameters, 0);
+      setterParameters[indexParameters.Length] = value;
 
-        IBinding setter = RuntimeHost.Binder.BindToIndex(obj, setterParameters, true);
-        if (setter != null) {
-            setter.Invoke(context, null);
-            return;
-        }
+      IBinding setter = RuntimeHost.Binder.BindToIndex(obj, setterParameters, true);
+      if (setter != null)
+      {
+        setter.Invoke(context, null);
+        return;
+      }
 
-        throw MethodNotFoundException("setter", indexParameters);
+      throw MethodNotFoundException("setter", indexParameters);
     }
 
-    private static void GetArrayValue(object obj, ScriptArrayResolution scriptArrayResolution, IScriptContext context) {
-        scriptArrayResolution.Evaluate(context);
-        object[] param = (object[])context.Result;
-        IBinding indexBind = RuntimeHost.Binder.BindToIndex(obj, param, false);
+    private static void GetArrayValue(object obj, ScriptArrayResolution scriptArrayResolution, IScriptContext context)
+    {
+      scriptArrayResolution.Evaluate(context);
+      object[] param = (object[])context.Result;
+      IBinding indexBind = RuntimeHost.Binder.BindToIndex(obj, param, false);
 
-        if (indexBind != null) {
-            context.Result = indexBind.Invoke(context, null);
-        } else {
-            throw MethodNotFoundException("indexer[]", param);
-        }
+      if (indexBind != null)
+      {
+        context.Result = indexBind.Invoke(context, null);
+      }
+      else
+      {
+        throw MethodNotFoundException("indexer[]", param);
+      }
     }
-      
-    //NOTE: This code contains bug, when dealing with multi-dimensional arrays
-    //private static void SetArrayValue(object obj, ScriptArrayResolution scriptArrayResolution, IScriptContext context, object value)
-    //{
-    //  scriptArrayResolution.Evaluate(context);
-
-    //  var indexParameters = (object[])context.Result;     
-    //  // Denis: don't remove (dynamic) casting whatever R# tells you
-    //  ((dynamic)obj)[(dynamic)indexParameters[0]] = (dynamic)value;
-    //}
-
-    //private static void GetArrayValue(object obj, ScriptArrayResolution scriptArrayResolution, IScriptContext context)
-    //{
-    //  scriptArrayResolution.Evaluate(context);
-
-    //  var param = (object[])context.Result;            
-    //  context.Result = ((dynamic)obj)[(dynamic)param[0]];      
-    //}
     #endregion
 
     #region Name Part
     private void EvaluateNamePart(IScriptContext context)
     {
-      _namePart.Evaluate(context);
+      namePart.Evaluate(context);
       object obj = context.Result;
       bool firstResolution = false;
 
-      if (_modifiers == null)
+      if (modifiers == null)
       {
-        context.Result = GetMemberValue(obj, _identifier);
+        context.Result = GetMemberValue(obj, identifier);
         return;
       }
 
       Type[] genericArguments = null;
-      foreach (ScriptAst node in _modifiers)
+      foreach (ScriptAst node in modifiers)
       {
         //NOTE: Generic modifier should be the first among other modifiers in the list
-        var generic = node as ScriptGenericsPostfix;
+        ScriptGenericsPostfix generic = node as ScriptGenericsPostfix;
         if (generic != null)
         {
           if (genericArguments != null)
           {
-            throw new ScriptSyntaxErrorException(string.Format(Strings.WrongSequenceOfModifiers, Code(context)));
+            throw new ScriptException("Wrong modifiers sequence");
           }
 
           generic.Execute(context);
@@ -459,20 +430,20 @@ namespace Scripting.SSharp.Parser.Ast
           continue;
         }
 
-        var functionCall = node as ScriptFunctionCall;
+        ScriptFunctionCall functionCall = node as ScriptFunctionCall;
         if (functionCall != null)
         {
-          CallClassMethod(obj, _identifier, functionCall, genericArguments, context);
+          CallClassMethod(obj, identifier, functionCall, genericArguments, context);
           obj = context.Result;
           continue;
         }
 
-        var arrayResolution = node as ScriptArrayResolution;
+        ScriptArrayResolution arrayResolution = node as ScriptArrayResolution;
         if (arrayResolution != null)
         {
           if (!firstResolution)
           {
-            obj = GetMemberValue(obj, _identifier);
+            obj = GetMemberValue(obj, identifier);
             firstResolution = true;
           }
 
@@ -485,20 +456,20 @@ namespace Scripting.SSharp.Parser.Ast
 
     private void AssignNamePart(object value, IScriptContext context)
     {
-      _namePart.Evaluate(context);
-      var obj = context.Result;
+      namePart.Evaluate(context);
+      object obj = context.Result;
 
-      if (_modifiers == null)
+      if (modifiers == null)
       {
         SetMember(context, obj, value);
         return;
       }
 
       //TODO: Bug, first evaluate get member, see unit test AssignmentToArrayObject
-      string localIdentifier = _identifier;
-      for (int index=0; index<_modifiers.Count; index++)
+      string localIdentifier = identifier;
+      for (int index=0; index<modifiers.Count; index++)
       {
-        var scriptFunctionCall = _modifiers[index] as ScriptFunctionCall;
+        ScriptFunctionCall scriptFunctionCall = modifiers[index] as ScriptFunctionCall;
         if (scriptFunctionCall != null)
         {
           if (localIdentifier != null)
@@ -509,14 +480,14 @@ namespace Scripting.SSharp.Parser.Ast
           }
           else
           {
-            var funcDef = obj as IInvokable;
-            if (funcDef == null) throw new ScriptExecutionException(string.Format(Strings.ObjectDoesNotImplementIInvokable, Code(context), "", Span.Start.Line, Span.Start.Position));
+            IInvokable funcDef = obj as IInvokable;
+            if (funcDef == null) throw new ScriptException("Attempt to invoke non IInvokable object.");
             obj = CallFunction(funcDef, scriptFunctionCall, context);
           }
           continue;
         }
 
-        var scriptArrayResolution = _modifiers[index] as ScriptArrayResolution;
+        ScriptArrayResolution scriptArrayResolution = modifiers[index] as ScriptArrayResolution;
         if (scriptArrayResolution != null)
         {
           if (localIdentifier != null)
@@ -525,7 +496,7 @@ namespace Scripting.SSharp.Parser.Ast
             localIdentifier = null;
           }
 
-          if (index == _modifiers.Count - 1)
+          if (index == modifiers.Count - 1)
           {
             SetArrayValue(obj, scriptArrayResolution, context, value);
           }
@@ -548,29 +519,26 @@ namespace Scripting.SSharp.Parser.Ast
       return functionDefinition.Invoke(context, (object[])context.Result);
     }
 
-    private static void CallClassMethod(object obj, string memeberInfo, ScriptFunctionCall scriptFunctionCall, Type[] genericArguments, IScriptContext context)
+    private void CallClassMethod(object obj, string memeberInfo, ScriptFunctionCall scriptFunctionCall, Type[] genericArguments, IScriptContext context)
     {
       scriptFunctionCall.Evaluate(context);
       context.Result = CallAppropriateMethod(context, obj, memeberInfo, genericArguments, (object[])context.Result);
     }
 
-    private static object CallAppropriateMethod(IScriptContext context, object obj, string name, Type[] genericArguments, object[] param)
+    private static object CallAppropriateMethod(IScriptContext context, object obj, string Name, Type[] genericArguments, object[] param)
     {
-      var methodBind = RuntimeHost.Binder.BindToMethod(obj, name, genericArguments, param);
+      IBinding methodBind = methodBind = RuntimeHost.Binder.BindToMethod(obj, Name, genericArguments, param);
       if (methodBind != null)
-        return methodBind.Invoke(context, null);
+        return methodBind.Invoke(context, param);
 
-      throw MethodNotFoundException(name, param);
+      throw MethodNotFoundException(Name, param);
     }
     #endregion
 
     #region Helpers
-
-    private static readonly char[] IdSeparator = new[] { ':' };
-
     private string ExtractId(string id)
-    {      
-      var parts = id.Split(IdSeparator);
+    {
+      string[] parts = id.Split(":".ToCharArray());
       if (parts.Length == 1) return parts[0];
 
       IsGlobal = true;
@@ -579,55 +547,39 @@ namespace Scripting.SSharp.Parser.Ast
 
     private void SetMember(IScriptContext context, object obj, object value)
     {
-      // Check whether we are setting member value for a dynamic object
-      var dynamicObject = obj as DynamicObject;
-      if (dynamicObject != null)
-      {
-        // Get or create a new call site for a setter
-        var setter = CallSiteCache.GetOrCreatePropertySetter(_identifier);
-        if (setter == null) throw new ScriptIdNotFoundException(_identifier);
-        // set property value for the dynamic object
-        setter.Target(setter, obj, value);
-      }
-      else
-      {
-        IMemberBinding bind = RuntimeHost.Binder.BindToMember(obj, _identifier, true);
-        if (bind == null) throw new ScriptIdNotFoundException(_identifier);
-        bind.SetValue(value);
-      }
+      IMemberBinding bind = RuntimeHost.Binder.BindToMember(obj, identifier, true);
+      if (bind == null)
+        throw new ScriptIdNotFoundException(identifier);
 
-      context.Result = value;     
+      bind.SetValue(value);
+      context.Result = value;
+      
+      //Context.Result = RuntimeHost.Binder.Set(Identifier, obj, value);
     }
 
     private static object GetMemberValue(object obj, string memberInfo)
     {
-      // Check whether we are getting member value from a dynamic object
-      var dynamicObject = obj as DynamicObject;
-      if (dynamicObject != null)
-      {
-        // Get or create a new call site for property getter
-        var getter = CallSiteCache.GetOrCreatePropertyGetter(memberInfo);
-        if (getter == null) throw new ScriptIdNotFoundException(memberInfo);
-        // get property value from dynamic object
-        return getter.Target(getter, obj);    
-      }
-
-      var bind = RuntimeHost.Binder.BindToMember(obj, memberInfo, true);
+      IMemberBinding bind = RuntimeHost.Binder.BindToMember(obj, memberInfo, true);
       if (bind == null)
         throw new ScriptIdNotFoundException(memberInfo);
 
       return bind.GetValue();
+     
+      //return RuntimeHost.Binder.Get(memberInfo, obj);
     }
 
-    private static ScriptMethodNotFoundException MethodNotFoundException(string name, IEnumerable<object> param)
+    private static ScriptMethodNotFoundException MethodNotFoundException(string Name, object[] param)
     {
       string message = "";
-      foreach (var t in param.Where(t => t != null))
+      foreach (object t in param)
       {
-        if (string.IsNullOrEmpty(message)) message += t.GetType().Name;
-        else message += ", " + t.GetType().Name;
+        if (t != null)
+        {
+          if (string.IsNullOrEmpty(message)) message += t.GetType().Name;
+          else message += ", " + t.GetType().Name;
+        }
       }
-      return new ScriptMethodNotFoundException(string.Format(Strings.MethodSignatureNotFound, name, message));
+      return new ScriptMethodNotFoundException("Semantic: There is no method with such signature: " + Name + "(" + message + ")");
     }
     #endregion
   }

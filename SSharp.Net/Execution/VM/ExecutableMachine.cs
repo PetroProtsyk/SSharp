@@ -1,20 +1,4 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Scripting.SSharp.Execution.VM
@@ -22,13 +6,13 @@ namespace Scripting.SSharp.Execution.VM
   using Operations;
   using Runtime;
 
-  internal class ExecutableMachine
+  public class ExecutableMachine
   {
     #region Fields
-    private readonly List<IOperation> _commands = new List<IOperation>();
+    private readonly List<IOperation> commands = new List<IOperation>();
 
-    private int _current;
-    private MachineFlags _flags;
+    private int current;
+    private MachineFlags flags;
     #endregion
 
     #region Registers
@@ -41,7 +25,7 @@ namespace Scripting.SSharp.Execution.VM
     //Should be read-only, see stack commands
     public readonly Stack<object> Stack = new Stack<object>();
 
-    internal protected int CommandCount { get { return _commands.Count; } }
+    internal protected int CommandCount { get { return commands.Count; } }
     #endregion
 
     #region Properties
@@ -49,8 +33,8 @@ namespace Scripting.SSharp.Execution.VM
     {
       get
       {
-        if (_current >= 0 && _current < _commands.Count)
-          return _commands[_current];
+        if (current >= 0 && current < commands.Count)
+          return commands[current];
 
         return null;
       }
@@ -60,8 +44,8 @@ namespace Scripting.SSharp.Execution.VM
     #region Execution
     public void Reset()
     {
-      _current = 0;
-      _flags = MachineFlags.Clear;
+      current = 0;
+      flags = MachineFlags.Clear;
 
       AX = null;
       BX = null;
@@ -73,10 +57,10 @@ namespace Scripting.SSharp.Execution.VM
 
     public void Execute(IScriptContext context)
     {
-      IOperation[] arCommands = _commands.ToArray();
+      IOperation[] arCommands = commands.ToArray();
 
-      while ((_flags & MachineFlags.Ret) != MachineFlags.Ret)
-        _current += arCommands[_current].Execute(context);
+      while ((flags & MachineFlags.Ret) != MachineFlags.Ret)
+        current += arCommands[current].Execute(context);
       
       //NOTE: Peformance      
       //while (!Test(MachineFlags.Ret))
@@ -90,34 +74,34 @@ namespace Scripting.SSharp.Execution.VM
       if (Test(MachineFlags.Ret))
         throw new MachineException("Ret command has been already executed, can't continue evaluation");
 
-      if (_current > _commands.Count - 1)
+      if (current > commands.Count - 1)
         throw new MachineException("Command execution flow exception");
 
-      _current += _commands[_current].Execute(context);
+      current += commands[current].Execute(context);
     }
 
     public bool Test(MachineFlags flag)
     {
-      return (_flags & flag) == flag;
+      return (flags & flag) == flag;
     }
 
     public void SetFlag(MachineFlags flag)
     {
-      _flags |= flag;
+      flags |= flag;
     }
 
     public void ClearFlag(MachineFlags flag)
     {
-      _flags ^= flag;
+      flags ^= flag;
     }
     #endregion
 
     #region Operations
-    readonly Dictionary<Type, IOperationBuilder> _registeredOperations = new Dictionary<Type, IOperationBuilder>();
+    readonly Dictionary<Type, IOperationBuilder> registeredOperations = new Dictionary<Type, IOperationBuilder>();
 
     public void RegisterOperation(Type operationType, IOperationBuilder builder)
     {
-      _registeredOperations.Add(operationType, builder);
+      registeredOperations.Add(operationType, builder);
     }
 
     public void RegisterOperation<T>(IOperationBuilder builder) where T : IOperation
@@ -127,8 +111,8 @@ namespace Scripting.SSharp.Execution.VM
 
     public IOperation CreateOperation(Type operationType)
     {
-      IOperation op = _registeredOperations[operationType].Create();
-      _commands.Add(op);
+      IOperation op = registeredOperations[operationType].Create();
+      commands.Add(op);
       return op;
     }
 
@@ -145,7 +129,7 @@ namespace Scripting.SSharp.Execution.VM
 
     public static ExecutableMachine Create()
     {
-      var machine = new ExecutableMachine();
+      ExecutableMachine machine = new ExecutableMachine();
 
       machine.RegisterOperation<RetOperation>(new BaseOperationBuilder<RetOperation>(machine));
       machine.RegisterOperation<GetValueOperation>(new BaseOperationBuilder<GetValueOperation>(machine));
@@ -182,7 +166,7 @@ namespace Scripting.SSharp.Execution.VM
   }
 
   [Flags]
-  internal enum MachineFlags
+  public enum MachineFlags
   {
     Clear = 0,
     Ret = 1 << 0,
@@ -191,28 +175,16 @@ namespace Scripting.SSharp.Execution.VM
   }
   
   [Flags]
-  internal enum MachineRegisters
+  public enum MachineRegisters
   {
     None = 0,
-    /// <summary>
-    /// Evaluation result register
-    /// </summary>
     AX = 1 << 0,
-    /// <summary>
-    /// Evaluation parameter register
-    /// </summary>
     BX = 1 << 1,
-    /// <summary>
-    /// Reserved evaluation register
-    /// </summary>
     DX = 1 << 2,
-    /// <summary>
-    /// Boolean result register
-    /// </summary>
     BBX = 1 << 3
   }
 
-  internal class MachineException : Exception
+  public class MachineException : Exception
   {
     public MachineException(string message)
       : base(message)

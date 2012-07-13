@@ -1,19 +1,4 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+using System;
 using System.Collections.Generic;
 using Scripting.SSharp.Parser.Ast;
 
@@ -31,12 +16,12 @@ namespace Scripting.SSharp.Parser.FastGrammar
     #region Fields
     private ISourceStream _source;
     private CompilerContext _context;
-    private readonly char[] _lineTerminators;
+    private char[] _lineTerminators;
     private TokenAst _currentToken;
     private int _nextNewLinePosition = -1;
-    private readonly TokenList _bufferedTokens = new TokenList();
+    private TokenList _bufferedTokens = new TokenList();
 
-    private static readonly char[] TabArr = { '\t' };
+    private static char[] _tab_arr = { '\t' };
 
     public static TerminalLookupTable TerminalsLookup = new TerminalLookupTable();
     #endregion
@@ -78,7 +63,7 @@ namespace Scripting.SSharp.Parser.FastGrammar
       if (_source.EOF())
         return TokenAst.Create(LRParser.Eof, _context, _source.TokenStart, string.Empty, LRParser.Eof.Name);
 
-      IEnumerable<ITerminal> terms = SelectTerminals(_source.CurrentChar);
+      TerminalList terms = SelectTerminals(_source.CurrentChar);
       TokenAst result = MatchTerminals(terms);
       
       if (result != null && !result.IsError())
@@ -87,8 +72,8 @@ namespace Scripting.SSharp.Parser.FastGrammar
         return result;
       }
 
-      if (result != null) return result;
-      result = LRParser.CreateSyntaxErrorToken(_context, _source.TokenStart, "Invalid character: '{0}'", _source.CurrentChar);
+      if (result == null)
+        result = LRParser.CreateSyntaxErrorToken(_context, _source.TokenStart, "Invalid character: '{0}'", _source.CurrentChar);
 
       return result;
     }
@@ -119,7 +104,7 @@ namespace Scripting.SSharp.Parser.FastGrammar
       return result;
     }
 
-    private static IEnumerable<ITerminal> SelectTerminals(char current)
+    private TerminalList SelectTerminals(char current)
     {
       TerminalList result;
 
@@ -158,7 +143,7 @@ namespace Scripting.SSharp.Parser.FastGrammar
       int tabCount = 0;
       int dummy = 0;
       if (_source.TabWidth > 1)
-        CountCharsInText(text, TabArr, lineStart, newPosition - 1, ref tabCount, ref dummy);
+        CountCharsInText(text, _tab_arr, lineStart, newPosition - 1, ref tabCount, ref dummy);
 
       tokenStart.Position = newPosition;
       tokenStart.Column = newPosition - lineStart - 1;
@@ -169,7 +154,7 @@ namespace Scripting.SSharp.Parser.FastGrammar
       _source.TokenStart = tokenStart;
     }
 
-    private static void CountCharsInText(string text, char[] chars, int from, int until, ref int count, ref int lastPosition)
+    private void CountCharsInText(string text, char[] chars, int from, int until, ref int count, ref int lastPosition)
     {
       if (from > until) return;
       while (true)
@@ -177,8 +162,8 @@ namespace Scripting.SSharp.Parser.FastGrammar
         int next = text.IndexOfAny(chars, from, until - from + 1);
         if (next < 0) return;
 
-        bool isCrlf = (text[next] == '\n' && next > 0 && text[next - 1] == '\r');
-        if (!isCrlf)
+        bool isCRLF = (text[next] == '\n' && next > 0 && text[next - 1] == '\r');
+        if (!isCRLF)
           count++; 
         lastPosition = next;
         from = next + 1;

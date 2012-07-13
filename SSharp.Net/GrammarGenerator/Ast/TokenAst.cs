@@ -1,18 +1,4 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+using System.Collections.Generic;
 
 namespace Scripting.SSharp.Parser.Ast
 {
@@ -28,7 +14,7 @@ namespace Scripting.SSharp.Parser.Ast
     #region Properties
     public ITerminal Terminal
     {
-      get { return Term as ITerminal; }
+      get { return base.Term as ITerminal; }
     }
 
     public string Text
@@ -88,9 +74,11 @@ namespace Scripting.SSharp.Parser.Ast
     public static TokenAst Create(ITerminal term, CompilerContext context, SourceLocation location, string text, object value)
     {
       int textLen = text == null ? 0 : text.Length;
-      var span = new SourceSpan(location, textLen);
-      var args = new AstNodeArgs(term, span, null);
-      var token = new TokenAst(args) { Text = text, Value = value };
+      SourceSpan span = new SourceSpan(location, textLen);
+      AstNodeArgs args = new AstNodeArgs(term, span, null);
+      TokenAst token = new TokenAst(args);
+      token.Text = text;
+      token.Value = value;
       return token;
     }
     #endregion

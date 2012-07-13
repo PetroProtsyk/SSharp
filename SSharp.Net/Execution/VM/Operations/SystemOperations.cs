@@ -1,26 +1,10 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 
 namespace Scripting.SSharp.Execution.VM.Operations
 {
   using Runtime;
 
-  internal class RetOperation : Operation
+  public class RetOperation : Operation
   {
     public override int Execute(IScriptContext context)
     {
@@ -30,7 +14,7 @@ namespace Scripting.SSharp.Execution.VM.Operations
     }
   }
 
-  internal class JmpOperation : Operation
+  public class JmpOperation : Operation
   {
     public int Offset { get; set; }
 
@@ -40,7 +24,7 @@ namespace Scripting.SSharp.Execution.VM.Operations
     }
   }
 
-  internal class JmpIfOperation : Operation
+  public class JmpIfOperation : Operation
   {
     public int Offset { get; set; }
 
@@ -57,7 +41,7 @@ namespace Scripting.SSharp.Execution.VM.Operations
     }
   }
 
-  internal class JmpIfFalseOperation : Operation
+  public class JmpIfFalseOperation : Operation
   {
     public int Offset { get; set; }
 
@@ -74,7 +58,7 @@ namespace Scripting.SSharp.Execution.VM.Operations
     }
   }
 
-  internal class ClearFlagOperation : Operation
+  public class ClearFlagOperation : Operation
   {
     public MachineFlags Flag { get; set; }
 
@@ -85,7 +69,7 @@ namespace Scripting.SSharp.Execution.VM.Operations
     }
   }
 
-  internal class SetFlagOperation : Operation
+  public class SetFlagOperation : Operation
   {
     public MachineFlags Flag { get; set; }
 
@@ -96,45 +80,45 @@ namespace Scripting.SSharp.Execution.VM.Operations
     }
   }
 
-  internal class RegisterOperation : Operation
+  public class RegisterOperation : Operation
   {
-    private MachineRegisters _source, _destination;
+    private MachineRegisters source, destination;
 
     public MachineRegisters Source
     {
       get
       {
-        return _source;
+        return source;
       }
       set
       {
-        _source = value;
+        source = value;
         switch (value)
         {
           case MachineRegisters.AX:
-            _getSource = () => machine.AX;
-            _setSource = x => machine.AX = x;
-            _internalExecute = Exchange;
+            getSource = () => machine.AX;
+            setSource = (x) => machine.AX = x;
+            internalExecute = Exchange;
             break;
           case MachineRegisters.BX:
-            _getSource = () => machine.BX;
-            _setSource = x => machine.BX = x;
-            _internalExecute = Exchange;
+            getSource = () => machine.BX;
+            setSource = (x) => machine.BX = x;
+            internalExecute = Exchange;
             break;
           case MachineRegisters.DX:
-            _getSource = () => machine.DX;
-            _setSource = x => machine.DX = x;
-            _internalExecute = Exchange;
+            getSource = () => machine.DX;
+            setSource = (x) => machine.DX = x;
+            internalExecute = Exchange;
             break;
           case MachineRegisters.BBX:
-            _getSource = () => machine.BBX;
-            _setSource = x => machine.BBX = (bool)x;
-            _internalExecute = Exchange;
+            getSource = () => machine.BBX;
+            setSource = (x) => machine.BBX = (bool)x;
+            internalExecute = Exchange;
             break;
           case MachineRegisters.None:
-            _getSource = null;
-            _setSource = null;
-            _internalExecute = SetValue;
+            getSource = null;
+            setSource = null;
+            internalExecute = SetValue;
             break;
           default:
             throw new NotSupportedException("Register is not supported");       
@@ -146,32 +130,32 @@ namespace Scripting.SSharp.Execution.VM.Operations
     {
       get
       {
-        return _destination;
+        return destination;
       }
       set
       {
-        _destination = value;
+        destination = value;
         switch (value)
         {
           case MachineRegisters.AX:
-            _getDestination = () => machine.AX;
-            _setDestination = x => machine.AX = x;
+            getDestination = () => machine.AX;
+            setDestination = (x) => machine.AX = x;
             return;
           case MachineRegisters.BX:
-            _getDestination = () => machine.BX;
-            _setDestination = x => machine.BX = x;
+            getDestination = () => machine.BX;
+            setDestination = (x) => machine.BX = x;
             return;
           case MachineRegisters.DX:
-            _getDestination = () => machine.DX;
-            _setDestination = x => machine.DX = x;
+            getDestination = () => machine.DX;
+            setDestination = (x) => machine.DX = x;
             return;
           case MachineRegisters.BBX:
-            _getDestination = () => machine.BBX;
-            _setDestination = x => machine.BBX = (bool)x;
+            getDestination = () => machine.BBX;
+            setDestination = (x) => machine.BBX = (bool)x;
             return;
           case MachineRegisters.None:
-            _getDestination = null;
-            _setDestination = null;
+            getDestination = null;
+            setDestination = null;
             break;
           default:
             throw new NotSupportedException("Register is not supported");
@@ -181,35 +165,34 @@ namespace Scripting.SSharp.Execution.VM.Operations
 
     public object Value { get; set; }
 
-    private Func<object> _getSource, _getDestination;
-    private Func<object, object> _setSource, _setDestination;
-    private ExecuteFunction _internalExecute;
+    private Func<object> getSource, getDestination;
+    private Func<object, object> setSource, setDestination;
+    private ExecuteFunction internalExecute;
     private delegate void ExecuteFunction();
 
     public RegisterOperation()
     {
-      _internalExecute = SetValue;
+      internalExecute = SetValue;
     }
 
     public override int Execute(IScriptContext context)
     {
-      _internalExecute();
+      internalExecute();
       return 1;
     }
 
     private void SetValue()
     {
-      _setDestination(Value);
+      setDestination(Value);
     }
 
     private void Exchange()
     {
-      object temp = _getDestination(); //GetRegister(Destination);
-      _setDestination(_getSource());    //SetRegister(Destination, GetRegister(Source));
-      _setSource(temp);                //SetRegister(Source, temp);   
+      object temp = getDestination(); //GetRegister(Destination);
+      setDestination(getSource());    //SetRegister(Destination, GetRegister(Source));
+      setSource(temp);                //SetRegister(Source, temp);   
     }
 
-/*
     private void SetRegister(MachineRegisters destination, object value)
     {
       switch (destination)
@@ -230,9 +213,7 @@ namespace Scripting.SSharp.Execution.VM.Operations
           throw new NotSupportedException("Register is not supported");
       }
     }
-*/
 
-/*
     private object GetRegister(MachineRegisters destination)
     {
       switch (destination)
@@ -249,6 +230,5 @@ namespace Scripting.SSharp.Execution.VM.Operations
           throw new NotSupportedException("Register is not supported");
       }
     }
-*/
   }
 }

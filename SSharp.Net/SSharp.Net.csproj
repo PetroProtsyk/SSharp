@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Scripting.SSharp</RootNamespace>
     <AssemblyName>Scripting.SSharp</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>scriptdotnet.snk</AssemblyOriginatorKeyFile>
@@ -18,13 +18,12 @@
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\Binaries\NET\$(Platform)-$(Configuration)</OutputPath>
+    <OutputPath>..\Binaries\NET\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -33,16 +32,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\Binaries\NET\$(Platform)-$(Configuration)</OutputPath>
+    <OutputPath>..\Binaries\NET\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -56,12 +53,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CompilerException.cs" />
-    <Compile Include="Extensions\HashSetExtensions.cs" />
-    <Compile Include="GrammarErrorException.cs" />
-    <Compile Include="Runtime\Promotion\StringIndexerBinding.cs" />
-    <Compile Include="Runtime\RuntimeObject.cs" />
-    <Compile Include="DynamicMath.cs" />
     <Compile Include="Execution\Compilers\Dom\OperatorType.cs" />
     <Compile Include="Parser\Ast\AScriptAstTemplate.cs" />
     <Compile Include="Parser\Ast\ScriptArrayConstructor.cs" />
@@ -187,13 +178,13 @@
     <Compile Include="Parser\Enums.cs" />
     <Compile Include="Parser\Ast\TokenAst.cs" />
     <Compile Include="Parser\SyntaxError.cs" />
+    <Compile Include="Parser\Exceptions.cs" />
     <Compile Include="Processing\DebugMarkerVisitor.cs" />
     <Compile Include="Processing\FunctionDeclarationVisitor.cs" />
     <Compile Include="Processing\IPostProcessing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\AssemblyManager.cs" />
     <Compile Include="Runtime\BaseAssemblyManager.cs" />
-    <Compile Include="Runtime\CallSiteCache.cs" />
     <Compile Include="Runtime\Configuration\ConfigSchema.cs" />
     <Compile Include="Runtime\Configuration\Operator.cs" />
     <Compile Include="Runtime\Configuration\Reference.cs" />
@@ -205,33 +196,27 @@
     <Compile Include="Runtime\IAssemblyManager.cs" />
     <Compile Include="Runtime\IOperatorHandler.cs" />
     <Compile Include="Runtime\IScriptContext.cs" />
-    <Compile Include="Runtime\Operators\AndOperator.cs" />
-    <Compile Include="Runtime\Operators\ConditionalAndOperator.cs" />
-    <Compile Include="Runtime\Operators\ConditionalOrOperator.cs" />
+    <Compile Include="Runtime\Operators\BinaryOperator.cs" />
+    <Compile Include="Runtime\Operators\BoolOperators.cs" />
     <Compile Include="Runtime\Operators\DivOperator.cs" />
-    <Compile Include="Runtime\Operators\EqualsOperator.cs" />
-    <Compile Include="Runtime\Operators\GreaterOrEqualsOperator.cs" />
-    <Compile Include="Runtime\Operators\GreaterOperator.cs" />
+    <Compile Include="Runtime\Operators\GqOperator.cs" />
+    <Compile Include="Runtime\Operators\GrOperator.cs" />
     <Compile Include="Runtime\Operators\IsOperator.cs" />
     <Compile Include="Runtime\Operators\LessOperator.cs" />
-    <Compile Include="Runtime\Operators\LessOrEqualsOperator.cs" />
-    <Compile Include="Runtime\Operators\SubOperator.cs" />
+    <Compile Include="Runtime\Operators\LqOperator.cs" />
+    <Compile Include="Runtime\Operators\MinusOperator.cs" />
     <Compile Include="Runtime\Operators\ModOperator.cs" />
     <Compile Include="Runtime\Operators\MulOperator.cs" />
-    <Compile Include="Runtime\Operators\NotEqualsOperator.cs" />
-    <Compile Include="Runtime\Operators\OperatorCodes.cs" />
-    <Compile Include="Runtime\Operators\OrOperator.cs" />
-    <Compile Include="Runtime\Operators\AddOperator.cs" />
+    <Compile Include="Runtime\Operators\PlusOperator.cs" />
     <Compile Include="Runtime\Operators\PowOperator.cs" />
     <Compile Include="Runtime\Operators\IOperator.cs" />
+    <Compile Include="Runtime\Operators\UnaryOperator.cs" />
     <Compile Include="Runtime\Operators\NegateOperators.cs" />
     <Compile Include="Runtime\Promotion\ConstructorBinding.cs" />
     <Compile Include="Runtime\Promotion\DelayedMemberBinding.cs" />
     <Compile Include="Runtime\Promotion\DelayedMethodBinding.cs" />
     <Compile Include="Runtime\Promotion\MethodBinding.cs" />
     <Compile Include="Runtime\Promotion\ObjectBinding.cs" />
-    <Compile Include="Runtime\Reflection\MethodProvider.cs" />
-    <Compile Include="Runtime\Reflection\PromotionProvider.cs" />
     <Compile Include="Runtime\RuntimeHost.cs" />
     <Compile Include="Runtime\ScopeServices.cs" />
     <Compile Include="Runtime\EventScopeActivator.cs" />
@@ -253,6 +238,7 @@
     </Compile>
     <Compile Include="Diagnostics\Assumes.cs" />
     <Compile Include="Diagnostics\Requires.cs" />
+    <Compile Include="Lazy.cs" />
     <Compile Include="Parser\Ast\ScriptVarExpr.cs" />
     <Compile Include="Parser\Grammar\ActionRecord.cs" />
     <Compile Include="Parser\Grammar\LRParserGenerated.cs" />
@@ -283,7 +269,7 @@
     <Compile Include="Runtime\IValueReference.cs" />
     <Compile Include="Runtime\ObjectActivator.cs" />
     <Compile Include="Runtime\Promotion\DefaultObjectBinding.cs" />
-    <Compile Include="Runtime\EventBroker.cs" />
+    <Compile Include="Runtime\Promotion\EventBroker.cs" />
     <Compile Include="Runtime\Promotion\Expando.cs" />
     <Compile Include="Runtime\Promotion\ExpandoWrapper.cs" />
     <Compile Include="Runtime\Promotion\IBinding.cs" />
@@ -296,18 +282,13 @@
     <Compile Include="Runtime\Promotion\ObjectBinding.Infrastructure.cs" />
     <Compile Include="Runtime\RuntimeException.cs" />
     <Compile Include="Runtime\ScopeValueReference.cs" />
+    <Compile Include="Runtime\TypeManager.cs" />
     <Compile Include="Runtime\ValueReference.cs" />
     <Compile Include="Strings.cs" />
     <None Include="ConfigGenerator.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ConfigGenerator.cs</LastGenOutput>
     </None>
-    <Content Include="Help\Script.NET.chm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Help\ProductWebsite.url">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <None Include="scriptdotnet.snk" />
   </ItemGroup>
   <ItemGroup>
@@ -339,9 +320,7 @@
     <Content Include="Examples\UIAutomation_FW3.txt" />
     <Content Include="Examples\WinForms.txt" />
     <Content Include="License.txt" />
-    <EmbeddedResource Include="RuntimeConfig.xml">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+    <EmbeddedResource Include="RuntimeConfig.xml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

@@ -1,20 +1,5 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 using System;
+using Scripting.SSharp.Parser;
 using Scripting.SSharp.Runtime;
 
 namespace Scripting.SSharp.Parser.Ast
@@ -24,53 +9,58 @@ namespace Scripting.SSharp.Parser.Ast
   /// </summary>
   internal class ScriptTypeExpr : ScriptExpr
   {
-    private readonly ScriptGenericsPostfix _genericsPostfix;
-    private readonly ScriptTypeExpr _typeExpr;
-    private readonly string _identifier;
+    private ScriptGenericsPostfix GenericsPostfix;
+    private ScriptTypeExpr TypeExpr;
+    private string Identifier;
 
     public ScriptTypeExpr(AstNodeArgs args)
       : base(args)
     {
       if (ChildNodes.Count == 2 && ChildNodes[1].ChildNodes.Count == 0)
       {
-        _identifier = ((TokenAst)ChildNodes[0]).Text;
+        Identifier = ((TokenAst)ChildNodes[0]).Text;
       }
       else
         if (ChildNodes[0] is ScriptTypeExpr)
         {
-          _typeExpr = ChildNodes[0] as ScriptTypeExpr;
-          _identifier = ((TokenAst) ChildNodes[2].ChildNodes[0]).Text;
-          _genericsPostfix = ChildNodes[2].ChildNodes[1] as ScriptGenericsPostfix;
+          TypeExpr = ChildNodes[0] as ScriptTypeExpr;
+          Identifier = (ChildNodes[2].ChildNodes[0] as TokenAst).Text;
+          GenericsPostfix = ChildNodes[2].ChildNodes[1] as ScriptGenericsPostfix;
         }
         else
         {
-          _genericsPostfix = (ScriptGenericsPostfix)ChildNodes[1];
-          _identifier = _genericsPostfix.GetGenericTypeName(((TokenAst)ChildNodes[0]).Text);
+          GenericsPostfix = (ScriptGenericsPostfix)ChildNodes[1];
+          Identifier = GenericsPostfix.GetGenericTypeName(((TokenAst)ChildNodes[0]).Text);
         }
     }
 
-    private static string EvaluateName(ScriptTypeExpr expr)
+    private string EvaluateName(ScriptTypeExpr expr)
     {
-      return expr._typeExpr != null ? EvaluateName(expr._typeExpr) + "." + expr._identifier : expr._identifier;
+      if (expr.TypeExpr != null)
+      {
+        return EvaluateName(expr.TypeExpr) + "." + expr.Identifier;
+      }
+      else
+        return expr.Identifier;
     }
 
     public override void Evaluate(IScriptContext context)
     {
-      if (_typeExpr == null && _genericsPostfix == null)
+      if (TypeExpr == null && GenericsPostfix == null)
       {
-        context.Result = RuntimeHost.GetType(_identifier);
+        context.Result = RuntimeHost.GetType(Identifier);
         return;
       }
      
-      if (_typeExpr != null)
+      if (TypeExpr != null)
       {
-        var name = string.Format("{0}.{1}", EvaluateName(_typeExpr), _identifier);
-        Type type;
+        string name = string.Format("{0}.{1}", EvaluateName(TypeExpr), Identifier);
+        Type type = null;
 
-        if (_genericsPostfix != null)
+        if (GenericsPostfix != null)
         {
-          var genericType = RuntimeHost.GetType(_genericsPostfix.GetGenericTypeName(name));
-          _genericsPostfix.Evaluate(context);
+          Type genericType = RuntimeHost.GetType(GenericsPostfix.GetGenericTypeName(name));
+          GenericsPostfix.Evaluate(context);
           type = genericType.MakeGenericType((Type[])context.Result);
         }
         else
@@ -82,8 +72,8 @@ namespace Scripting.SSharp.Parser.Ast
       }
       else
       {
-        Type genericType = RuntimeHost.GetType(_identifier);
-        _genericsPostfix.Evaluate(context);
+        Type genericType = RuntimeHost.GetType(Identifier);
+        GenericsPostfix.Evaluate(context);
         context.Result = genericType.MakeGenericType((Type[])context.Result);
       }
     }

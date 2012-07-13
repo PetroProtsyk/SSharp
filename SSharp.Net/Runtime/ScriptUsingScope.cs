@@ -1,114 +1,90 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 using Scripting.SSharp.Runtime.Promotion;
 
 namespace Scripting.SSharp.Runtime
 {
   public class ScriptUsingScope : ScriptScope
   {
-    private Dictionary<string, IInvokable> _bindings = new Dictionary<string, IInvokable>();
-    private Dictionary<string, IMemberBinding> _members = new Dictionary<string, IMemberBinding>();
-    private object _usingObject;
+    Dictionary<string, IInvokable> bindings = new Dictionary<string, IInvokable>();
+    Dictionary<string, IMemberBinding> members = new Dictionary<string, IMemberBinding>();
+    object usingObject; 
 
     public ScriptUsingScope(IScriptScope parent, object usingObject):
         base(parent)
     {
       if (parent == null) throw new ArgumentNullException("parent");
       if (usingObject == null) throw new ArgumentNullException("usingObject");
-      _usingObject = usingObject;
+      this.usingObject = usingObject;
 
-      var type = usingObject as Type ?? usingObject.GetType();
+      Type type = usingObject as Type;
+      if (type == null) type = usingObject.GetType(); ;
 
-      var methods = type.GetMethods(ObjectBinding.MethodFilter);
-      foreach (var method in methods.Where(method => !_bindings.ContainsKey(method.Name)))
-        _bindings.Add(method.Name, new DelayedMethodBinding(method.Name, usingObject));
+      IEnumerable<MethodInfo> methods = type.GetMethods(ObjectBinding.MethodFilter);
+      foreach (MethodInfo method in methods)
+      {
+        if (bindings.ContainsKey(method.Name)) continue;
+        bindings.Add(method.Name, new DelayedMethodBinding(method.Name, usingObject));
+      }
 
-      var properties = type.GetProperties(ObjectBinding.PropertyFilter);     
-      foreach (var property in properties.Where(property => !_members.ContainsKey(property.Name)))
-        _members.Add(property.Name, RuntimeHost.Binder.BindToMember(usingObject, property.Name, true));
+      IEnumerable<PropertyInfo> properties = type.GetProperties(ObjectBinding.PropertyFilter);     
+      foreach (PropertyInfo property in properties)
+      {
+        if (members.ContainsKey(property.Name)) continue;
+        members.Add(property.Name, RuntimeHost.Binder.BindToMember(usingObject, property.Name, true));
+      }
 
-      var fields = type.GetFields(ObjectBinding.FieldFilter);
-      foreach (var field in fields.Where(field => !_members.ContainsKey(field.Name)))
-        _members.Add(field.Name, RuntimeHost.Binder.BindToMember(usingObject, field.Name, true));
+      IEnumerable<FieldInfo> fields = type.GetFields(ObjectBinding.FieldFilter);
+      foreach (FieldInfo field in fields)
+      {
+        if (members.ContainsKey(field.Name)) continue;
+        members.Add(field.Name, RuntimeHost.Binder.BindToMember(usingObject, field.Name, true));
+      }
+
     }
 
     protected override object GetVariableInternal(string id, bool searchHierarchy)
     {
       IInvokable result;
-      if (_bindings.TryGetValue(id, out result)) return result;
+      if (bindings.TryGetValue(id, out result)) return result;
       IMemberBinding member;
-      if (_members.TryGetValue(id, out member)) return member.GetValue();
+      if (members.TryGetValue(id, out member)) return member.GetValue();
       
       return base.GetVariableInternal(id, searchHierarchy);
     }
 
     public override bool HasVariable(string id)
     {
-      if (_bindings.ContainsKey(id)) return true;
-      if (_members.ContainsKey(id)) return true;
+      if (bindings.ContainsKey(id)) return true;
+      if (members.ContainsKey(id)) return true;
       return base.HasVariable(id);
     }
 
     public override void SetItem(string id, object value)
     {
       IMemberBinding member;
-      if (_members.TryGetValue(id, out member))
+      if (members.TryGetValue(id, out member))
       {
         member.SetValue(value);
         return;
       }
 
-      if (_bindings.ContainsKey(id)) throw new ScriptRuntimeException(string.Format(Strings.UsingScopeBindingErrorDuringSetOperation, id));
+      if (bindings.ContainsKey(id)) throw new ScriptException("Can't assign value to existing binding");
 
       Parent.SetItem(id, value);
     }
 
     public override IValueReference Ref(string id)
     {
-      if (_bindings.ContainsKey(id)) return null;
-      if (_members.ContainsKey(id)) return null;
+      if (bindings.ContainsKey(id)) return null;
+      if (members.ContainsKey(id)) return null;
       return Parent.Ref(id);
     }
-
-    protected override void Cleanup()
+    
+    public override void Clean()
     {
-      try
-      {
-        _usingObject = null;
-
-        if (_bindings != null)
-        {
-          _bindings.Clear();
-          _bindings = null;
-        }
-
-        if (_members != null)
-        {
-          _members.Clear();
-          _members = null;
-        }
-      }
-      finally
-      {
-        base.Cleanup();
-      }
+      base.Clean();
     }
   }
 

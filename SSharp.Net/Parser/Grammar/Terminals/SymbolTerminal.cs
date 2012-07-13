@@ -1,21 +1,4 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 using System.Collections.Generic;
-using System.Linq;
 using Scripting.SSharp.Parser.Ast;
 
 namespace Scripting.SSharp.Parser.FastGrammar
@@ -28,7 +11,7 @@ namespace Scripting.SSharp.Parser.FastGrammar
     {
       Symbol = symbol;
       Key = symbol.Trim();
-      Priority = int.MinValue + symbol.Length;
+      base.Priority = int.MinValue + symbol.Length;
     }
     #endregion
 
@@ -47,37 +30,40 @@ namespace Scripting.SSharp.Parser.FastGrammar
         return null;
     
       source.Position += Symbol.Length;
-      var tokenAst = TokenAst.Create(this, context, source.TokenStart, Symbol);
+      TokenAst tokenAst = TokenAst.Create(this, context, source.TokenStart, Symbol);
 
       return tokenAst;
     }
     
-    private static readonly Dictionary<string, SymbolTerminal> Symbols = new Dictionary<string, SymbolTerminal>();
+    private static Dictionary<string, SymbolTerminal> _symbols = new Dictionary<string, SymbolTerminal>();
 
     public static SymbolTerminal GetSymbol(string symbol)
     {
       SymbolTerminal term;
-      if (Symbols.TryGetValue(symbol, out term))
+      if (_symbols.TryGetValue(symbol, out term))
       {
         return term;
       }
 
       term = new SymbolTerminal(symbol);
       term.SetOption(TermOptions.IsGrammarSymbol, true);
-      Symbols[symbol] = term;
+      _symbols[symbol] = term;
 
       return term;
     }
 
     public static void ClearSymbols()
     {
-      Symbols.Clear();
+      _symbols.Clear();
     }
 
     public static void RegisterPunctuation(params string[] symbols)
     {
-      foreach (var term in symbols.Select(GetSymbol))
+      foreach (string symbol in symbols)
+      {
+        SymbolTerminal term = SymbolTerminal.GetSymbol(symbol);
         term.SetOption(TermOptions.IsPunctuation);
+      }
     }
 
     public static void RegisterOperators(int precedence, params string[] opSymbols)
@@ -87,14 +73,14 @@ namespace Scripting.SSharp.Parser.FastGrammar
 
     public static void RegisterOperators(int precedence, Associativity associativity, params string[] opSymbols)
     {
-      foreach (var opSymbol in opSymbols.Select(GetSymbol))
+      foreach (string op in opSymbols)
       {
+        SymbolTerminal opSymbol = SymbolTerminal.GetSymbol(op);
         opSymbol.SetOption(TermOptions.IsOperator, true);
         opSymbol.Precedence = precedence;
         opSymbol.Associativity = associativity;
       }
     }
-
     #endregion
   }
 }

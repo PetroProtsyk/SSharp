@@ -1,20 +1,4 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#if SILVERLIGHT || PocketPC
+﻿#if SILVERLIGHT || PocketPC
 using DefaultAssemblyManager = Scripting.SSharp.Runtime.BaseAssemblyManager;
 #else
 using DefaultAssemblyManager = Scripting.SSharp.Runtime.AssemblyManager;
@@ -31,6 +15,7 @@ using Scripting.SSharp.Runtime.Promotion;
 using Scripting.SSharp.Runtime.Configuration;
 using Scripting.SSharp.Runtime.Operators;
 using Scripting.SSharp.Diagnostics;
+using Scripting.SSharp.Parser;
 
 namespace Scripting.SSharp.Runtime
 {
@@ -40,9 +25,9 @@ namespace Scripting.SSharp.Runtime
   public static class RuntimeHost
   {  
     #region Fields & Properties
-    private static ScriptConfiguration _configuration;
+    private static ScriptConfiguration Configuration = null;
 
-    private static Script _initializationScript;
+    private static Script InitializationScript = null;
 
     /// <summary>
     /// Settings section
@@ -62,9 +47,7 @@ namespace Scripting.SSharp.Runtime
     /// <summary>
     /// Object used to synchronize during multi-threaded execution
     /// </summary>
-    private static readonly object SyncRoot = new object();
-
-    public static bool IsInitialized { get; private set; }
+    private static object syncRoot = new object();
 
     [Promote(false)]
     public static IScopeFactory ScopeFactory { get; private set; }
@@ -89,7 +72,50 @@ namespace Scripting.SSharp.Runtime
 
     public static object NullValue = new object();
 
-    internal static Parser.FastGrammar.LRParser Parser { get; private set; }
+    internal static Scripting.SSharp.Parser.FastGrammar.LRParser Parser { get; private set; }
+
+    private static TypeManager _TypeManager = new TypeManager();
+    public static TypeManager TypeManager
+    {
+      get { return _TypeManager; }
+    }
+
+    private static bool _UnsubscribeAllEvents = true;
+    /// <summary>
+    /// Enables/Disables automatic events release when script execution is finished. Default value is "True".
+    /// <remarks>
+    /// Set this property to "False" is you want even handlers live regardless the script execution life-time.
+    /// This might be usefull when initializing WinForms/WPF/SL controls.
+    /// </remarks>
+    /// </summary>
+    public static bool UnsubscribeAllEvents
+    {
+      get { return _UnsubscribeAllEvents; }
+      set
+      {
+        lock (syncRoot)
+        {
+          _UnsubscribeAllEvents = value;
+        }
+      }
+    }
+
+    private static bool _ContextEnabledEvents;
+
+    /// <summary>
+    /// Determines whether event handlers should be executed in the same scope they were assigned. Default value is "False".
+    /// </summary>
+    public static bool ContextEnabledEvents
+    {
+      get { return _ContextEnabledEvents; }
+      set
+      {
+        lock (syncRoot)
+        {
+          _ContextEnabledEvents = value;
+        }
+      }
+    }
     #endregion
 
     #region Construction & Initialization
@@ -102,8 +128,8 @@ namespace Scripting.SSharp.Runtime
 #if PocketPC || SILVERLIGHT
       Initialize(DefaultConfig);
 #else
-      Initialize(DefaultConfig);
-      //Initialize(Configurations.CreateDefault());
+      //Initialize(DefaultConfig);
+      Initialize(Configurations.CreateDefault());
 #endif     
     }
 
@@ -120,17 +146,15 @@ namespace Scripting.SSharp.Runtime
     [Promote(false)]
     public static void Initialize(ScriptConfiguration configuration)
     {
-      if (IsInitialized) return;
-
       if (Parser == null)
       {
-        Parser = new Parser.FastGrammar.LRParser();
+        Parser = new Scripting.SSharp.Parser.FastGrammar.LRParser();
       }
 
       Lock();
       try
       {
-        _configuration = configuration;
+        Configuration = configuration;
 
         if (Binder == null)
           Binder = new DefaultObjectBinding();
@@ -150,28 +174,27 @@ namespace Scripting.SSharp.Runtime
           AssemblyManager = new DefaultAssemblyManager();
 
         OnInitializingTypes(AssemblyManager);
-        AssemblyManager.Initialize(_configuration);
+        AssemblyManager.Initialize(Configuration);
 
-        if (!string.IsNullOrEmpty(_configuration.Initialization))
-          _initializationScript = Script.Compile(_configuration.Initialization);
+        if (!string.IsNullOrEmpty(Configuration.Initialization))
+          InitializationScript = Script.Compile(Configuration.Initialization);
 
         RegisterOperatorHandler("+=", new EventOperatorHandler(true));
         RegisterOperatorHandler("-=", new EventOperatorHandler(false));
 
-        SSharp.Parser.Ast.ScriptExpr.HandleOperator += HandleOperator;
+        Scripting.SSharp.Parser.Ast.ScriptExpr.HandleOperator += HandleOperator;
       }
       finally
       {
-        IsInitialized = true;
         UnLock();
       }
     }
 
     private static void RegisterOperators()
     {
-      foreach (var definition in _configuration.Operators)
+      foreach (OperatorDefinition definition in Configuration.Operators)
       {
-        var oper = (IOperator)Activator.CreateInstance(GetNativeType(definition.Type));
+        IOperator oper = (IOperator)Activator.CreateInstance(GetNativeType(definition.Type));
         if (oper.Unary)
           UnaryOperators.Add(oper.Name, oper);
         else
@@ -195,7 +218,7 @@ namespace Scripting.SSharp.Runtime
       //ScopeFactory.RegisterType(ScopeTypes.Contract, typeof(ScriptContractScope));
       //ScopeFactory.RegisterType(ScopeTypes.Using, typeof(ScriptUsingScope));
 
-      foreach (ScopeDefinition definition in _configuration.Scopes)
+      foreach (ScopeDefinition definition in Configuration.Scopes)
       {
         ScopeFactory.RegisterType(definition.Id, (IScopeActivator)Activator.CreateInstance(GetNativeType(definition.Type)));
       }
@@ -210,7 +233,7 @@ namespace Scripting.SSharp.Runtime
       Lock();
       try
       {
-        SSharp.Parser.Ast.ScriptExpr.HandleOperator -= HandleOperator;
+        Scripting.SSharp.Parser.Ast.ScriptExpr.HandleOperator -= HandleOperator;
         Handlers.Clear();
         initializingTypes.Clear();
         Binder = null;
@@ -226,13 +249,12 @@ namespace Scripting.SSharp.Runtime
         SettingsItems.Clear();
         BinOperators.Clear();
         UnaryOperators.Clear();
-        _initializationScript = null;
+        InitializationScript = null;
 
-        _configuration = new ScriptConfiguration();
+        Configuration = new ScriptConfiguration();
       }
       finally
       {
-        IsInitialized = false;
         UnLock();
       }
     }
@@ -245,10 +267,10 @@ namespace Scripting.SSharp.Runtime
     /// <param name="configStream"></param>
     private static ScriptConfiguration LoadConfiguration(Stream configStream)
     {
-      var configurationSerializer = new XmlSerializer(typeof(ScriptConfiguration));
-      var configuration = configurationSerializer.Deserialize(configStream) as ScriptConfiguration;
+      XmlSerializer configurationSerializer = new XmlSerializer(typeof(ScriptConfiguration));
+      ScriptConfiguration configuration = configurationSerializer.Deserialize(configStream) as ScriptConfiguration;
       if (configuration == null)
-        throw new ScriptRuntimeException(Strings.WrongConfigurationError);
+        throw new ScriptException("Configuration has wrong format or empty");
 
       return configuration;
     }
@@ -257,7 +279,7 @@ namespace Scripting.SSharp.Runtime
     #region Loading
     private static void InitializeSettingItems()
     {
-      foreach (SettingXml item in _configuration.SettingXml)
+      foreach (SettingXml item in Configuration.SettingXml)
       {
         object rez = item.Value;
         if (!string.IsNullOrEmpty(item.Converter))
@@ -280,7 +302,7 @@ namespace Scripting.SSharp.Runtime
             System.Diagnostics.Debug.WriteLine("Failed to convert string to type: " + converterType.ToString());
           }
 #else
-      var converterObject = Activator.CreateInstance(converterType) as TypeConverter;
+      TypeConverter converterObject = Activator.CreateInstance(converterType) as TypeConverter;
       if (converterObject != null && converterObject.CanConvertFrom(typeof(string)))
       {
         return converterObject.ConvertFrom(value);
@@ -358,12 +380,12 @@ namespace Scripting.SSharp.Runtime
     [Promote(false)]
     public static void InitializeScript(IScriptContext context)
     {
-      if (_initializationScript == null) return;
+      if (InitializationScript == null) return;
 
       Lock();
-      _initializationScript.Context = context;
-      _initializationScript.Execute();
-      _initializationScript.Context = null;
+      InitializationScript.Context = context;
+      InitializationScript.Execute();
+      InitializationScript.Context = null;
       UnLock();
     }
 
@@ -386,7 +408,7 @@ namespace Scripting.SSharp.Runtime
     public static void AddType(string alias, Type type)
     {
       Requires.NotNullOrEmpty(alias, alias);
-      Requires.NotNull(type, "type");
+      Requires.NotNull<Type>(type, "type");
 
       AssemblyManager.AddType(alias, type);
     }
@@ -414,7 +436,7 @@ namespace Scripting.SSharp.Runtime
     /// </summary>
     public static void Lock()
     {
-      Monitor.Enter(SyncRoot);
+      Monitor.Enter(syncRoot);
     }
 
     /// <summary>
@@ -422,7 +444,7 @@ namespace Scripting.SSharp.Runtime
     /// </summary>
     public static void UnLock()
     {
-      Monitor.Exit(SyncRoot);
+      Monitor.Exit(syncRoot);
     }
 
     /// <summary>
@@ -442,11 +464,11 @@ namespace Scripting.SSharp.Runtime
       }
     }
 
-    private static readonly List<EventHandler<EventArgs>> initializingTypes = new List<EventHandler<EventArgs>>();
+    private static List<EventHandler<EventArgs>> initializingTypes = new List<EventHandler<EventArgs>>();
 
     private static void OnInitializingTypes(object sender)
     {
-      foreach (var handler in initializingTypes)
+      foreach (EventHandler<EventArgs> handler in initializingTypes)
         handler.Invoke(sender, EventArgs.Empty);
     }
     #endregion
@@ -456,7 +478,7 @@ namespace Scripting.SSharp.Runtime
     {
       get
       {
-        var configStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Scripting.SSharp.RuntimeConfig.xml");
+        Stream configStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Scripting.SSharp.RuntimeConfig.xml");
         configStream.Seek(0, SeekOrigin.Begin);
         return configStream;
       }

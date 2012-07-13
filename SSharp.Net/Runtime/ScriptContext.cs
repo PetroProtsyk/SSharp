@@ -1,19 +1,3 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 using System;
 
 namespace Scripting.SSharp.Runtime
@@ -23,33 +7,42 @@ namespace Scripting.SSharp.Runtime
   /// </summary>
   public class ScriptContext : IScriptContext
   {
-    #region Fields
-    private ContextFlags _flags = ContextFlags.Empty;
-    #endregion
-
     #region Properties
+    private IScriptScope scope;
+
     /// <summary>
     /// Scope object
     /// </summary>
     public IScriptScope Scope
     {
-      get;
-      private set;
+      get { return scope; }
+      private set { scope = value; }
     }
 
-    public Script Owner
+    /// <summary>
+    /// Script source code. Should be provided before executing the script
+    /// </summary>
+    public string SourceCode { get; private set; }
+
+    private ContextFlags flags = ContextFlags.Empty;
+
+    bool IsSkip
     {
-      get;
-      private set;
+      get
+      {
+        return IsBreak() || IsContinue() || IsReturn();
+      }
     }
+
+    private object result;
 
     /// <summary>
     /// Script Result object
     /// </summary>
     public object Result
     {
-      get;
-      set;
+      get { return result; }
+      set { result = value; }
     }
     #endregion
 
@@ -67,22 +60,20 @@ namespace Scripting.SSharp.Runtime
     /// <summary>
     /// Creates new default nested scope
     /// </summary>
-    public IScriptScope CreateScope()
+    public void CreateScope()
     {
       Scope = RuntimeHost.ScopeFactory.Create(ScopeTypes.Default, Scope);
-      return Scope;
     }
 
     /// <summary>
     /// Replace existing scope with new one
     /// </summary>
     /// <param name="scope"></param>
-    public IScriptScope CreateScope(IScriptScope scope)
+    public void CreateScope(IScriptScope scope)
     {
       if (scope.Parent != Scope)
-        throw new ScriptRuntimeException(Strings.ScopeParentIsNotValid);
+        throw new ScriptException("Wrong scope structure");
       Scope = scope;
-      return Scope;
     }
 
     /// <summary>
@@ -94,12 +85,13 @@ namespace Scripting.SSharp.Runtime
       {
         IScriptScope scopeToRemove = Scope;
         Scope = Scope.Parent;
-        scopeToRemove.Dispose();
+        scopeToRemove.Clean();
       }
       else
         throw new Exception("Can't remove global scope, use Scope.Clean");
     }
 
+    #region IScriptScope     
     public object GetItem(string id, bool throwException)
     {
       return Scope.GetItem(id, throwException);
@@ -112,55 +104,17 @@ namespace Scripting.SSharp.Runtime
 
     public IValueReference Ref(string id)
     {
-      var args = new ReferencingEventArgs(false, null);
-      if (OnReferencing(args)) return args.Ref;
-
-      var scope = Scope;
+      IScriptScope scope = Scope;
 
       while (scope != null)
       {
-        //TODO: Figure out more maintainable solution
-        if (scope is FunctionScope) return null;
-
-        if (scope.HasVariable(id))
-        {
-          args = new ReferencingEventArgs(false, scope.Ref(id));
-          if (args.Ref != null && OnReferenced(args))
-          {
-            if (Owner != null)
-            {
-              Owner.NotifyReferenceCreated(args.Ref);
-            }
-
-            return args.Ref;
-          }
-          return null;
-        }
+        if (scope.HasVariable(id)) return scope.Ref(id);
         scope = scope.Parent;
       }
 
       return null;
     }
-
-    public event EventHandler<ReferencingEventArgs> Referencing;
-  
-    protected virtual bool OnReferencing(ReferencingEventArgs args)
-    {
-      if (Referencing != null)
-        Referencing.Invoke(this, args);
-
-      return args.Cancel;
-    }
-
-    public event EventHandler<ReferencingEventArgs> Referenced;
-
-    protected virtual bool OnReferenced(ReferencingEventArgs args)
-    {
-      if (Referenced != null)
-        Referenced.Invoke(this, args);
-
-      return !args.Cancel;
-    }
+    #endregion
     #endregion
 
     #region Break-Continue-Return
@@ -170,13 +124,13 @@ namespace Scripting.SSharp.Runtime
     /// <param name="val">true or false</param>
     public void SetReturn(bool val)
     {
-      if (val && IsContinue()) throw new ScriptRuntimeException(Strings.ContextHasCorruptedFlagsError);
-      if (val && IsBreak()) throw new ScriptRuntimeException(Strings.ContextHasCorruptedFlagsError);
+      if (val && IsContinue()) throw new ScriptException("Implementation: Implementation error, consult with developer");
+      if (val && IsBreak()) throw new ScriptException("Implementation: Implementation error, consult with developer");
 
       if (val)
-        _flags = _flags | ContextFlags.Return;
+        flags = flags | ContextFlags.Return;
       else
-        _flags = _flags & ~ContextFlags.Return;
+        flags = flags & ~ContextFlags.Return;
     }
 
     /// <summary>
@@ -185,12 +139,12 @@ namespace Scripting.SSharp.Runtime
     /// <param name="val">true or false</param>
     public void SetBreak(bool val)
     {
-      if (val && IsContinue()) throw new ScriptRuntimeException(Strings.ContextHasCorruptedFlagsError);
+      if (val && IsContinue()) throw new ScriptException("Implementation: Implementation error, consult with developer");
 
       if (val)
-        _flags = _flags | ContextFlags.Break;
+        flags = flags | ContextFlags.Break;
       else
-        _flags = _flags & ~ContextFlags.Break;
+        flags = flags & ~ContextFlags.Break;
     }
 
     /// <summary>
@@ -199,21 +153,12 @@ namespace Scripting.SSharp.Runtime
     /// <param name="val">true or false</param>
     public void SetContinue(bool val)
     {
-      if (val && IsBreak()) throw new ScriptRuntimeException(Strings.ContextHasCorruptedFlagsError);
+      if (val && IsBreak()) throw new ScriptException("Implementation: Implementation error, consult with developer");
 
       if (val)
-        _flags = _flags | ContextFlags.Continue;
+        flags = flags | ContextFlags.Continue;
       else
-        _flags = _flags & ~ContextFlags.Continue;
-    }
-
-    /// <summary>
-    /// Reset all flags that control execution. Called on each context 
-    /// before and after script execution
-    /// </summary>
-    public void ResetControlFlags()
-    {
-      _flags = ContextFlags.Empty;
+        flags = flags & ~ContextFlags.Continue;
     }
 
     /// <summary>
@@ -222,7 +167,7 @@ namespace Scripting.SSharp.Runtime
     /// <returns>true or false</returns>
     public bool IsReturn()
     {
-      return (_flags & ContextFlags.Return) == ContextFlags.Return;
+      return (flags & ContextFlags.Return) == ContextFlags.Return;
     }
 
     /// <summary>
@@ -231,7 +176,7 @@ namespace Scripting.SSharp.Runtime
     /// <returns>true or false</returns>
     public bool IsBreak()
     {
-      return (_flags & ContextFlags.Break) == ContextFlags.Break;
+      return (flags & ContextFlags.Break) == ContextFlags.Break;
     }
 
     /// <summary>
@@ -240,7 +185,7 @@ namespace Scripting.SSharp.Runtime
     /// <returns>true or false</returns>
     public bool IsContinue()
     {
-      return (_flags & ContextFlags.Continue) == ContextFlags.Continue;
+      return (flags & ContextFlags.Continue) == ContextFlags.Continue;
     }
     #endregion
 
@@ -252,64 +197,7 @@ namespace Scripting.SSharp.Runtime
     /// <returns>IInvokable object</returns>
     public IInvokable GetFunctionDefinition(string name)
     {
-      return Scope.GetFunctionDefinition(name);
-    }
-    #endregion
-
-    #region Internal Methods
-    internal void SetOwner(Script owner)
-    {
-      //Remove context from previous owner
-      if (Owner != null && owner != null && Owner != owner)
-        Owner.Context = null;
-
-      Owner = owner;
-    }
-    #endregion
-
-    #region IDisposable Members
-    private bool _disposed;
-    protected bool Disposed
-    {
-      get
-      {
-        lock (this)
-        {
-          return _disposed;
-        }
-      }
-    }
-
-    public void Dispose()
-    {
-      lock (this)
-      {
-        if (_disposed == false)
-        {
-          Cleanup();
-          _disposed = true;
-          GC.SuppressFinalize(this);
-        }
-      }
-    }
-
-    ~ScriptContext()
-    {
-      Cleanup();
-    }
-
-    protected virtual void Cleanup()
-    {
-      IScriptScope s = Scope;
-      while (s != null)
-      {
-        IScriptScope toRemove = s;
-        s = s.Parent;
-        toRemove.Dispose();
-      }
-
-      Result = null;
-      Scope = null;
+      return scope.GetFunctionDefinition(name);
     }
     #endregion
   }
@@ -317,7 +205,7 @@ namespace Scripting.SSharp.Runtime
   /// <summary>
   /// Specify context state
   /// </summary>
-  [Flags]
+  [Flags()]
   public enum ContextFlags
   {
     /// <summary>
@@ -338,20 +226,4 @@ namespace Scripting.SSharp.Runtime
     Return = 8
   }
 
-  public class ReferencingEventArgs : EventArgs
-  {
-    public bool Cancel { get; set; }
-
-    public IValueReference Ref { get; set; }
-
-    public ReferencingEventArgs() : this(false, null)
-    {
-    }
-
-    public ReferencingEventArgs(bool cancel, IValueReference reference)
-    {
-      Cancel = cancel;
-      Ref = reference;
-    }
-  }
 }

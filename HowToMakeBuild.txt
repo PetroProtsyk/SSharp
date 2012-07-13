@@ -1,4 +1,0 @@
-1. Build solution
-2. Obfuscate dlls from Binaries using SSharpObfuscation.xml using DotFuscator
-3. Sign assemblies in Dotfuscated folder using sign.bat from VS2010 command prompt
-4. Use binaries from Dotfuscated folder

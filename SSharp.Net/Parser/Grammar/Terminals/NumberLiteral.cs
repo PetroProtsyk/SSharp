@@ -1,21 +1,6 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using Scripting.SSharp.Parser.Ast;
 
@@ -24,17 +9,17 @@ namespace Scripting.SSharp.Parser.FastGrammar
   internal class NumberLiteral : RegexBasedTerminal
   {
     #region Fields
-    public const string Pattern = "(0[xX][0-9a-fA-F]+)|([-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?(ul|u|l|d|f|m)?)";
+    public const string pattern = "(0[xX][0-9a-fA-F]+)|([-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?(ul|u|l|d|f|m)?)";
     //"[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?";
-    private static readonly List<string> Firsts = new List<string>();
+    private static List<string> firsts = new List<string>();
     #endregion
 
     #region Construction
     public NumberLiteral()
-      : base("number", Pattern)
+      : base("number", pattern)
     {
-      Firsts.Add("0x");
-      Firsts.AddRange(new[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" });
+      firsts.Add("0x");
+      firsts.AddRange(new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" });
     }
     #endregion
 
@@ -46,7 +31,7 @@ namespace Scripting.SSharp.Parser.FastGrammar
       return token;
     }
 
-    private static object ConvertNumber(string text)
+    private object ConvertNumber(string text)
     {
       if (text.Contains(".") || text.Contains("e") || text.EndsWith("d") || text.EndsWith("f") || text.EndsWith("m"))
         return ToDouble(text);
@@ -58,7 +43,7 @@ namespace Scripting.SSharp.Parser.FastGrammar
       //throw new NotSupportedException("Number is not in correct format:" + text);
     }
 
-    private static object ToInteger(string text)
+    private object ToInteger(string text)
     {
       if (text.EndsWith("ul"))
         return Convert.ToUInt64(text.TrimEnd('u', 'l'), CultureInfo.InvariantCulture);

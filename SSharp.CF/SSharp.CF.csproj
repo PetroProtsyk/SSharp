@@ -1,0 +1,755 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{65A84A6D-38BF-49D6-B107-597A511DC862}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Scripting.SSharp</RootNamespace>
+    <AssemblyName>Scripting.SSharp</AssemblyName>
+    <ProjectTypeGuids>{4D628B5B-2FBC-4AA6-8C16-197242AEB884};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <PlatformFamilyName>PocketPC</PlatformFamilyName>
+    <PlatformID>4118C335-430C-497f-BE48-11C3316B135E</PlatformID>
+    <OSVersion>5.1</OSVersion>
+    <DeployDirSuffix>SSharp.CF</DeployDirSuffix>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <NativePlatformName>Windows Mobile 5.0 Pocket PC SDK</NativePlatformName>
+    <FormFactorID>
+    </FormFactorID>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>scriptdotnet.snk</AssemblyOriginatorKeyFile>
+    <FileUpgradeFlags>0</FileUpgradeFlags>
+    <OldToolsVersion>4.0</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Binaries\CF\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;$(PlatformFamilyName)</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <FileAlignment>512</FileAlignment>
+    <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Binaries\CF\</OutputPath>
+    <DefineConstants>TRACE;$(PlatformFamilyName)</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <FileAlignment>512</FileAlignment>
+    <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SSharp.Net\CustomFunctions\AppendFunc.cs">
+      <Link>CustomFunctions\AppendFunc.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\CustomFunctions\ArrayFunc.cs">
+      <Link>CustomFunctions\ArrayFunc.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\CustomFunctions\CharFunc.cs">
+      <Link>CustomFunctions\CharFunc.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\CustomFunctions\EvalFunc.cs">
+      <Link>CustomFunctions\EvalFunc.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\CustomFunctions\ReplaceFunc.cs">
+      <Link>CustomFunctions\ReplaceFunc.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\CustomFunctions\RunConsole.cs">
+      <Link>CustomFunctions\RunConsole.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Diagnostics\Assumes.cs">
+      <Link>Diagnostics\Assumes.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Diagnostics\Requires.cs">
+      <Link>Diagnostics\Requires.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\AstDomCompiler.cs">
+      <Link>Execution\AstDomCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\CodeDomCompiler.cs">
+      <Link>Execution\CodeDomCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptAssignExprCompiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptAssignExprCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptBinExprCompiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptBinExprCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptCompoundStatementCompiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptCompoundStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptConstExprCompiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptConstExprCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptFlowControlStatementComiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptFlowControlStatementComiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptForEachStatementCompiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptForEachStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptForStatementCompiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptForStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptFunctionCallCompiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptFunctionCallCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptIfStatementCompiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptIfStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptQualifiedNameCompiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptQualifiedNameCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptStatementCompiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptSwitchStatementCompiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptSwitchStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptTypeConvertExprCompiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptTypeConvertExprCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\AstToDom\ScriptWhileStatementCompiler.cs">
+      <Link>Execution\Compilers\AstToDom\ScriptWhileStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\BaseCompiler.cs">
+      <Link>Execution\Compilers\BaseCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\CompilerTypeAttribute.cs">
+      <Link>Execution\Compilers\CompilerTypeAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeAssignExpressionCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeAssignExpressionCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeBinaryOperatorCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeBinaryOperatorCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeBlockStatementCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeBlockStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeExpressionStatementCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeExpressionStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeForEachStatementCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeForEachStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeForStatementCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeForStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeIfStatementCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeIfStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeObjectFunctionCallCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeObjectFunctionCallCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeObjectReferenceCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeObjectReferenceCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeProgramCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeProgramCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeReturnStatementCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeReturnStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeSwitchStatementCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeSwitchStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeValueReferenceCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeValueReferenceCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeVariableReferenceCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeVariableReferenceCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\DomToVM\CodeWhileStatementCompiler.cs">
+      <Link>Execution\Compilers\DomToVM\CodeWhileStatementCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeAssignExpression.cs">
+      <Link>Execution\Compilers\Dom\CodeAssignExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeBinaryOperator.cs">
+      <Link>Execution\Compilers\Dom\CodeBinaryOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeBlockStatement.cs">
+      <Link>Execution\Compilers\Dom\CodeBlockStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeExpression.cs">
+      <Link>Execution\Compilers\Dom\CodeExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeExpressionStatement.cs">
+      <Link>Execution\Compilers\Dom\CodeExpressionStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeForEachStatement.cs">
+      <Link>Execution\Compilers\Dom\CodeForEachStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeForStatement.cs">
+      <Link>Execution\Compilers\Dom\CodeForStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeIfStatement.cs">
+      <Link>Execution\Compilers\Dom\CodeIfStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeObject.cs">
+      <Link>Execution\Compilers\Dom\CodeObject.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeObjectFunctionCall.cs">
+      <Link>Execution\Compilers\Dom\CodeObjectFunctionCall.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeObjectReference.cs">
+      <Link>Execution\Compilers\Dom\CodeObjectReference.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeProgram.cs">
+      <Link>Execution\Compilers\Dom\CodeProgram.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeReturnStatement.cs">
+      <Link>Execution\Compilers\Dom\CodeReturnStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeStatement.cs">
+      <Link>Execution\Compilers\Dom\CodeStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeSwitchCase.cs">
+      <Link>Execution\Compilers\Dom\CodeSwitchCase.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeSwitchStatement.cs">
+      <Link>Execution\Compilers\Dom\CodeSwitchStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeValueReference.cs">
+      <Link>Execution\Compilers\Dom\CodeValueReference.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeVariableReference.cs">
+      <Link>Execution\Compilers\Dom\CodeVariableReference.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\CodeWhileStatement.cs">
+      <Link>Execution\Compilers\Dom\CodeWhileStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\Dom\OperatorType.cs">
+      <Link>Execution\Compilers\Dom\OperatorType.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\ICompiler.cs">
+      <Link>Execution\Compilers\ICompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\IDomCompiler.cs">
+      <Link>Execution\Compilers\IDomCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\Compilers\IVMCompiler.cs">
+      <Link>Execution\Compilers\IVMCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\VM\ExecutableMachine.cs">
+      <Link>Execution\VM\ExecutableMachine.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\VM\Operation.cs">
+      <Link>Execution\VM\Operation.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\VM\Operations\ArithmeticOperations.cs">
+      <Link>Execution\VM\Operations\ArithmeticOperations.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\VM\Operations\BooleanOperations.cs">
+      <Link>Execution\VM\Operations\BooleanOperations.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\VM\Operations\ObjectOperations.cs">
+      <Link>Execution\VM\Operations\ObjectOperations.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\VM\Operations\StackOperations.cs">
+      <Link>Execution\VM\Operations\StackOperations.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\VM\Operations\SystemOperations.cs">
+      <Link>Execution\VM\Operations\SystemOperations.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Execution\VM\Operations\ValueOperations.cs">
+      <Link>Execution\VM\Operations\ValueOperations.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Lazy.cs">
+      <Link>Lazy.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\AScriptAstTemplate.cs">
+      <Link>Parser\Ast\AScriptAstTemplate.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\AstNode.cs">
+      <Link>Parser\Ast\AstNode.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\AstNodeArgs.cs">
+      <Link>Parser\Ast\AstNodeArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\IAstVisitor.cs">
+      <Link>Parser\Ast\IAstVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptArrayConstructor.cs">
+      <Link>Parser\Ast\ScriptArrayConstructor.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptArrayResolution.cs">
+      <Link>Parser\Ast\ScriptArrayResolution.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptAssignExpr.cs">
+      <Link>Parser\Ast\ScriptAssignExpr.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptAst.cs">
+      <Link>Parser\Ast\ScriptAst.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptBinExpr.cs">
+      <Link>Parser\Ast\ScriptBinExpr.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptCompoundStatement.cs">
+      <Link>Parser\Ast\ScriptCompoundStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptCondition.cs">
+      <Link>Parser\Ast\ScriptCondition.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptConstExpr.cs">
+      <Link>Parser\Ast\ScriptConstExpr.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptElements.cs">
+      <Link>Parser\Ast\ScriptElements.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptExpr.cs">
+      <Link>Parser\Ast\ScriptExpr.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptExprList.cs">
+      <Link>Parser\Ast\ScriptExprList.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptFlowControlStatement.cs">
+      <Link>Parser\Ast\ScriptFlowControlStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptForEachStatement.cs">
+      <Link>Parser\Ast\ScriptForEachStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptForStatement.cs">
+      <Link>Parser\Ast\ScriptForStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptFuncContract.cs">
+      <Link>Parser\Ast\ScriptFuncContract.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptFuncContractInv.cs">
+      <Link>Parser\Ast\ScriptFuncContractInv.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptFuncContractPost.cs">
+      <Link>Parser\Ast\ScriptFuncContractPost.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptFuncContractPre.cs">
+      <Link>Parser\Ast\ScriptFuncContractPre.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptFuncParameters.cs">
+      <Link>Parser\Ast\ScriptFuncParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptFunctionCall.cs">
+      <Link>Parser\Ast\ScriptFunctionCall.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptFunctionDefinition.cs">
+      <Link>Parser\Ast\ScriptFunctionDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptGenericsPostfix.cs">
+      <Link>Parser\Ast\ScriptGenericsPostfix.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptGlobalList.cs">
+      <Link>Parser\Ast\ScriptGlobalList.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptIfStatement.cs">
+      <Link>Parser\Ast\ScriptIfStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptIsExpr.cs">
+      <Link>Parser\Ast\ScriptIsExpr.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptMetaExpr.cs">
+      <Link>Parser\Ast\ScriptMetaExpr.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptMObject.cs">
+      <Link>Parser\Ast\ScriptMObject.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptMObjectPart.cs">
+      <Link>Parser\Ast\ScriptMObjectPart.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptNewArrStmt.cs">
+      <Link>Parser\Ast\ScriptNewArrStmt.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptNewStmt.cs">
+      <Link>Parser\Ast\ScriptNewStmt.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptProg.cs">
+      <Link>Parser\Ast\ScriptProg.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptQualifiedName.cs">
+      <Link>Parser\Ast\ScriptQualifiedName.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptRefExpr.cs">
+      <Link>Parser\Ast\ScriptRefExpr.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptStatement.cs">
+      <Link>Parser\Ast\ScriptStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptSwitchCaseStatement.cs">
+      <Link>Parser\Ast\ScriptSwitchCaseStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptSwitchDefaultStatement.cs">
+      <Link>Parser\Ast\ScriptSwitchDefaultStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptSwitchRootStatement.cs">
+      <Link>Parser\Ast\ScriptSwitchRootStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptSwitchStatement.cs">
+      <Link>Parser\Ast\ScriptSwitchStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptTryCatchFinallyStatement.cs">
+      <Link>Parser\Ast\ScriptTryCatchFinallyStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptTypeConstructor.cs">
+      <Link>Parser\Ast\ScriptTypeConstructor.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptTypeConvertExpr.cs">
+      <Link>Parser\Ast\ScriptTypeConvertExpr.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptTypeExpr.cs">
+      <Link>Parser\Ast\ScriptTypeExpr.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptTypeExprList.cs">
+      <Link>Parser\Ast\ScriptTypeExprList.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptUnaryExpr.cs">
+      <Link>Parser\Ast\ScriptUnaryExpr.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptUsingStatement.cs">
+      <Link>Parser\Ast\ScriptUsingStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptVarExpr.cs">
+      <Link>Parser\Ast\ScriptVarExpr.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\ScriptWhileStatement.cs">
+      <Link>Parser\Ast\ScriptWhileStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Ast\TokenAst.cs">
+      <Link>Parser\Ast\TokenAst.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Common.cs">
+      <Link>Parser\Common.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\CompilerContext.cs">
+      <Link>Parser\CompilerContext.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Enums.cs">
+      <Link>Parser\Enums.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Exceptions.cs">
+      <Link>Parser\Exceptions.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\ActionRecord.cs">
+      <Link>Parser\Grammar\ActionRecord.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\LRParser.cs">
+      <Link>Parser\Grammar\LRParser.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\LRParserGenerated.cs">
+      <Link>Parser\Grammar\LRParserGenerated.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\NonTerminal.cs">
+      <Link>Parser\Grammar\NonTerminal.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\ParserStack.cs">
+      <Link>Parser\Grammar\ParserStack.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\ParserState.cs">
+      <Link>Parser\Grammar\ParserState.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\Scanner.cs">
+      <Link>Parser\Grammar\Scanner.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\Terminal.cs">
+      <Link>Parser\Grammar\Terminal.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\Terminals\CommentTerminal.cs">
+      <Link>Parser\Grammar\Terminals\CommentTerminal.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\Terminals\IdentifierTerminal.cs">
+      <Link>Parser\Grammar\Terminals\IdentifierTerminal.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\Terminals\NumberLiteral.cs">
+      <Link>Parser\Grammar\Terminals\NumberLiteral.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\Terminals\RegExBasedTerminal.cs">
+      <Link>Parser\Grammar\Terminals\RegExBasedTerminal.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\Terminals\StringLiteral.cs">
+      <Link>Parser\Grammar\Terminals\StringLiteral.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\Grammar\Terminals\SymbolTerminal.cs">
+      <Link>Parser\Grammar\Terminals\SymbolTerminal.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\SourceFile.cs">
+      <Link>Parser\SourceFile.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Parser\SyntaxError.cs">
+      <Link>Parser\SyntaxError.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Processing\DebugMarkerVisitor.cs">
+      <Link>Processing\DebugMarkerVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Processing\FunctionDeclarationVisitor.cs">
+      <Link>Processing\FunctionDeclarationVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Processing\IPostProcessing.cs">
+      <Link>Processing\IPostProcessing.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\BaseAssemblyManager.cs">
+      <Link>Runtime\BaseAssemblyManager.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Configuration\ConfigSchema.cs">
+      <Link>Runtime\Configuration\ConfigSchema.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Configuration\Operator.cs">
+      <Link>Runtime\Configuration\Operator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Configuration\Reference.cs">
+      <Link>Runtime\Configuration\Reference.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Configuration\ScopeDefinition.cs">
+      <Link>Runtime\Configuration\ScopeDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Configuration\ScriptConfiguration.cs">
+      <Link>Runtime\Configuration\ScriptConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Configuration\SettingXml.cs">
+      <Link>Runtime\Configuration\SettingXml.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Configuration\TypeXml.cs">
+      <Link>Runtime\Configuration\TypeXml.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\DynamicValueReference.cs">
+      <Link>Runtime\DynamicValueReference.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\EventScopeActivator.cs">
+      <Link>Runtime\EventScopeActivator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Exceptions.cs">
+      <Link>Runtime\Exceptions.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\ExplicitInterface.cs">
+      <Link>Runtime\ExplicitInterface.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\FunctionScope.cs">
+      <Link>Runtime\FunctionScope.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\FunctionTable.cs">
+      <Link>Runtime\FunctionTable.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\IAssemblyManager.cs">
+      <Link>Runtime\IAssemblyManager.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\IInvokable.cs">
+      <Link>Runtime\IInvokable.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\INotifyingScope.cs">
+      <Link>Runtime\INotifyingScope.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\IObjectActivator.cs">
+      <Link>Runtime\IObjectActivator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\IOperatorHandler.cs">
+      <Link>Runtime\IOperatorHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\IScopeActivator.cs">
+      <Link>Runtime\IScopeActivator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\IScopeFactory.cs">
+      <Link>Runtime\IScopeFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\IScriptable.cs">
+      <Link>Runtime\IScriptable.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\IScriptContext.cs">
+      <Link>Runtime\IScriptContext.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\IScriptScope.cs">
+      <Link>Runtime\IScriptScope.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\ISupportAssign.cs">
+      <Link>Runtime\ISupportAssign.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\IValueReference.cs">
+      <Link>Runtime\IValueReference.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\LocalScope.cs">
+      <Link>Runtime\LocalScope.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\LocalScopeActivator.cs">
+      <Link>Runtime\LocalScopeActivator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\ObjectActivator.cs">
+      <Link>Runtime\ObjectActivator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\BinaryOperator.cs">
+      <Link>Runtime\Operators\BinaryOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\BoolOperators.cs">
+      <Link>Runtime\Operators\BoolOperators.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\DivOperator.cs">
+      <Link>Runtime\Operators\DivOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\GqOperator.cs">
+      <Link>Runtime\Operators\GqOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\GrOperator.cs">
+      <Link>Runtime\Operators\GrOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\IOperator.cs">
+      <Link>Runtime\Operators\IOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\IsOperator.cs">
+      <Link>Runtime\Operators\IsOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\LessOperator.cs">
+      <Link>Runtime\Operators\LessOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\LqOperator.cs">
+      <Link>Runtime\Operators\LqOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\MinusOperator.cs">
+      <Link>Runtime\Operators\MinusOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\ModOperator.cs">
+      <Link>Runtime\Operators\ModOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\MulOperator.cs">
+      <Link>Runtime\Operators\MulOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\NegateOperators.cs">
+      <Link>Runtime\Operators\NegateOperators.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\PlusOperator.cs">
+      <Link>Runtime\Operators\PlusOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\PowOperator.cs">
+      <Link>Runtime\Operators\PowOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Operators\UnaryOperator.cs">
+      <Link>Runtime\Operators\UnaryOperator.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\PromoteAttribute.cs">
+      <Link>Runtime\PromoteAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\ConstructorBinding.cs">
+      <Link>Runtime\Promotion\ConstructorBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\DefaultObjectBinding.cs">
+      <Link>Runtime\Promotion\DefaultObjectBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\DelayedMemberBinding.cs">
+      <Link>Runtime\Promotion\DelayedMemberBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\DelayedMethodBinding.cs">
+      <Link>Runtime\Promotion\DelayedMethodBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\EventBroker.cs">
+      <Link>Runtime\Promotion\EventBroker.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\Expando.cs">
+      <Link>Runtime\Promotion\Expando.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\ExpandoWrapper.cs">
+      <Link>Runtime\Promotion\ExpandoWrapper.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\IBinding.cs">
+      <Link>Runtime\Promotion\IBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\IMemberBinding.cs">
+      <Link>Runtime\Promotion\IMemberBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\IObjectBinding.cs">
+      <Link>Runtime\Promotion\IObjectBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\MemberRename.cs">
+      <Link>Runtime\Promotion\MemberRename.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\MethodBinding.cs">
+      <Link>Runtime\Promotion\MethodBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\Namespace.cs">
+      <Link>Runtime\Promotion\Namespace.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\NamespaceBinding.cs">
+      <Link>Runtime\Promotion\NamespaceBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\NamespaceResolver.cs">
+      <Link>Runtime\Promotion\NamespaceResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\ObjectBinding.cs">
+      <Link>Runtime\Promotion\ObjectBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\Promotion\ObjectBinding.Infrastructure.cs">
+      <Link>Runtime\Promotion\ObjectBinding.Infrastructure.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\RuntimeException.cs">
+      <Link>Runtime\RuntimeException.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\RuntimeHost.cs">
+      <Link>Runtime\RuntimeHost.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\ScopeFactory.cs">
+      <Link>Runtime\ScopeFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\ScopeServices.cs">
+      <Link>Runtime\ScopeServices.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\ScopeValueReference.cs">
+      <Link>Runtime\ScopeValueReference.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\ScriptContext.cs">
+      <Link>Runtime\ScriptContext.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\ScriptScope.cs">
+      <Link>Runtime\ScriptScope.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\ScriptUsingScope.cs">
+      <Link>Runtime\ScriptUsingScope.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\TypeManager.cs">
+      <Link>Runtime\TypeManager.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Runtime\ValueReference.cs">
+      <Link>Runtime\ValueReference.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Script.cs">
+      <Link>Script.cs</Link>
+    </Compile>
+    <Compile Include="..\SSharp.Net\Strings.cs">
+      <Link>Strings.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="License.txt" />
+    <EmbeddedResource Include="RuntimeConfig.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scriptdotnet.snk" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CompactFramework.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}">
+        <HostingProcess disable="1" />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

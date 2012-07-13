@@ -1,20 +1,5 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 using System.Diagnostics;
+using Scripting.SSharp.Parser;
 using Scripting.SSharp.Runtime.Operators;
 using Scripting.SSharp.Runtime;
 
@@ -25,24 +10,33 @@ namespace Scripting.SSharp.Parser.Ast
   /// </summary>
   internal class ScriptAssignExpr : ScriptExpr
   {
-    private readonly ScriptQualifiedName _nameExpr;
-    private readonly ScriptExpr _rightExpr;
-    private readonly string _oper;
-    private readonly AssignmentFunction _assignOperation;
+    private ScriptQualifiedName nameExpr;
+    private ScriptExpr rightExpr;
+    private string oper;
+    private AssignmentFunction assignOperation;
 
     public ScriptQualifiedName LeftExpression
     {
-      get { return _nameExpr; }
+      get
+      {
+        return nameExpr;
+      }
     }
 
     public ScriptExpr RightExpression
     {
-      get { return _rightExpr; }
+      get
+      {
+        return rightExpr;
+      }
     }
 
     public string Symbol
     {
-      get { return _oper; }
+      get
+      {
+        return oper;
+      }
     }
 
     private delegate object AssignmentFunction(IScriptContext context);
@@ -50,80 +44,83 @@ namespace Scripting.SSharp.Parser.Ast
     public ScriptAssignExpr(AstNodeArgs args)
         : base(args)
     {
-      var varExpr = args.ChildNodes[0] as ScriptVarExpr;
+      ScriptVarExpr varExpr = args.ChildNodes[0] as ScriptVarExpr;
       if (varExpr != null)
       {
-        var id = varExpr.ChildNodes[1] as TokenAst;
-        _nameExpr = new ScriptQualifiedName(new AstNodeArgs(args.Term, args.Span,
-           new AstNodeList { id, new AstNode(new AstNodeArgs(args.Term, new SourceSpan(new SourceLocation(0, 0, 0), 0), new AstNodeList())) })) { IsVar = true };
+        TokenAst id = varExpr.ChildNodes[1] as TokenAst;
+        nameExpr = new ScriptQualifiedName(new AstNodeArgs(args.Term, args.Span,
+           new AstNodeList() { id, new AstNode(new AstNodeArgs(args.Term, new SourceSpan(new SourceLocation(0, 0, 0), 0), new AstNodeList())) })) { IsVar = true };
       }
       else
       {
-        _nameExpr = (ScriptQualifiedName)args.ChildNodes[0];
+        nameExpr = (ScriptQualifiedName)args.ChildNodes[0];
       }
 
-      _oper = ((TokenAst)args.ChildNodes[1]).Text;
+      oper = ((TokenAst)args.ChildNodes[1]).Text;
       if (args.ChildNodes.Count == 3)
-        _rightExpr = (ScriptExpr)args.ChildNodes[2];
+        rightExpr = (ScriptExpr)args.ChildNodes[2];
 
-      Debug.Assert(_oper == "=" || _oper == ":=" || _oper == "+=" || _oper == "-=" || _oper == "++" || _oper == "--" || _oper == ":=");
-            
-      switch (_oper)
+      Debug.Assert(oper == "=" || oper == ":=" || oper == "+=" || oper == "-=" || oper == "++" || oper == "--" || oper == ":=");
+
+      switch (oper)
       {
         case "=":
-          _assignOperation = Assign;
+          assignOperation = Assign;
           break;
         case ":=":
-          _assignOperation = AssignEx;
+          assignOperation = AssignEx;
           break;
         case "++":
-          _assignOperation = PlusPlus;
+          assignOperation = PlusPlus;
           break;
         case "--":
-          _assignOperation = MinusMinus;
+          assignOperation = MinusMinus;
           break;
         case "+=":
-          _assignOperation = PlusEqual;
+          assignOperation = PlusEqual;
           break;
         case "-=":
-          _assignOperation = MinusEqual;
+          assignOperation = MinusEqual;
           break;
         default:
-          throw new System.InvalidOperationException(string.Format(Strings.AssignmentOperatorNotSupported, _oper));
+          throw new ScriptException("Assignment operator:" + oper + " is not supported");
       }
 
-      _minus = RuntimeHost.GetBinaryOperator(OperatorCodes.Sub);
-      _plus = RuntimeHost.GetBinaryOperator(OperatorCodes.Add);
+      minus = RuntimeHost.GetBinaryOperator("-");
+      plus = RuntimeHost.GetBinaryOperator("+");
 
-      if (_plus == null || _minus == null)
-        throw new ScriptRuntimeException(string.Format(Strings.MissingOperatorError, "+,-"));
+      if (plus == null || minus == null)
+        throw new ScriptException("RuntimeHost did not initialize property. Can't find binary operators.");
     }
 
     public override void Evaluate(IScriptContext context)
     {
-      if (_rightExpr != null)
+      if (rightExpr != null)
       {
-        _rightExpr.Evaluate(context);
+        rightExpr.Evaluate(context);
       }
  
-      context.Result = _assignOperation(context);
+      context.Result = assignOperation(context);
     }
 
     #region Operators
-    private readonly IOperator _minus;
-    private readonly IOperator _plus;
+    private IOperator minus;
+    private IOperator plus;
     #endregion
 
     #region Assignments
     private object MinusEqual(IScriptContext context)
     {
       object rez = context.Result;
-      _nameExpr.Evaluate(context);
+      nameExpr.Evaluate(context);
 
-      var rezName = context.Result;
+      object rezName = context.Result;
 
-      var handling = OnHandleOperator(this, context, "-=", rezName, rez);
-      rez = handling.Cancel ? handling.Result : _minus.Evaluate(rezName, rez);
+      HandleOperatorArgs handling = OnHandleOperator(this, context, "-=", rezName, rez);
+      if (handling.Cancel)
+        rez = handling.Result;
+      else
+        rez = minus.Evaluate(rezName, rez);
 
       //if (!(rezName is EventInfo))
       //{
@@ -133,19 +130,22 @@ namespace Scripting.SSharp.Parser.Ast
       //{
       //  rez = new RemoveDelegate((IInvokable)rez);
       //}
-      _nameExpr.Assign(rez, context);
+      nameExpr.Assign(rez, context);
       return rez;
     }
 
     private object PlusEqual(IScriptContext context)
     {
-      var rez = context.Result;
+      object rez = context.Result;
 
-      _nameExpr.Evaluate(context);
-      var rezName = context.Result;
+      nameExpr.Evaluate(context);
+      object rezName = context.Result;
 
-      var handling = OnHandleOperator(this, context, "+=", rezName, rez);
-      rez = handling.Cancel ? handling.Result : _plus.Evaluate(rezName, rez);
+      HandleOperatorArgs handling = OnHandleOperator(this, context, "+=", rezName, rez);
+      if (handling.Cancel)
+        rez = handling.Result;
+      else
+        rez = plus.Evaluate(rezName, rez);
 
       //TODO: Events!
       //if (!(rezName is EventInfo))
@@ -153,35 +153,39 @@ namespace Scripting.SSharp.Parser.Ast
       //  rez = RuntimeHost.GetBinaryOperator("+").Evaluate(rezName, rez);
       //}
 
-      _nameExpr.Assign(rez, context);
+      nameExpr.Assign(rez, context);
       return rez;
     }
 
     private object MinusMinus(IScriptContext context)
     {
-      _nameExpr.Evaluate(context);
-      var rez = _minus.Evaluate(context.Result, 1);
+      object rez = context.Result;
 
-      _nameExpr.Assign(rez, context);
+      nameExpr.Evaluate(context);
+      rez = minus.Evaluate(context.Result, 1);
+
+      nameExpr.Assign(rez, context);
       return rez;
     }
 
     private object PlusPlus(IScriptContext context)
     {
-      _nameExpr.Evaluate(context);
-      var rez = _plus.Evaluate(context.Result, 1);
-                  
-      _nameExpr.Assign(rez, context);
+      object rez = context.Result;
+
+      nameExpr.Evaluate(context);
+      rez = plus.Evaluate(context.Result, 1);
+
+      nameExpr.Assign(rez, context);
       return rez;
     }
 
     private object AssignEx(IScriptContext context)
     {
-      var rez = context.Result;
+      object rez = context.Result;
 
-      _nameExpr.Evaluate(context);
+      nameExpr.Evaluate(context);
 
-      var handling = OnHandleOperator(this, context, ":=", context.Result, rez);
+      HandleOperatorArgs handling = OnHandleOperator(this, context, ":=", context.Result, rez);
       if (handling.Cancel)
         rez = handling.Result;
       else
@@ -195,8 +199,8 @@ namespace Scripting.SSharp.Parser.Ast
 
     private object Assign(IScriptContext context)
     {
-      var rez = context.Result;
-      _nameExpr.Assign(rez, context);
+      object rez = context.Result;
+      nameExpr.Assign(rez, context);
       return rez;
     }
     #endregion

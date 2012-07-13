@@ -1,46 +1,57 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 
 namespace Scripting.SSharp.Runtime.Operators
 {
   /// <summary>
   /// Implementation of mod operator
   /// </summary>
-  public sealed class ModOperator : IOperator
+  public class ModOperator : BinaryOperator
   {
-    public string Name
+    public ModOperator() :
+      base("%")
     {
-      get { return "%"; }
-    }
+        RegisterEvaluator<Decimal, Decimal>((x, y) => x % y);
+        RegisterEvaluator<Decimal, Int16>((x, y) => x % y);
+        RegisterEvaluator<Decimal, Int32>((x, y) => x % y);
+        RegisterEvaluator<Decimal, Int64>((x, y) => x % y);
+        RegisterEvaluator<Decimal, double>((x, y) => (double)x % y);
+        RegisterEvaluator<Decimal, float>((x, y) => (float)x % y);
 
-    public bool Unary
-    {
-      get { return false; }
-    }
+        RegisterEvaluator<Int16,Decimal>((x, y) => x % y);
+        RegisterEvaluator<Int32,Decimal>((x, y) => x % y);
+        RegisterEvaluator<Int64,Decimal>((x, y) => x % y);
+        RegisterEvaluator<double, Decimal>((x, y) => x % (double)y);
+        RegisterEvaluator<float, Decimal>((x, y) => x % (float)y);
 
-    public object Evaluate(object value)
-    {
-      throw new NotImplementedException();
-    }
+        RegisterEvaluator<Int16, Int16>((x, y) => x % y);
+        RegisterEvaluator<Int16, Int32>((x, y) => x % y);
+        RegisterEvaluator<Int16, Int64>((x, y) => x % y);
+        RegisterEvaluator<Int16, double>((x, y) => x % y);
+        RegisterEvaluator<Int16, float>((x, y) => x % y);
 
-    public object Evaluate(object left, object right)
-    {
-      return DynamicMath.Mod(left, right);
+        RegisterEvaluator<Int32, Int16>((x, y) => x % y);
+        RegisterEvaluator<Int32, Int32>((x, y) => x % y);
+        RegisterEvaluator<Int32, Int64>((x, y) => x % y);
+        RegisterEvaluator<Int32, double>((x, y) => x % y);
+        RegisterEvaluator<Int32, float>((x, y) => x % y);
+
+        RegisterEvaluator<Int64, Int16>((x, y) => x % y);
+        RegisterEvaluator<Int64, Int32>((x, y) => x % y);
+        RegisterEvaluator<Int64, Int64>((x, y) => x % y);
+        RegisterEvaluator<Int64, double>((x, y) => x % y);
+        RegisterEvaluator<Int64, float>((x, y) => x % y);
+
+        RegisterEvaluator<double, Int16>((x, y) => x % y);
+        RegisterEvaluator<double, Int32>((x, y) => x % y);
+        RegisterEvaluator<double, Int64>((x, y) => x % y);
+        RegisterEvaluator<double, double>((x, y) => x % y);
+        RegisterEvaluator<double, float>((x, y) => x % y);
+
+        RegisterEvaluator<float, Int16>((x, y) => x % y);
+        RegisterEvaluator<float, Int32>((x, y) => x % y);
+        RegisterEvaluator<float, Int64>((x, y) => x % y);
+        RegisterEvaluator<float, double>((x, y) => x % y);
+        RegisterEvaluator<float, float>((x, y) => x % y);
     }
   }
 }

@@ -1,31 +1,15 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 using System.Reflection;
 
 namespace Scripting.SSharp.Runtime.Promotion
 {
   internal class NamespaceBinding : IMemberBinding
   {
-    private readonly string _name;
+    string name;
 
     public NamespaceBinding(string name)
     {
-      _name = name;
+      this.name = name;
     }
 
     #region IMemberBind Members
@@ -52,7 +36,14 @@ namespace Scripting.SSharp.Runtime.Promotion
 
     public object GetValue()
     {
-      return RuntimeHost.HasType(_name) ? (object) RuntimeHost.GetType(_name) : new Namespace(_name);
+      if (RuntimeHost.HasType(name))
+      {
+        return RuntimeHost.GetType(name);
+      }
+      else
+      {
+        return new Namespace(name);
+      }
     }
 
     public void AddHandler(object value)

@@ -50,6 +50,7 @@ namespace ScriptNET.Execution.UnitTests
     public void CodeValueReferenceTest()
     {
       IScriptContext context = new ScriptContext();
+
       CodeProgram prog1 = new CodeProgram();
       prog1.Statements.Add(
         new CodeExpressionStatement(

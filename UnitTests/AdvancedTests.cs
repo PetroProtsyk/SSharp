@@ -21,14 +21,14 @@ namespace UnitTests
     public void Setup()
     {
       RuntimeHost.Initialize();
-      EventBroker.ClearAllSubscriptions();
+      EventBroker.ClearAllEvents();
     }
 
     [TestCleanup]
     public void TearDown()
     {
       RuntimeHost.CleanUp();
-      EventBroker.ClearAllSubscriptions();
+      EventBroker.ClearAllEvents();
     }
 
     [TestMethod]
@@ -376,16 +376,6 @@ namespace UnitTests
            if (a[2]>a[1])
              return 2;
       ");
-      Assert.AreEqual(2, result);
-
-      //Is a conflict between meta expression token <!   !>
-      //and array resolution with greater operator
-      result = Script.RunCode(@"
-           a=true;
-           if (a<!a)
-             return 5;
-           else return 3;
-      ");
 
       Assert.AreEqual(2, result);
     }
@@ -443,129 +433,6 @@ namespace UnitTests
 
       Assert.IsInstanceOfType(result, typeof(string));
     }
-
-    [TestMethod]
-    public void AccessingShadowedMembers()
-    {
-      object result = Script.RunCode(@"
-              a = new TestShadowBase();
-              b = new TestShadow();
-
-              return a.Name + b.Name + a.Get() + b.Get();
-      ");
-
-      Assert.AreEqual("BaseShadowBaseGetShadowGet", result);
-    }
-
-    [TestMethod]
-    public void AccessingExtensionMethods() {
-      IEnumerable<int> input = new int[] { 1, 2, 3, 4, 5 };
-      IScriptContext ctx = new ScriptContext();
-      ctx.SetItem("input", input);
-
-      object result = Script.RunCode(@"
-              return input.Sum();
-      ", ctx);
-
-      Assert.AreEqual(input.Sum(), result);
-    }
-
-    [TestMethod]
-    public void AccessingExtensionMethods1() {
-        IEnumerable<object> input = new object[] { 1, "V1", 2, 3, 4, 5 };
-        IScriptContext ctx = new ScriptContext();
-        ctx.SetItem("input", input);
-
-        object result = Script.RunCode(@"
-              return input.OfType<|int|>().Count<|int|>();
-        ", ctx);
-
-        Assert.AreEqual(input.OfType<int>().Count(), result);
-    }
-
-    [TestMethod]
-    public void AccessingExtensionMethods2_ImplictGenericsNotSupported() {
-        IEnumerable<object> input = new object[] { 1, "V1", 2, 3, 4, 5 };
-        IScriptContext ctx = new ScriptContext();
-        ctx.SetItem("input", input);
-
-        object result = Script.RunCode(@"
-              return input.OfType<|int|>().Count();
-        ", ctx);
-
-        Assert.AreEqual(input.OfType<int>().Count(), result);
-    }
-
-    [TestMethod]
-    public void AccessingExtensionMethodsWithLambdaExpressions() {
-        IEnumerable<object> input = new object[] { 1, "V1", 2, 3, 4, 5 };
-
-        Script result = Script.Compile(@"
-              f = function(i) { return i>3; };
-              return f;
-        ");
-        result.Context.SetItem("input", input);
-
-        var f = result.Execute() as Scripting.SSharp.Parser.Ast.ScriptFunctionDefinition;
-        var d = f.AsDelegate(typeof(Func<int, bool>));
-        d.ActiveContext = result.Context;
-        
-        var rez = (bool)d.Method.DynamicInvoke(5);
-        Assert.IsTrue(rez);
-
-        rez = (bool)d.Method.DynamicInvoke(2);
-        Assert.IsFalse(rez);
-
-        var r = input.OfType<int>().Where<int>((Func<int,bool>)d.Method).ToArray();
-        Assert.AreEqual(2, r.Length);
-
-
-        result = Script.Compile(@"
-              f = function(i) { return i>3; };
-              return input.OfType<|int|>().Select<|int, bool|>(f).Count<|bool|>();
-        ");
-        result.Context.SetItem("input", input);
-        result.Execute();
-
-        Assert.AreEqual(input.OfType<int>().Select(i => i > 3).Count(), result.Context.Result);
-
-        result = Script.Compile(@"
-              f = function(i) { return i>3; };
-              r = input.OfType<|int|>();
-              c = r.Where<|int|>(f);
-              return c.ToArray<|int|>().Length;
-        ");
-        result.Context.SetItem("input", input);
-        result.Execute();
-
-        Assert.AreEqual(input.OfType<int>().Where<int>(i => i > 3).ToArray().Length, result.Context.Result);
-    }
-
-    [TestMethod]
-    public void AccessingExtensionMethodsWithLambdaExpressionsEx() {
-        IEnumerable<object> input = new object[] { 1, 2, 3, 4, 5 };
-
-        Script result = Script.Compile(@"
-          return input.OfType<|int|>().Sum<|int|>(function (x) { return x*x; });
-        ");
-        result.Context.SetItem("input", input);
-        result.Execute();
-
-        Assert.AreEqual(input.OfType<int>().Sum(x=>x*x), result.Context.Result);
-    }
-
-    [TestMethod]
-    public void TestForConstEvaluations() {
-        Script result = Script.Compile(@"
-          loop = 10;
-          while (loop > 0){
-            loop--;
-            counter = (1+2)*3+15;
-          }
-        ");
-        result.Execute();
-    }
-
   }
 
   public class TestFunction : IInvokable
@@ -629,25 +496,12 @@ namespace UnitTests
     }
   }
 
+
   public class DoubleGeneric<T, W> where T : W
   {
     public W Get(T input)
     {
       return (W)input;
     }
-  }
-
-  public class TestShadowBase
-  {
-    public string Name { get { return "Base"; } }
-
-    public virtual string Get(){ return "BaseGet"; }
-  }
-
-  public class TestShadow : TestShadowBase
-  {
-    public new string Name { get { return "Shadow"; } }
-
-    public new string Get() { return "ShadowGet"; }
   }
 }

@@ -1,4 +1,4 @@
-a = <!global:c++; global:b+=3; return 2;!>;
+a = <!c++; b+=3; return 2;!>;
 
 c=2;
 b=5;
@@ -10,8 +10,3 @@ Test.AreEqual(3, c);
 Test.AreEqual(8, b);
 
 Test.AreEqual(2,  eval('1+1'));
-
-
-a = <! return a+b; !>;
-
-Test.AreEqual(19, a([a->9, b->10]));

@@ -1,20 +1,4 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 
@@ -24,20 +8,20 @@ namespace Scripting.SSharp.Runtime.Promotion
   {
     protected abstract class BaseHandler
     {
-      private readonly IObjectBinding _binder;
+      IObjectBinding binder;
 
-      protected BaseHandler(IObjectBinding parent)
+      public BaseHandler(IObjectBinding parent)
       {
-        _binder = parent;
+        binder = parent;
       }
 
       protected bool CanBind(MemberInfo member)
       {
-        return _binder.CanBind(member);
+        return binder.CanBind(member);
       }
     }
 
-    protected class PropertyHandler : BaseHandler, IHandler
+    protected class PropertyHandler : BaseHandler, IGetter, ISetter, IHandler
     {
       public PropertyHandler(IObjectBinding parent)
         : base(parent)
@@ -57,39 +41,14 @@ namespace Scripting.SSharp.Runtime.Promotion
 
       #region ISetter Members
 
-      //private static Dictionary<Type, Dictionary<string, PropertyInfo>> propertyCache = new Dictionary<Type, Dictionary<string, PropertyInfo>>();
-
-      //private static PropertyInfo GetPropertyInfo(Type ownerType, string propertyName)
-      //{
-      //  Dictionary<string, PropertyInfo> props = null;
-      //  if (!propertyCache.TryGetValue(ownerType, out props))
-      //  {
-      //    props = new Dictionary<string, PropertyInfo>();
-      //    propertyCache.Add(ownerType, props);
-      //  }
-
-      //  PropertyInfo pi = null;
-      //  if (!props.TryGetValue(propertyName, out pi))
-      //  {
-      //    pi = ownerType.GetProperty(propertyName, ObjectBinding.PropertyFilter);
-      //    if (pi != null) props.Add(propertyName, pi);
-      //  }
-
-      //  return pi;
-      //}
-
-      
       public object Set(string name, object instance, Type type, object value, params object[] arguments)
-      {                
-        PropertyInfo pi = GetProperty(type, name);        
-        // TODO: Denis: quick and dirty optimization, needs review and Concurrency support
-        //PropertyInfo pi = GetPropertyInfo(type, name);
+      {
+        PropertyInfo pi = GetProperty(type, name);
         if (pi == null) return NoResult;
         if (!CanBind(pi)) return NoResult;
-                
 
         if (value != null && pi.PropertyType.IsAssignableFrom(value.GetType()))
-        {       
+        {
           pi.SetValue(instance, value, null);
         }
         else
@@ -99,15 +58,15 @@ namespace Scripting.SSharp.Runtime.Promotion
         return value;
       }
 
-      private static PropertyInfo GetProperty(Type type, string name)
-      {        
-        return type.GetProperty(name, PropertyFilter);
+      private PropertyInfo GetProperty(Type type, string name)
+      {
+        return type.GetProperties(ObjectBinding.PropertyFilter).Where(pi => pi.Name == name).FirstOrDefault();
       }
 
       #endregion
     }
 
-    protected class FieldHandler : BaseHandler, IHandler
+    protected class FieldHandler : BaseHandler, IGetter, ISetter, IHandler
     {
       public FieldHandler(IObjectBinding parent)
         : base(parent)
@@ -117,9 +76,11 @@ namespace Scripting.SSharp.Runtime.Promotion
       #region IGetter Members
       public object Get(string name, object instance, Type type, params object[] arguments)
       {
-        var fi = type.GetField(name, FieldFilter);
+        FieldInfo fi = type.GetField(name, ObjectBinding.FieldFilter);
         if (fi == null) return NoResult;
-        return !CanBind(fi) ? NoResult : fi.GetValue(instance);
+        if (!CanBind(fi)) return NoResult;
+
+        return fi.GetValue(instance);
       }
       #endregion
 
@@ -127,7 +88,7 @@ namespace Scripting.SSharp.Runtime.Promotion
 
       public object Set(string name, object instance, Type type, object value, params object[] arguments)
       {
-        var fi = type.GetField(name, FieldFilter);
+        FieldInfo fi = type.GetField(name, ObjectBinding.FieldFilter);
         if (fi == null) return NoResult;
         if (!CanBind(fi)) return NoResult;
 
@@ -138,7 +99,7 @@ namespace Scripting.SSharp.Runtime.Promotion
       #endregion
     }
 
-    protected class EventHandler : BaseHandler, IHandler
+    protected class EventHandler : BaseHandler, IGetter, ISetter, IHandler
     {
       public EventHandler(IObjectBinding parent)
         : base(parent)
@@ -148,12 +109,13 @@ namespace Scripting.SSharp.Runtime.Promotion
       #region IGetter Members
       public object Get(string name, object instance, Type type, params object[] arguments)
       {
-        var ei = type.GetEvent(name, PropertyFilter);
+        EventInfo ei = type.GetEvent(name, ObjectBinding.PropertyFilter);
         if (ei == null) return NoResult;
-        return !CanBind(ei) ? NoResult : ei;
+        if (!CanBind(ei)) return NoResult;
 
         //Type eventHelper = typeof(EventHelper<>);
         //Type actualHelper = eventHelper.MakeGenericType(ei.EventHandlerType);
+        return ei;
       }
       #endregion
 
@@ -161,16 +123,14 @@ namespace Scripting.SSharp.Runtime.Promotion
 
       public object Set(string name, object instance, Type type, object value, params object[] arguments)
       {
-        EventInfo ei = type.GetEvent(name, PropertyFilter);
+        EventInfo ei = type.GetEvent(name, ObjectBinding.PropertyFilter);
         if (ei == null) return NoResult;
         if (!CanBind(ei)) return NoResult;
 
-        RemoveDelegate remove_delegate = value as RemoveDelegate;
-
-        if (remove_delegate==null)
+        if (!(value is RemoveDelegate))
           EventBroker.AssignEvent(ei, instance, (IInvokable)value);
         else
-          EventBroker.RemoveEvent(ei, instance, remove_delegate.OriginalMethod);
+          EventBroker.RemoveEvent(ei, instance, (IInvokable)value);
 
         return value;
       }
@@ -189,15 +149,41 @@ namespace Scripting.SSharp.Runtime.Promotion
       public object Get(string name, object instance, Type type, params object[] arguments)
       {
         // TODO: Denis: this should be cached to improve performance        
-        var methods = type.GetMethods(MethodFilter).Where(m => m.Name == name && CanBind(m)).ToArray();
+        MethodInfo[] methods = type.GetMethods(ObjectBinding.MethodFilter).Where(m => m.Name == name && CanBind(m)).ToArray();
         if (methods == null || methods.Length == 0) return NoResult;
 
         return new DelayedMethodBinding(name, instance);
       }
       #endregion
     }
-   
-    protected class ScriptableHandler : BaseHandler, IHandler
+
+    //protected class MutantHandler : IGetter, ISetter, IHandler
+    //{
+    //  #region IGetter Members
+    //  public object Get(string name, object instance, Type type, params object[] arguments)
+    //  {
+    //    IMutant dm = instance as IMutant;
+    //    if (dm == null) return NoResult;
+
+    //    return dm.Get(name, null);
+    //  }
+    //  #endregion
+
+    //  #region ISetter Members
+
+    //  public object Set(string name, object instance, Type type, object value, params object[] arguments)
+    //  {
+    //    IMutant dm = instance as IMutant;
+    //    if (dm == null) return NoResult;
+    //    dm.Set(name, value, null);
+
+    //    return value;
+    //  }
+
+    //  #endregion
+    //}
+
+    protected class ScriptableHandler : BaseHandler, IGetter, ISetter, IHandler
     {
       public ScriptableHandler(IObjectBinding parent)
         : base(parent)
@@ -228,6 +214,7 @@ namespace Scripting.SSharp.Runtime.Promotion
       #endregion
     }
 
+
     protected class NestedTypeGetter : BaseHandler, IGetter
     {
       public NestedTypeGetter(IObjectBinding parent)
@@ -238,10 +225,26 @@ namespace Scripting.SSharp.Runtime.Promotion
       #region IGetter Members
       public object Get(string name, object instance, Type type, params object[] arguments)
       {
-        var nested = type.GetNestedType(name, NestedTypeFilter);
-        return nested ?? NoResult;
+        Type nested = type.GetNestedType(name, ObjectBinding.NestedTypeFilter);
+        if (nested == null) return NoResult;
+
+        return nested;
       }
       #endregion
-    }  
+    }
+
+    //protected class NameSpaceGetter : IGetter
+    //{
+    //    #region IGetter Members
+    //    public object Get(string name, object instance, Type type, params object[] arguments)
+    //    {
+    //        NameSpaceMutant nameSpace = NameSpaceCache.Get(type.Namespace); // new NameSpaceMutant(type.Namespace);
+    //        object rez = nameSpace.Get(name, null);
+    //        if (rez == null) return NoResult;
+
+    //        return rez;
+    //    }
+    //    #endregion
+    //}
   }
 }

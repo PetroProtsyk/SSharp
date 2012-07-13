@@ -1,40 +1,31 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
+using Scripting.SSharp.Parser;
 using Scripting.SSharp.Runtime;
 using Scripting.SSharp.Parser.Ast;
+using Scripting.SSharp.Runtime.Promotion;
 
 namespace Scripting.SSharp.Processing
 {
   internal class FunctionDeclarationVisitor : IPostProcessing
   {
-    private Script _script;
+    private Script Script;
+
+    public FunctionDeclarationVisitor()
+    {
+    }
 
     #region IAstVisitor Members
 
     public void BeginVisit(AstNode node)
     {
-      var definition = node as ScriptFunctionDefinition;
-      if (definition == null || string.IsNullOrEmpty(definition.Name)) return;
+      ScriptFunctionDefinition definition = node as ScriptFunctionDefinition;
+      if (definition != null && !string.IsNullOrEmpty(definition.Name))
+      {
+        Script.Context.SetItem(definition.Name, definition);
 
-      definition._owner = _script;
-      _script.Context.SetItem(definition.Name, definition);
-
-      EventBroker.RegisterFunction(definition, _script);
+        if (RuntimeHost.ContextEnabledEvents)
+          EventBroker.RegisterFunction(definition, Script);
+      }
     }
 
     public void EndVisit(AstNode node)
@@ -47,13 +38,13 @@ namespace Scripting.SSharp.Processing
 
     public void BeginProcessing(Script script)
     {
-      _script = script;
+      Script = script;
     }
 
     public void EndProcessing(Script script)
     {
-      if (_script != script) throw new InvalidOperationException();
-      _script = null;
+      if (Script != script) throw new InvalidOperationException();
+      Script = null;
     }
 
     #endregion

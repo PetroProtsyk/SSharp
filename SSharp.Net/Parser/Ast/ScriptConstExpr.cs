@@ -1,19 +1,4 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+using Scripting.SSharp.Parser;
 using Scripting.SSharp.Runtime;
 
 namespace Scripting.SSharp.Parser.Ast
@@ -23,21 +8,21 @@ namespace Scripting.SSharp.Parser.Ast
   /// </summary>
   internal class ScriptConstExpr : ScriptExpr
   {
+    private object m_value;
+
     /// <summary>
     /// Value of the constant
     /// </summary>
-    public object Value { get; set; }
-
-    protected internal override bool IsConst {
-        get {
-            return true;
-        }
+    public object Value
+    {
+      get { return m_value; }
+      set { m_value = value; }
     }
 
     public ScriptConstExpr(AstNodeArgs args)
         : base(args)
     {
-      var cons = (TokenAst)ChildNodes[0];
+      TokenAst cons = (TokenAst)ChildNodes[0];
       Value = cons.Value;
 
       if (Value.Equals("true")) Value = true;
@@ -47,7 +32,7 @@ namespace Scripting.SSharp.Parser.Ast
 
     public override void Evaluate(IScriptContext context)
     {
-      context.Result = Value;
+      context.Result = m_value;
     }
   }
 }

@@ -1,22 +1,8 @@
-/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 using System;
+using Scripting.SSharp.Parser;
 using Scripting.SSharp.Runtime;
 using Scripting.SSharp.Parser.Ast;
+using Scripting.SSharp.Parser.FastGrammar;
 
 namespace Scripting.SSharp.CustomFunctions
 {
@@ -38,9 +24,10 @@ namespace Scripting.SSharp.CustomFunctions
 
     public object Invoke(IScriptContext context, object[] args)
     {      
-      var code = (String)args[0];
-      ScriptAst result;
+      string code = (String)args[0];
+      ScriptAst result = null;
 
+      LRParser compiler = (LRParser)context.GetItem("Compiler", true);
       RuntimeHost.Lock();
       
       try
@@ -55,7 +42,7 @@ namespace Scripting.SSharp.CustomFunctions
         RuntimeHost.UnLock();
       }
 
-      if (result != null) result.Evaluate(context);
+      result.Evaluate(context);
       context.RemoveLocalScope();
       
       return context.Result;

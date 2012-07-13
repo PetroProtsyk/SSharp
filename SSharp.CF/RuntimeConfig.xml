@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+
+  <References>
+    <Assembly name="Scripting.SSharp, Version=1.3.0.1, Culture=neutral, PublicKeyToken=1d1c89e6576d99e6" sn="true" />  
+    <Assembly name="mscorlib" sn="true"/>
+  </References>
+  
+  <Types>
+    <Type alias="string" name="System.String" />
+    <Type alias="int" name="System.Int32" />
+    <Type alias="long" name="System.Int64" />
+    <Type alias="Char" name="System.Char" />
+    <Type alias="bool" name="System.Boolean" />
+    <Type alias="boolean" name="System.Boolean" />    
+    <Type alias="double" name="System.Double" />
+    <Type alias="float" name="System.Single" />
+    <Type alias="decimal" name="System.Decimal" />
+    <Type alias="object" name="System.Object" />
+
+    <Type alias="Array" name="System.Collections.Generic.List`1[[System.Object]]" />
+    <Type alias="Expando" name="Scripting.SSharp.Runtime.Promotion.Expando" />
+    <Type alias="Wrapper" name="Scripting.SSharp.Runtime.Promotion.ExpandoWrapper" />
+  </Types>
+
+  <Scopes>
+    <!--Default Scope-->
+    <Scope id="0" type="Scripting.SSharp.Runtime.ScriptScopeActivator" />
+
+    <!--Function Contract-->
+    <Scope id="1" type="Scripting.SSharp.Runtime.FunctionScopeActivator" />
+
+    <!--Using statement-->
+    <Scope id="2" type="Scripting.SSharp.Runtime.ScriptUsingScopeActivator" />
+
+    <!--Event scope-->
+    <Scope id="3" type="Scripting.SSharp.Runtime.EventScopeActivator" />
+
+    <!--Local scope-->
+    <Scope id="5" type="Scripting.SSharp.Runtime.LocalScopeActivator" />
+
+  </Scopes>
+
+  <Operators>
+    <Operator name="Plus" type="Scripting.SSharp.Runtime.Operators.PlusOperator"/>
+    <Operator name="Minus" type="Scripting.SSharp.Runtime.Operators.MinusOperator"/>
+    <Operator name="Mod" type="Scripting.SSharp.Runtime.Operators.ModOperator"/>
+    <Operator name="Div" type="Scripting.SSharp.Runtime.Operators.DivOperator"/>
+    <Operator name="Mul" type="Scripting.SSharp.Runtime.Operators.MulOperator"/>
+    <Operator name="Pow" type="Scripting.SSharp.Runtime.Operators.PowOperator"/>
+
+    <Operator name="Less" type="Scripting.SSharp.Runtime.Operators.LessOperator"/>
+    <Operator name="LessEquals" type="Scripting.SSharp.Runtime.Operators.LqOperator"/>
+    <Operator name="Greater" type="Scripting.SSharp.Runtime.Operators.GrOperator"/>
+    <Operator name="GreaterEquals" type="Scripting.SSharp.Runtime.Operators.GqOperator"/>
+
+    <Operator name="And" type="Scripting.SSharp.Runtime.Operators.AndOperator"/>
+    <Operator name="And2" type="Scripting.SSharp.Runtime.Operators.And2Operator"/>
+    <Operator name="Or" type="Scripting.SSharp.Runtime.Operators.OrOperator"/>
+    <Operator name="Or2" type="Scripting.SSharp.Runtime.Operators.Or2Operator"/>
+    <Operator name="Equals" type="Scripting.SSharp.Runtime.Operators.EqualsOperator"/>
+    <Operator name="NotEquals" type="Scripting.SSharp.Runtime.Operators.NotEqualsOperator"/>
+
+    <Operator name="Is" type="Scripting.SSharp.Runtime.Operators.IsOperator"/>
+
+    <!-- Unary -->
+    <Operator name="Negate1" type="Scripting.SSharp.Runtime.Operators.NegateOperator1"/>
+    <Operator name="Negate2" type="Scripting.SSharp.Runtime.Operators.NegateOperator2"/>
+    <Operator name="Negate3" type="Scripting.SSharp.Runtime.Operators.NegateOperator3"/>
+  </Operators>
+
+  <Settings>        
+    <Item id="ScopeFactory" value="Scripting.SSharp.Runtime.ScopeFactory" />
+    <Item id="ScriptableObjectType" value="Scripting.SSharp.Runtime.Promotion.Expando" />
+  </Settings>
+
+  <Initialization>
+    <![CDATA[
+    ]]>
+  </Initialization>
+</Configuration>

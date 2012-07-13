@@ -22,14 +22,14 @@ namespace UnitTests
     public void Setup()
     {
       RuntimeHost.Initialize();
-      EventBroker.ClearAllSubscriptions();
+      EventBroker.ClearAllEvents();
     }
 
     [TestCleanup]
     public void TearDown()
     {
       RuntimeHost.CleanUp();
-      EventBroker.ClearAllSubscriptions();
+      EventBroker.ClearAllEvents();
     }
 
     [TestMethod]
@@ -492,6 +492,8 @@ namespace UnitTests
     [TestMethod]
     public void EventInvokation()
     {
+      RuntimeHost.UnsubscribeAllEvents = true;
+
       Script script2 = Script.Compile(@"function f(sender){ sender.test = 1;}
        c = new EventHelperInvocation();
        c.test = 0;
@@ -501,14 +503,15 @@ namespace UnitTests
        return c;
        ");
       EventHelperInvocation rez = (EventHelperInvocation)script2.Execute();
-      EventBroker.ClearAllSubscriptions();
+
       Assert.AreEqual(1, rez.test);
       Assert.IsTrue(rez.IsEventNull());
-      Assert.IsFalse(EventBroker.HasSubscriptions);
+      Assert.AreEqual(0, EventBroker.subscriptions.Count);
     }
 
     [TestMethod]
-    public void DuplicateEventSubscriptionSupported()
+    [ExpectedException(typeof(ScriptEventException))]
+    public void DuplicateEventSubscriptionThrowsException()
     {
       Script script2 = Script.Compile(@"function f(sender){ sender.test = 1;}
        c = new EventHelperInvocation();
@@ -516,7 +519,7 @@ namespace UnitTests
        c.eva+=f;
        c.eva+=f;
        ");
-      script2.Execute();
+      EventHelperInvocation rez = (EventHelperInvocation)script2.Execute();
     }
 
 

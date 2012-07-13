@@ -2,8 +2,7 @@
 <Configuration>
 
   <References>
-    <Assembly name="System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" sn="true"/>
-    <Assembly name="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" sn="true"/>
+    <Assembly name="System.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" sn="true"/>
   </References>
   
   <Types>
@@ -17,9 +16,7 @@
     <Type alias="decimal" name="System.Decimal" />
     <Type alias="float" name="System.Single" />
     <Type alias="object" name="System.Object" />
-    
-    <Type alias="dynamic" name="Scripting.SSharp.Runtime.RuntimeObject"/>
-    
+
     <Type alias="Array" name="System.Collections.Generic.List`1[[System.Object]]" />   
     <Type alias="Expando" name="Scripting.SSharp.Runtime.Promotion.Expando" />
     <Type alias="Wrapper" name="Scripting.SSharp.Runtime.Promotion.ExpandoWrapper" />
@@ -44,22 +41,22 @@
   </Scopes>
 
   <Operators>
-    <Operator name="Plus" type="Scripting.SSharp.Runtime.Operators.AddOperator"/>
-    <Operator name="Minus" type="Scripting.SSharp.Runtime.Operators.SubOperator"/>
+    <Operator name="Plus" type="Scripting.SSharp.Runtime.Operators.PlusOperator"/>
+    <Operator name="Minus" type="Scripting.SSharp.Runtime.Operators.MinusOperator"/>
     <Operator name="Mod" type="Scripting.SSharp.Runtime.Operators.ModOperator"/>
     <Operator name="Div" type="Scripting.SSharp.Runtime.Operators.DivOperator"/>
     <Operator name="Mul" type="Scripting.SSharp.Runtime.Operators.MulOperator"/>
     <Operator name="Pow" type="Scripting.SSharp.Runtime.Operators.PowOperator"/>
 
     <Operator name="Less" type="Scripting.SSharp.Runtime.Operators.LessOperator"/>
-    <Operator name="LessEquals" type="Scripting.SSharp.Runtime.Operators.LessOrEqualsOperator"/>
-    <Operator name="Greater" type="Scripting.SSharp.Runtime.Operators.GreaterOperator"/>
-    <Operator name="GreaterEquals" type="Scripting.SSharp.Runtime.Operators.GreaterOrEqualsOperator"/>
+    <Operator name="LessEquals" type="Scripting.SSharp.Runtime.Operators.LqOperator"/>
+    <Operator name="Greater" type="Scripting.SSharp.Runtime.Operators.GrOperator"/>
+    <Operator name="GreaterEquals" type="Scripting.SSharp.Runtime.Operators.GqOperator"/>
     
     <Operator name="And" type="Scripting.SSharp.Runtime.Operators.AndOperator"/>
-    <Operator name="And2" type="Scripting.SSharp.Runtime.Operators.ConditionalAndOperator"/>
+    <Operator name="And2" type="Scripting.SSharp.Runtime.Operators.And2Operator"/>
     <Operator name="Or" type="Scripting.SSharp.Runtime.Operators.OrOperator"/>
-    <Operator name="Or2" type="Scripting.SSharp.Runtime.Operators.ConditionalOrOperator"/>
+    <Operator name="Or2" type="Scripting.SSharp.Runtime.Operators.Or2Operator"/>
     <Operator name="Equals" type="Scripting.SSharp.Runtime.Operators.EqualsOperator"/>
     <Operator name="NotEquals" type="Scripting.SSharp.Runtime.Operators.NotEqualsOperator"/>
 

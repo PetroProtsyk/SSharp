@@ -1,20 +1,4 @@
-﻿/*
- * Copyright © 2011, Petro Protsyk, Denys Vuika
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 using System.Reflection;
 
 namespace Scripting.SSharp.Runtime.Promotion
@@ -56,22 +40,26 @@ namespace Scripting.SSharp.Runtime.Promotion
     IBinding BindToMethod(object target, MethodInfo method, object[] arguments);
 
     /// <summary>
-    /// Binds to indexer
-    /// </summary>
-    /// <param name="target"></param>
-    /// <param name="arguments"></param>
-    /// <param name="setter"></param>
-    /// <returns></returns>
-    IBinding BindToIndex(object target, object[] arguments, bool setter);
-    
-    /// <summary>
     /// Binds to Field, Property of Event of a given object
     /// </summary>
     /// <param name="target"></param>
     /// <param name="memberName"></param>
     /// <returns></returns>
     IMemberBinding BindToMember(object target, string memberName, bool throwNotFound);
-        
+
+    /// <summary>
+    /// Binds to the indexer property
+    /// </summary>
+    /// <param name="target">target object</param>
+    /// <param name="arguments">parameters</param>
+    /// <param name="setter">if true binds to setter, elsewise binds to getter</param>
+    /// <returns>IObjectBind or null</returns>
+    IBinding BindToIndex(object target, object[] arguments, bool setter);
+
+    //object Get(string name, object instance, bool throwNotFound, params object[] arguments);
+
+    //object Set(string name, object instance, object value, bool throwNotFound, params object[] arguments);
+
     /// <summary>
     /// Converts value to target type
     /// </summary>
