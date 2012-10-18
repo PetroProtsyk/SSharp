@@ -67,5 +67,23 @@ namespace UnitTests
       object resultVal = result.Execute();
     }
 
+    [TestMethod]
+    public void VoidFunction() {
+        Script result =
+           Script.Compile(
+           @"
+            function f(){
+            };
+
+            i = 1;
+            f();
+          "
+           );
+
+        object resultVal = result.Execute();
+
+        Assert.AreEqual(RuntimeHost.NullValue, resultVal);
+    }
+
   }
 }
