@@ -487,6 +487,18 @@ namespace UnitTests
     }
 
     [TestMethod]
+    public void NotEqualsOperator()
+    {
+        object resultVal =
+         Script.RunCode(
+         @"
+            return ((byte)0) != ((int)0);
+        ");
+
+        Assert.IsFalse((bool)resultVal);
+    }
+
+    [TestMethod]
     public void CreatingGlobalVariableDifferentCases()
     {
       IScriptContext context = new ScriptContext();
@@ -557,14 +569,14 @@ namespace UnitTests
              {//Local scope 2
 
                //This will set variable to top-most scope which contains 
-               //definition for variable, which is Local scope 1              
+               //definition for variable, which is Local scope 1
                a = 5;
                 
                { //Local scope 3
                  
                  var a; //Create empty variable in local scope 3
-             
-                 //This will set variable to top-most scope which contains 
+
+                //This will set variable to top-most scope which contains 
                  //definition for variable, which is Local scope 1
                  global:a = 4;
                  

@@ -40,7 +40,7 @@ namespace Scripting.SSharp.Runtime.Operators
 
     public object Evaluate(object left, object right)
     {
-      return !Equals(left, right);
+        return DynamicMath.Neq(left, right);
     }
   }
 }

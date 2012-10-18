@@ -106,6 +106,10 @@ namespace Scripting.SSharp
       return ((left == right) || (((left != null) && (right != null)) && left.Equals(right)));
     }
 
+    public static bool Neq(dynamic left, dynamic right) {
+        return !Eq(left, right);
+    }
+
     public static dynamic Add(dynamic left, dynamic right)
     {
       Tuple<dynamic, dynamic> converted = TryConvert(left, right);
@@ -190,7 +194,7 @@ namespace Scripting.SSharp
       return left / right;
     }
 
-    public static bool And(dynamic left, dynamic right)
+    public static dynamic And(dynamic left, dynamic right)
     {
       return left & right;
     }
@@ -200,7 +204,7 @@ namespace Scripting.SSharp
       return left && right;
     }
 
-    public static bool Or(dynamic left, dynamic right)
+    public static dynamic Or(dynamic left, dynamic right)
     {
       return left | right;
     }
