@@ -13,10 +13,12 @@ public class Configurations
    {
       ScriptConfiguration cf = new ScriptConfiguration();
       cf.References.Add(new Reference("System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",true));
+      cf.References.Add(new Reference("System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",true));
       
 
       cf.Types.Add(new TypeXml() { Alias = "string", QualifiedName = "System.String" });
       cf.Types.Add(new TypeXml() { Alias = "int", QualifiedName = "System.Int32" });
+      cf.Types.Add(new TypeXml() { Alias = "byte", QualifiedName = "System.Byte" });
       cf.Types.Add(new TypeXml() { Alias = "long", QualifiedName = "System.Int64" });
       cf.Types.Add(new TypeXml() { Alias = "Char", QualifiedName = "System.Char" });
       cf.Types.Add(new TypeXml() { Alias = "bool", QualifiedName = "System.Boolean" });

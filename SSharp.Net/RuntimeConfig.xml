@@ -9,10 +9,11 @@
   <Types>
     <Type alias="string" name="System.String" />
     <Type alias="int" name="System.Int32" />
+    <Type alias="byte" name="System.Byte" />
     <Type alias="long" name="System.Int64" />
     <Type alias="Char" name="System.Char" />
     <Type alias="bool" name="System.Boolean" />
-    <Type alias="boolean" name="System.Boolean" />    
+    <Type alias="boolean" name="System.Boolean" />
     <Type alias="double" name="System.Double" />
     <Type alias="decimal" name="System.Decimal" />
     <Type alias="float" name="System.Single" />

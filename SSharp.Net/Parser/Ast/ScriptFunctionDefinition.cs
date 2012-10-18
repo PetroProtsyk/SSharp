@@ -102,7 +102,7 @@ namespace Scripting.SSharp.Parser.Ast
 
         var functionScope = (INotifyingScope)RuntimeHost.ScopeFactory.Create(ScopeTypes.Function, context.Scope, context);
         context.CreateScope(functionScope);
-      
+
         try
         {
           if (_parameters != null)
@@ -151,7 +151,7 @@ namespace Scripting.SSharp.Parser.Ast
 
       if (globalNames.Contains(args.Name))
       {
-        ScriptQualifiedName.SetToParentScope(sender.Parent, args.Name, args.Value);        
+        ScriptQualifiedName.SetToParentScope(sender.Parent, args.Name, args.Value);
         args.Cancel = true;
       }
 
@@ -174,7 +174,6 @@ namespace Scripting.SSharp.Parser.Ast
         _globalList.Evaluate(context);
         globalNames = new List<string>((string[]) context.Result);
       }
-
       return globalNames;
     }
 
@@ -218,10 +217,10 @@ namespace Scripting.SSharp.Parser.Ast
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldloc_0);
         il.EmitCall(OpCodes.Call, invokeMethod, null);
-                
+
         //convert to return type
         //il.Emit(OpCodes.Castclass, delegateInvokeMethod.ReturnType);
-        //il.Emit(OpCodes.Unbox_Any);      
+        //il.Emit(OpCodes.Unbox_Any);
         il.Emit(OpCodes.Ret);
 
         FunctionDelegate result = new FunctionDelegate();
@@ -252,8 +251,8 @@ namespace Scripting.SSharp.Parser.Ast
     public override string ToString()
     {
       return Name == null ? "_anonimous_func" : "_func:" + Name;
-    }    
     }
+  }
 
   internal class FunctionDelegate {
       public ScriptFunctionDefinition Function { get; set; }
