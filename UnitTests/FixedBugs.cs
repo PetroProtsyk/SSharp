@@ -481,7 +481,27 @@ namespace UnitTests
         ");
         var c = s.Execute();
         Assert.AreEqual("", c);
-    }  
+    }
+
+    [TestMethod]
+    public void SettingPublicProperty() {
+      var result = Script.RunCode(@"
+         var d = new PropertiesDerived();
+         d.ModifiedOnPublicSetter = DateTime.Now;
+         return d.ModifiedOnPublicSetter;
+      ");
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void SettingPrivateProperty() {
+        var result = Script.RunCode(@"
+         var d = new PropertiesDerived();
+         d.ModifiedOn = DateTime.Now;
+         return d.ModifiedOn;
+      ");
+    }
+
   }
 
   #region Interfaces
@@ -569,6 +589,16 @@ namespace UnitTests
       public string Instance = "Test1";
     }
   }
+
+    public class PropertiesTest {
+        public DateTime ModifiedOn { get; private set; }
+
+        public DateTime ModifiedOnPublicSetter { get; set; }
+    }
+
+    public class PropertiesDerived : PropertiesTest {
+    }
+
   #endregion
 
   #region Helpers
