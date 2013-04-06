@@ -37,12 +37,15 @@ namespace Scripting.SSharp.Parser.Ast
     public ScriptConstExpr(AstNodeArgs args)
         : base(args)
     {
-      var cons = (TokenAst)ChildNodes[0];
-      Value = cons.Value;
+      TokenAst constant = (TokenAst)ChildNodes[0];
+      Value = constant.Value;
 
-      if (Value.Equals("true")) Value = true;
-      if (Value.Equals("false")) Value = false;
-      if (Value.Equals("null")) Value = null;
+      if (constant.IsKeyword)
+      {
+        if (Value.Equals("true")) Value = true;
+        else if (Value.Equals("false")) Value = false;
+        else if (Value.Equals("null")) Value = null;
+      }
     }
 
     public override void Evaluate(IScriptContext context)

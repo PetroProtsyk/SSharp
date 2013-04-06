@@ -502,6 +502,17 @@ namespace UnitTests
       ");
     }
 
+    [TestMethod]
+    public void TrueConstant() {
+        Assert.IsInstanceOfType(Script.RunCode("return true;"), typeof(bool));
+        Assert.IsInstanceOfType(Script.RunCode("return false;"), typeof(bool));
+        Assert.IsNull(Script.RunCode("return null;"));
+
+        Assert.IsInstanceOfType(Script.RunCode("return \"true\";"), typeof(string));
+        Assert.IsInstanceOfType(Script.RunCode("return \"false\";"), typeof(string));
+        Assert.IsInstanceOfType(Script.RunCode("return \"null\";"), typeof(string));
+    }
+
   }
 
   #region Interfaces
