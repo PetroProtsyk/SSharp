@@ -35,20 +35,9 @@ namespace Scripting.SSharp.Runtime
         Parent.SetItem(id, value);
     }
 
-    public void CreateVariable(string id, object value)
+    public override void CreateVariable(string id, object value)
     {
       base.SetItem(id, value);
-    }
-
-    protected override void Cleanup()
-    {
-      try
-      {
-      }
-      finally
-      {
-        base.Cleanup();
-      }
     }
   }
 }

@@ -21,10 +21,6 @@ namespace Scripting.SSharp.Runtime
   /// </summary>
   public class FunctionScope : ScriptScope, INotifyingScope
   {
-    #region Fields
-    public bool SearchHierarchy { get; set; }
-    #endregion
-
     #region Constructors
     /// <summary>
     /// Default Constructor
@@ -38,7 +34,7 @@ namespace Scripting.SSharp.Runtime
     #region Methods
     public override object GetItem(string id, bool throwException)
     {
-      var args = new ScopeArgs(id, RuntimeHost.NullValue);
+      var args = new ScopeArgs(id, RuntimeHost.NullValue, ScopeOperation.Get);
 
       OnBeforeGetItem(args);
       if (args.Cancel)
@@ -61,9 +57,9 @@ namespace Scripting.SSharp.Runtime
 
     public override void SetItem(string id, object value)
     {
-      var args = new ScopeArgs(id, value);
+      var args = new ScopeArgs(id, value, ScopeOperation.Set);
 
-      OnBeforeSetItem(args);    
+      OnBeforeSetItem(args);
       if (args.Cancel) return;
 
       base.SetItem(id, args.Value);
@@ -71,6 +67,21 @@ namespace Scripting.SSharp.Runtime
       OnAfterSetItem(args);
       if (args.Cancel)
       {
+        throw new ScriptIdNotFoundException(string.Format(Strings.IdProcessingCanceledByUser, id));
+      }
+    }
+
+    public override void CreateVariable(string id, object value)
+    {
+      var args = new ScopeArgs(id, value, ScopeOperation.Create);
+
+      OnBeforeSetItem(args);
+      if (args.Cancel) return;
+
+      base.CreateVariable(id, value);
+
+      OnAfterSetItem(args);
+      if (args.Cancel) {
         throw new ScriptIdNotFoundException(string.Format(Strings.IdProcessingCanceledByUser, id));
       }
     }

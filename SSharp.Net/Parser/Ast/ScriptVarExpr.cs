@@ -38,11 +38,10 @@ namespace Scripting.SSharp.Parser.Ast
 
     public override void Evaluate(IScriptContext context)
     {
-      var local = context.Scope as LocalScope;
-      if (local != null)
-        local.CreateVariable(_identifier, null);
-      else
-        context.SetItem(_identifier, null);
+      if (context.Scope == null)
+        throw new ScriptExecutionException("Null scope");
+
+      context.Scope.CreateVariable(_identifier, null);
     }
   }
 }

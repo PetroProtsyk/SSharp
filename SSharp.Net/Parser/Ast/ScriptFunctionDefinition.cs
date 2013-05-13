@@ -34,6 +34,7 @@ namespace Scripting.SSharp.Parser.Ast
     private readonly ScriptGlobalList _globalList;
     private readonly ScriptCompoundStatement _body;
     private IScriptContext _activeContext;
+    private List<string> _globalNames;
 
     //Field used to ensure consistency
     internal Script _owner;
@@ -111,6 +112,8 @@ namespace Scripting.SSharp.Parser.Ast
             _parameters.Evaluate(context);
           }
 
+          _globalNames = GetGlobalNames(_activeContext);
+
           functionScope.BeforeSetItem += ScopeBeforeSetItem;
 
           if (_contract != null)
@@ -146,19 +149,22 @@ namespace Scripting.SSharp.Parser.Ast
 
     private void ScopeBeforeSetItem(IScriptScope sender, ScopeArgs args)
     {
-      //TODO: Performance improvement. Should be evaluated once per function call
-      List<string> globalNames = GetGlobalNames(_activeContext);
-
-      if (globalNames.Contains(args.Name))
+      if (_globalNames.Contains(args.Name))
       {
-        ScriptQualifiedName.SetToParentScope(sender.Parent, args.Name, args.Value);
-        args.Cancel = true;
-      }
+        switch (args.Operation)
+        {
+          case ScopeOperation.Set:
+              ScriptQualifiedName.SetToParentScope(sender.Parent, args.Name, args.Value);
+              args.Cancel = true;
+              break;
 
-      //if (!sender.HasVariable(args.Name))
-      //{
-      //  args.Cancel = SetToParentScope(sender.Parent, args.Name, args.Value);
-      //}
+          case ScopeOperation.Create:
+              throw new ScriptExecutionException(string.Format(Strings.LocalIdConflictWithGlobalList, args.Name));
+
+          default:
+              break;
+        }
+      }
     }
 
     private void CheckContractInvariant(object sender, ScopeArgs args)

@@ -32,6 +32,14 @@ namespace Scripting.SSharp.Runtime
     event ScopeSetEvent AfterSetItem;
   }
 
+  public enum ScopeOperation
+  {
+      None,
+      Get,
+      Set,
+      Create
+  }
+
   public class ScopeArgs : EventArgs
   {
     public string Name { get; private set; }
@@ -40,11 +48,14 @@ namespace Scripting.SSharp.Runtime
 
     public bool Cancel { get; set; }
 
-    public ScopeArgs(string name, object value)
+    public ScopeOperation Operation { get; private set; }
+
+    public ScopeArgs(string name, object value, ScopeOperation operation)
     {
       Name = name;
       Value = value;
       Cancel = false;
+      Operation = operation;
     }
   }
 

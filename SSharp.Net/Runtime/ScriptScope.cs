@@ -159,6 +159,10 @@ namespace Scripting.SSharp.Runtime
       return _vars[id];
     }
 
+    public virtual void CreateVariable(string id, object value)
+    {
+        SetItem(id, value);
+    }
     #endregion
 
     #region Functions

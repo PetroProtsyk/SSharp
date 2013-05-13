@@ -82,5 +82,37 @@ namespace UnitTests
       Assert.AreEqual(2, context.GetItem("b", true));
     }
 
+    [TestMethod]
+    [ExpectedException(typeof(ScriptExecutionException))]
+    public void RedefineGlobalVariableInFunctionNotAllowed()
+    {
+        var result = Script.RunCode(@"
+         var x = 5;
+         function f() global(x)
+         {
+             var x;
+         } 
+         f();
+         return x;
+      ");
+    }
+
+    [TestMethod]
+    public void RedefineVariableInFunction() {
+        ScriptContext context = new ScriptContext();
+        var result = Script.RunCode(@"
+         var x = 5;
+         function f()
+         {
+             var x;
+             x = 10;
+         } 
+         f();
+         return x;
+      ", context);
+
+      Assert.AreEqual(5, context.GetItem("x", true));
+    }
+
   }
 }

@@ -47,6 +47,7 @@ namespace Scripting.SSharp
     public const string FunctionNotFound = "Function '{0}' not found";
     public const string VariableNotFound = "Variable '{0}' not found";
     public const string DuplicateEventSubscriptionError = "Duplicate event subscription is not supported";
+    public const string LocalIdConflictWithGlobalList = "Cannot create local variable \"{0}\" when it is defined in function global list";
 
     public const string VerificationNonBoolean = "Condition expression evaluates non boolean value";
     public const string VerificationPreCondition = "Pre condition for function call failed, function '{0}' in code '{1}'";

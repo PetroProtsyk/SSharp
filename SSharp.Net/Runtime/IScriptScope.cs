@@ -44,6 +44,13 @@ namespace Scripting.SSharp.Runtime
     void SetItem(string id, object value);
 
     /// <summary>
+    /// Create a new variable in this scope
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="value"></param>
+    void CreateVariable(string id, object value);
+
+    /// <summary>
     /// Returns true if excatly this scope has variable with given id
     /// </summary>
     /// <param name="id"></param>
