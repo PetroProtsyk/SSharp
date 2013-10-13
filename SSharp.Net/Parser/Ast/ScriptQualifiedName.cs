@@ -230,10 +230,9 @@ namespace Scripting.SSharp.Parser.Ast
         return;
       }
 
-      var scope = context.Scope as LocalScope;
-      if (IsVar && scope != null)
+      if (IsVar && ((context.Scope is LocalScope) || (context.Scope is FunctionScope)))
       {
-        scope.CreateVariable(_identifier, value);
+        context.Scope.CreateVariable(_identifier, value);
         return;
       }
 

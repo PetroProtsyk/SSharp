@@ -98,6 +98,23 @@ namespace UnitTests
     }
 
     [TestMethod]
+    [ExpectedException(typeof(ScriptExecutionException))]
+    public void ReassignGlobalVariableInFunctionNotAllowed() {
+        ScriptContext context = new ScriptContext();
+        var result = Script.RunCode(@"
+         var x = 5;
+         function f() global (x)
+         {
+             var x = 10;
+         } 
+         f();
+         return x;
+      ", context);
+
+        Assert.AreEqual(5, context.GetItem("x", true));
+    }
+
+    [TestMethod]
     public void RedefineVariableInFunction() {
         ScriptContext context = new ScriptContext();
         var result = Script.RunCode(@"
@@ -113,6 +130,5 @@ namespace UnitTests
 
       Assert.AreEqual(5, context.GetItem("x", true));
     }
-
   }
 }
