@@ -21,6 +21,6 @@ the default behavior of script run-time by an xml configuration, replacing
 binding behavior to methods, properties, constructors of native .NET types; 
 name, function and type resolving and much more.
 
-[S# Manual](000-Overview)
+[S# Manual](SSharp/wiki/000-Overview)
 
 Web: http://www.protsyk.com/scriptdotnet
