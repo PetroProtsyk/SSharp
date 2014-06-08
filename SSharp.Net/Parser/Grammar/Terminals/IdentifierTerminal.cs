@@ -23,7 +23,7 @@ namespace Scripting.SSharp.Parser.FastGrammar
   internal sealed class IdentifierTerminal : RegexBasedTerminal
   {
     #region Fields
-    private const string AllLatinLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private const string AllLatinLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
     private const string Pattern = "(?<prefix>global:)?(?<body>[_A-Za-z][_A-Za-z0-9]*)";
     private static readonly List<string> Firsts = new List<string>();
     private readonly HashSet<string> _keywords = new HashSet<string>();

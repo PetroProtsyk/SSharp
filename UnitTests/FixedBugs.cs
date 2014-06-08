@@ -513,6 +513,19 @@ namespace UnitTests
         Assert.IsInstanceOfType(Script.RunCode("return \"null\";"), typeof(string));
     }
 
+    [TestMethod]
+    public void UnderscoreIdentifier() {
+        var result = Script.RunCode(@" var _y = 5;
+                                       return _y;");
+        Assert.AreEqual(5, result);
+    }
+
+    [TestMethod]
+    public void UnderscoreFunction() {
+        var result = Script.RunCode(@" function _y() { return 5; };
+                                       return _y();");
+        Assert.AreEqual(5, result);
+    }
   }
 
   #region Interfaces

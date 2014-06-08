@@ -6643,6 +6643,8 @@ namespace Scripting.SSharp.Parser.FastGrammar
       Scanner.TerminalsLookup.Add((char)121, tl);
       tl = new TerminalList() { v, };
       Scanner.TerminalsLookup.Add((char)122, tl);
+      tl = new TerminalList() { v, };
+      Scanner.TerminalsLookup.Add((char)95, tl);
       tl = new TerminalList() { n, n, };
       Scanner.TerminalsLookup.Add((char)48, tl);
       tl = new TerminalList() { n, };
