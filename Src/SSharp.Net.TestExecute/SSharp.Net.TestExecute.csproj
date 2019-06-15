@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Authors>Petro Protsyk, Denis Vuyka</Authors>
+    <Product>S# Test Executor</Product>
+    <Copyright>Copyright © 2007-2011 Petro Protsyk, Denis Vuyka</Copyright>
+    <Version>0.9.1</Version>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SSharp.Net\SSharp.Net.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Authors>Petro Protsyk, Denis Vuyka</Authors>
+    <Product>S#</Product>
+    <Copyright>Copyright © 2007-2011 Petro Protsyk, Denis Vuyka</Copyright>
+    <Version>0.9.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="RuntimeConfig.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="RuntimeConfig.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ConfigGenerator.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ConfigGenerator.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ConfigGenerator.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ConfigGenerator.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

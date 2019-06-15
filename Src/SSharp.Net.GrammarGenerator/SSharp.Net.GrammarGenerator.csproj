@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Authors>Petro Protsyk, Denis Vuyka</Authors>
+    <Product>S# Grammar Generator</Product>
+    <Copyright>Copyright © 2007-2011 Petro Protsyk, Denis Vuyka</Copyright>
+    <Version>0.9.1</Version>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+  </PropertyGroup>
+
+</Project>
