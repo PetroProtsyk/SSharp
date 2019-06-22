@@ -14,6 +14,6 @@ name, function and type resolving and much more.
 
 # Copyrights
 
-Copyright (c) 2007 Petro Protsyk
-Copyright (c) 2008-2011, Petro Protsyk, Denys Vuika
-Copyright (c) 2012-2019 Petro Protsyk
+* Copyright (c) 2007 Petro Protsyk
+* Copyright (c) 2008-2011, Petro Protsyk, Denys Vuika
+* Copyright (c) 2012-2019 Petro Protsyk
