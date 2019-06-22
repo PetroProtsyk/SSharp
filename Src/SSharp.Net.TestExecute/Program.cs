@@ -30,7 +30,7 @@ namespace Debug.TestExecute
 
       RuntimeHost.Initialize();
 
-      TypeLine("Elapsed time:" + sw.ElapsedMilliseconds, ConsoleColor.White);
+      TypeLine("Elapsed time:" + sw.Elapsed, ConsoleColor.White);
       TypeLine("Pass 1: Parsing files", ConsoleColor.Yellow);
 
       DirectoryInfo dir = new DirectoryInfo(args[0]);
@@ -65,7 +65,7 @@ namespace Debug.TestExecute
           s.Context.SetItem("Test", new Test());
           object rez = s.Execute();
           //TypeLine("Execute:" + file.Name + " success, result [" + (rez == null ? "Null" : rez.ToString()) + "] elapsed time:" + sw.ElapsedMilliseconds, ConsoleColor.Gray);
-          TypeLine(file.Name + ";success;" + sw.ElapsedMilliseconds, ConsoleColor.Gray);
+          TypeLine(file.Name + ";success;" + sw.Elapsed, ConsoleColor.Gray);
         }
         catch (Exception e)
         {
@@ -77,7 +77,7 @@ namespace Debug.TestExecute
 
       if (execErr + parsingErr == 0)
       {
-        TypeLine("Done, all " + total + " tests passed, time " + totalTime.ElapsedMilliseconds, ConsoleColor.Green);
+        TypeLine("Done, all " + total + " tests passed, time " + totalTime.Elapsed, ConsoleColor.Green);
         return 0;
       }
       else

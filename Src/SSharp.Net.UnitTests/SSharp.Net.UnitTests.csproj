@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <Authors>Petro Protsyk, Denis Vuyka</Authors>
-    <Product>S# Grammar Generator</Product>
-    <Copyright>Copyright � 2007-2011 Petro Protsyk, Denis Vuyka</Copyright>
-    <Version>0.9.1</Version>
     <IsPackable>false</IsPackable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\AssemblyVersionInfo.cs" Link="Properties\AssemblyVersionInfo.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="TestConfig.xml" />
