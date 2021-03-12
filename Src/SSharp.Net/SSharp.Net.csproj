@@ -17,6 +17,12 @@
     <Configurations>Debug;Release;Debug_NET4;Release_NET4</Configurations>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="bin\Release\netcoreapp3.1\SSharp.Net.dll" Pack="true" PackagePath="lib\netcoreapp3.1\SSharp.Net.dll" />
+    <None Include="bin\Release_NET4\net48\SSharp.Net.dll" Pack="true" PackagePath="lib\net48\SSharp.Net.dll" />
+    <Content Include="build\SSharp.Net.targets" Pack="true" PackagePath="build\SSharp.Net.targets" />
+  </ItemGroup>
+
   <ItemGroup Condition=" '$(Configuration)' == 'Debug_NET4' OR '$(Configuration)' == 'Release_NET4' ">
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
