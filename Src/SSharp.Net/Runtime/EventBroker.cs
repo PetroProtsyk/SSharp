@@ -80,10 +80,19 @@ namespace Scripting.SSharp.Runtime
 
     internal static void ClearMapping(Script script)
     {
-      var toRemove = MethodContextMapping.Keys.Where(handler => MethodContextMapping[handler] == script).ToList();
-
-      foreach (var handler in toRemove)
-        MethodContextMapping.Remove(handler);
+      RuntimeHost.Lock();
+      try
+      {
+       var toRemove = MethodContextMapping.Keys.Where(handler => MethodContextMapping[handler] == script).ToList();
+       foreach (var handler in toRemove)
+       {
+         MethodContextMapping.Remove(handler);
+       }
+      }
+      finally
+      {
+       RuntimeHost.UnLock();
+      }
     }
 
     public static void ClearAllSubscriptions()
