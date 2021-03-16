@@ -1,29 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug_NET4' OR '$(Configuration)' == 'Release_NET4' ">
-    <TargetFramework>net48</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' OR '$(Configuration)' == 'Release' ">
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+  <PropertyGroup>
+    <!-- https://docs.microsoft.com/en-us/dotnet/standard/frameworks -->
+    <TargetFrameworks>netcoreapp3.1;net48;net5.0</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-    <Version>4.0.1</Version>
+    <!-- https://docs.microsoft.com/en-us/nuget/reference/msbuild-targets -->
+    <!-- This version should be in sync with Assembly version -->
+    <!-- The first and the last two numbers -->
+    <Version>4.1.1</Version>
     <Authors>Petro Protsyk</Authors>
+    <RepositoryUrl>https://github.com/PetroProtsyk/SSharp</RepositoryUrl>
+    <Description>Script.NET or S# is a scripting language for .NET applications which allows to customize behavior of your .NET applications, interact with native .NET objects, types and assemblies.</Description>
     <PackageId>SSharp.Net</PackageId>
-    <Configurations>Debug;Release;Debug_NET4;Release_NET4</Configurations>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="bin\Release\netcoreapp3.1\SSharp.Net.dll" Pack="true" PackagePath="lib\netcoreapp3.1\SSharp.Net.dll" />
-    <None Include="bin\Release_NET4\net48\SSharp.Net.dll" Pack="true" PackagePath="lib\net48\SSharp.Net.dll" />
-    <Content Include="build\SSharp.Net.targets" Pack="true" PackagePath="build\SSharp.Net.targets" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(Configuration)' == 'Debug_NET4' OR '$(Configuration)' == 'Release_NET4' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
